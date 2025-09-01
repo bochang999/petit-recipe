@@ -1,5 +1,4 @@
 // Service Worker for PWA Template
-const CACHE_NAME = 'pwa-template-v1.0.0';
 const STATIC_CACHE_NAME = 'pwa-template-static-v1.0.0';
 const DYNAMIC_CACHE_NAME = 'pwa-template-dynamic-v1.0.0';
 

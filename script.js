@@ -20,7 +20,7 @@ class PetitRecipe {
         this.showRecipeList();
         
         // URL変更の監視（簡易ルーティング）
-        window.addEventListener('popstate', (event) => {
+        window.addEventListener('popstate', () => {
             this.handleRoute();
         });
         

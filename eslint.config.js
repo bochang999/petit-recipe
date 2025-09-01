@@ -11,6 +11,13 @@ export default [
       globals: {
         ...globals.browser,
       }
+    },
+    rules: {
+      "no-unused-vars": ["warn", { 
+        "args": "none", 
+        "varsIgnorePattern": "^_",
+        "caughtErrors": "none"
+      }]
     }
   },
   // sw.jsファイルには特別にサービスワーカー環境を適用

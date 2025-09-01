@@ -140,9 +140,10 @@ jobs:
 
     - name: Initialize and Sync Capacitor Project
       run: |
-        echo "🔄 Capacitor同期開始"
+        echo "🔄 Capacitorプロジェクト準備開始"
+        npx cap add android
         npx cap sync android
-        echo "✅ Capacitor同期完了"
+        echo "✅ Capacitorプロジェクト準備完了"
 
     - name: Generate App Icons and Splash Screens (Capacitor Assets)
       run: |

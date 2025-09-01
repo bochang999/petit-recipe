@@ -2,7 +2,7 @@ name: Build PWA APK
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, feature/milestone-1-complete ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:

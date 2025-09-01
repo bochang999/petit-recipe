@@ -134,7 +134,7 @@ jobs:
         
         # distディレクトリ作成とファイルコピー
         mkdir -p dist
-        cp index.html style.css script.js manifest.json sw.js config.js dist/
+        cp index.html style.css script.js manifest.json sw.js dist/
         
         echo "✅ ウェブアセット準備完了"
 

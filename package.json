@@ -1,6 +1,7 @@
 {
   "name": "petit-recipe",
   "version": "1.0.0",
+  "type": "module",
   "description": "シンプルで使いやすいデジタルレシピ帳アプリ",
   "main": "index.html",
   "scripts": {

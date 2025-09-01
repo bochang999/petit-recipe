@@ -1,17 +1,25 @@
+import globals from "globals";
+import js from "@eslint/js";
+
 export default [
-    {
-        languageOptions: {
-            ecmaVersion: 2022,
-            sourceType: "module",
-            globals: {
-                window: "readonly", document: "readonly", console: "readonly",
-                localStorage: "readonly", history: "readonly", navigator: "readonly"
-            }
-        },
-        rules: {
-            "no-unused-vars": ["warn", { "args": "none" }],
-            "no-undef": "error",
-            "quotes": ["warn", "single", { "allowTemplateLiterals": true }]
-        }
+  // ESLintの推奨ルールを適用
+  js.configs.recommended,
+  // すべてのJSファイルにブラウザ環境を適用
+  {
+    files: ["**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      }
     }
+  },
+  // sw.jsファイルには特別にサービスワーカー環境を適用
+  {
+    files: ["sw.js"],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+      }
+    }
+  }
 ];

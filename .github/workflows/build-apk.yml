@@ -55,6 +55,8 @@ jobs:
         echo "✅ 依存関係インストール完了"
 
     - name: Run Lint and Format Check
+      env:
+        ESLINT_USE_FLAT_CONFIG: true
       run: |
         npm run lint
         npm run format -- --check

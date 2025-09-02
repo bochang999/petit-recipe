@@ -15,7 +15,7 @@ export default [
     rules: {
       "no-unused-vars": ["warn", { 
         "args": "none", 
-        "varsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_|showScreen",
         "caughtErrors": "none"
       }]
     }

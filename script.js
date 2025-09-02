@@ -1,39 +1,15 @@
-// ===== Petit Recipe with RecipeBox UI =====
+// Petit Recipe App JavaScript - RecipeBox UI Integration
 
-// データアダプタークラス: petit-recipe形式をRecipeBox形式に変換
-class DataAdapter {
-    static petitToRecipeBox(petitRecipe) {
-        return {
-            id: `recipe_${petitRecipe.id}`,
-            name: petitRecipe.title,
-            category: 'main', // デフォルト
-            createdAt: '2024-01-01',
-            updatedAt: '2024-01-01',
-            servings: parseInt(petitRecipe.servings) || 1,
-            cookTime: petitRecipe.cookTime || '30分',
-            difficulty: petitRecipe.difficulty || '初級',
-            ingredients: petitRecipe.ingredients.map(ing => {
-                const match = ing.match(/^(.+?)\s+(\d+(?:\.\d+)?)\s*(\w+)$/);
-                if (match) {
-                    return { name: match[1], amount: parseFloat(match[2]), unit: match[3] };
-                } else {
-                    return { name: ing, amount: 1, unit: '個' };
-                }
-            }),
-            steps: petitRecipe.instructions || []
-        };
-    }
-}
-
-// RecipeBox互換のメインアプリケーションクラス
-class PetitRecipe {
+class PetitRecipeApp {
     constructor() {
         this.recipes = [];
-        this.currentScreen = 'main-screen';
+        this.filteredRecipes = [];
+        this.currentRecipe = null;
+        this.currentPortion = 1;
+        this.currentScreen = 'recipes-screen';
         this.init();
     }
 
-    // 初期化
     async init() {
         console.log('🍳 Petit Recipe with RecipeBox UI 初期化開始');
         
@@ -44,8 +20,7 @@ class PetitRecipe {
         this.setupEventListeners();
         
         // 初期画面表示
-        this.showScreen('recipes-screen'); // 直接レシピ画面へ
-        this.renderRecipesList();
+        this.renderRecipes();
         
         console.log('✅ Petit Recipe 初期化完了');
     }
@@ -57,7 +32,8 @@ class PetitRecipe {
             const petitRecipes = await response.json();
             
             // petit-recipe形式をRecipeBox形式に変換
-            this.recipes = petitRecipes.map(recipe => DataAdapter.petitToRecipeBox(recipe));
+            this.recipes = petitRecipes.map(recipe => this.convertPetitToRecipeBox(recipe));
+            this.filteredRecipes = [...this.recipes];
             
             console.log('📖 レシピデータ読み込み完了:', this.recipes.length + '件');
         } catch (error) {
@@ -73,7 +49,64 @@ class PetitRecipe {
                 cookTime: "30分",
                 difficulty: "初級"
             }];
+            this.filteredRecipes = [...this.recipes];
         }
+    }
+
+    // petit-recipe形式をRecipeBox形式に変換
+    convertPetitToRecipeBox(petitRecipe) {
+        return {
+            id: `recipe_${petitRecipe.id}`,
+            name: petitRecipe.title,
+            category: this.getCategoryFromTitle(petitRecipe.title),
+            createdAt: '2024-01-01',
+            updatedAt: '2024-01-01',
+            servings: parseInt(petitRecipe.servings) || 1,
+            cookTime: petitRecipe.cookTime || '30分',
+            difficulty: petitRecipe.difficulty || '初級',
+            ingredients: this.parseIngredients(petitRecipe.ingredients || []),
+            steps: petitRecipe.instructions || [],
+            yield: `${petitRecipe.servings}人前`,
+            versions: [
+                { version: '1.0', date: '2024-01-01', changes: '初版作成' }
+            ]
+        };
+    }
+
+    // 材料の解析
+    parseIngredients(ingredients) {
+        return ingredients.map(ing => {
+            if (typeof ing === 'string') {
+                const match = ing.match(/^(.+?)\s+([\d.]+)\s*(\S+)$/);
+                if (match) {
+                    return { 
+                        name: match[1], 
+                        amount: parseFloat(match[2]), 
+                        unit: match[3] 
+                    };
+                } else {
+                    return { name: ing, amount: 1, unit: '個' };
+                }
+            }
+            return ing; // すでにオブジェクト形式の場合
+        });
+    }
+
+    // タイトルからカテゴリを推測
+    getCategoryFromTitle(title) {
+        if (!title) return 'main';
+        const lowerTitle = title.toLowerCase();
+        
+        if (lowerTitle.includes('プリン') || lowerTitle.includes('ケーキ') || lowerTitle.includes('チョコ')) {
+            return 'dessert';
+        }
+        if (lowerTitle.includes('タレ') || lowerTitle.includes('ソース') || lowerTitle.includes('ドレッシング')) {
+            return 'sauce';
+        }
+        if (lowerTitle.includes('ジュース') || lowerTitle.includes('茶') || lowerTitle.includes('コーヒー')) {
+            return 'drink';
+        }
+        return 'main';
     }
 
     // イベントリスナー設定
@@ -82,55 +115,47 @@ class PetitRecipe {
         const searchInput = document.getElementById('recipe-search');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
-                this.filterRecipes(e.target.value);
+                this.searchRecipes(e.target.value);
             });
         }
 
-        // ソート機能
-        const sortTabs = document.querySelectorAll('.sort-tab');
-        sortTabs.forEach(tab => {
+        // ソートタブ
+        document.querySelectorAll('.sort-tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 // アクティブタブの切り替え
-                sortTabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('active'));
                 e.target.classList.add('active');
                 
                 const sortType = e.target.dataset.sort;
                 this.sortRecipes(sortType);
             });
         });
-    }
 
-    // 画面切り替え
-    showScreen(screenId) {
-        // すべての画面を非表示
-        document.querySelectorAll('.screen').forEach(screen => {
-            screen.classList.remove('active');
-        });
-        
-        // 指定された画面を表示
-        const targetScreen = document.getElementById(screenId);
-        if (targetScreen) {
-            targetScreen.classList.add('active');
-            this.currentScreen = screenId;
+        // 分量調整スライダー
+        const portionSlider = document.getElementById('portion-slider');
+        if (portionSlider) {
+            portionSlider.addEventListener('input', (e) => {
+                this.updatePortion(e.target.value);
+            });
         }
     }
 
     // レシピ一覧の表示
-    renderRecipesList() {
-        const recipesListContainer = document.getElementById('recipes-list');
-        if (!recipesListContainer) return;
+    renderRecipes() {
+        const recipesList = document.getElementById('recipes-list');
+        if (!recipesList) return;
 
-        if (this.recipes.length === 0) {
-            recipesListContainer.innerHTML = '<div class="no-recipes">レシピがありません</div>';
+        if (this.filteredRecipes.length === 0) {
+            recipesList.innerHTML = '<div class="no-recipes">レシピがありません</div>';
             return;
         }
 
-        const recipeCards = this.recipes.map(recipe => {
-            const difficultyClass = recipe.difficulty.replace('級', '').toLowerCase();
+        const recipesHtml = this.filteredRecipes.map(recipe => {
             const categoryIcon = this.getCategoryIcon(recipe.category);
+            const difficultyClass = recipe.difficulty ? recipe.difficulty.replace('級', '').toLowerCase() : '';
             
             return `
-                <div class="recipe-card" onclick="petitRecipe.showRecipeDetail('${recipe.id}')">
+                <div class="recipe-card" onclick="app.showRecipeDetail('${recipe.id}')">
                     <div class="recipe-header">
                         <div class="recipe-icon">${categoryIcon}</div>
                         <div class="recipe-meta">
@@ -138,7 +163,7 @@ class PetitRecipe {
                             <div class="recipe-tags">
                                 <span class="recipe-time">⏱️ ${recipe.cookTime}</span>
                                 <span class="recipe-servings">👥 ${recipe.servings}人前</span>
-                                <span class="recipe-difficulty ${difficultyClass}">${recipe.difficulty}</span>
+                                ${recipe.difficulty ? `<span class="recipe-difficulty ${difficultyClass}">${recipe.difficulty}</span>` : ''}
                             </div>
                         </div>
                     </div>
@@ -149,7 +174,7 @@ class PetitRecipe {
             `;
         }).join('');
 
-        recipesListContainer.innerHTML = recipeCards;
+        recipesList.innerHTML = recipesHtml;
     }
 
     // レシピ詳細の表示
@@ -160,6 +185,9 @@ class PetitRecipe {
             return;
         }
 
+        this.currentRecipe = recipe;
+        this.currentPortion = 1;
+        
         // レシピ詳細画面に切り替え
         this.showScreen('recipe-detail-screen');
         
@@ -169,13 +197,17 @@ class PetitRecipe {
             titleElement.textContent = recipe.name;
         }
 
-        // 材料リストの表示
-        this.renderIngredients(recipe);
-        
-        // 手順の表示
-        this.renderSteps(recipe);
+        // 人数スライダーリセット
+        const portionSlider = document.getElementById('portion-slider');
+        const portionValue = document.getElementById('portion-value');
+        if (portionSlider && portionValue) {
+            portionSlider.value = '1';
+            portionValue.textContent = '1';
+        }
 
-        // 追加情報の表示
+        // 材料・手順・追加情報の表示
+        this.renderIngredients(recipe);
+        this.renderSteps(recipe);
         this.renderAdditionalInfo(recipe);
     }
 
@@ -187,7 +219,7 @@ class PetitRecipe {
         const ingredientsHtml = recipe.ingredients.map(ingredient => `
             <div class="ingredient-item">
                 <span class="ingredient-name">${ingredient.name}</span>
-                <span class="ingredient-amount">${ingredient.amount}${ingredient.unit}</span>
+                <span class="ingredient-amount" data-original-amount="${ingredient.amount}">${this.formatAmount(ingredient.amount * this.currentPortion)}${ingredient.unit}</span>
             </div>
         `).join('');
 
@@ -220,19 +252,87 @@ class PetitRecipe {
             categoryElement.innerHTML = `<strong>カテゴリ:</strong> ${this.getCategoryName(recipe.category)}`;
         }
         if (yieldElement) {
-            yieldElement.innerHTML = `<strong>分量:</strong> ${recipe.servings}人前`;
+            yieldElement.innerHTML = `<strong>分量:</strong> ${recipe.yield || recipe.servings + '人前'}`;
         }
         if (cookingTimeElement) {
             cookingTimeElement.innerHTML = `<strong>調理時間:</strong> ${recipe.cookTime}`;
         }
         if (equipmentElement) {
-            equipmentElement.innerHTML = `<strong>難易度:</strong> ${recipe.difficulty}`;
+            const equipment = recipe.equipment ? recipe.equipment.join(', ') : recipe.difficulty || 'なし';
+            equipmentElement.innerHTML = `<strong>器具・難易度:</strong> ${equipment}`;
         }
 
-        // バージョン履歴は非表示
+        // バージョン履歴
         const versionList = document.getElementById('version-list');
-        if (versionList) {
-            versionList.innerHTML = '<div class="version-item">初回作成</div>';
+        if (versionList && recipe.versions) {
+            const versionsHtml = recipe.versions.map(version => `
+                <div class="version-item">
+                    <span class="version-number">v${version.version}</span>
+                    <span class="version-date">${version.date}</span>
+                    <span class="version-changes">${version.changes}</span>
+                </div>
+            `).join('');
+            versionList.innerHTML = versionsHtml;
+        }
+    }
+
+    // 分量調整
+    updatePortion(portion) {
+        this.currentPortion = parseInt(portion);
+        
+        const portionValue = document.getElementById('portion-value');
+        if (portionValue) {
+            portionValue.textContent = portion;
+        }
+
+        // 材料の分量を更新
+        if (this.currentRecipe) {
+            this.renderIngredients(this.currentRecipe);
+        }
+    }
+
+    // レシピ検索
+    searchRecipes(searchTerm) {
+        if (!searchTerm.trim()) {
+            this.filteredRecipes = [...this.recipes];
+        } else {
+            this.filteredRecipes = this.recipes.filter(recipe =>
+                recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                recipe.ingredients.some(ing => ing.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+        }
+        this.renderRecipes();
+    }
+
+    // レシピソート
+    sortRecipes(sortType) {
+        switch (sortType) {
+            case 'time':
+                this.filteredRecipes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'name':
+                this.filteredRecipes.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+                break;
+            case 'popular':
+                // 人気順はランダム（実際のアプリでは使用回数等でソート）
+                this.filteredRecipes.sort(() => Math.random() - 0.5);
+                break;
+        }
+        this.renderRecipes();
+    }
+
+    // 画面切り替え
+    showScreen(screenId) {
+        // すべての画面を非表示
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        
+        // 指定された画面を表示
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+            this.currentScreen = screenId;
         }
     }
 
@@ -243,7 +343,8 @@ class PetitRecipe {
             dessert: '🍰',
             sauce: '🥄',
             drink: '🥤',
-            side: '🥗'
+            side: '🥗',
+            bread: '🍞'
         };
         return icons[category] || '🍳';
     }
@@ -255,59 +356,34 @@ class PetitRecipe {
             dessert: 'デザート',
             sauce: 'タレ・調味料',
             drink: '飲み物',
-            side: '副菜'
+            side: '副菜',
+            bread: 'パン類'
         };
         return names[category] || 'その他';
     }
 
-    // レシピ検索・フィルタリング
-    filterRecipes(searchTerm) {
-        if (!searchTerm.trim()) {
-            this.renderRecipesList();
-            return;
-        }
-
-        const filtered = this.recipes.filter(recipe =>
-            recipe.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            recipe.ingredients.some(ing => ing.name.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-
-        const originalRecipes = this.recipes;
-        this.recipes = filtered;
-        this.renderRecipesList();
-        this.recipes = originalRecipes;
-    }
-
-    // レシピソート
-    sortRecipes(sortType) {
-        switch (sortType) {
-            case 'time':
-                this.recipes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                break;
-            case 'name':
-                this.recipes.sort((a, b) => a.name.localeCompare(b.name, 'ja'));
-                break;
-            case 'popular':
-                // 人気順はランダム（実際のアプリでは使用回数等でソート）
-                this.recipes.sort(() => Math.random() - 0.5);
-                break;
-        }
-        this.renderRecipesList();
+    // 数量のフォーマット
+    formatAmount(amount) {
+        if (amount === 0) return '';
+        if (amount < 0.1) return amount.toFixed(2);
+        if (amount < 1) return amount.toFixed(1);
+        if (amount % 1 === 0) return Math.round(amount);
+        return amount.toFixed(1);
     }
 }
 
-// グローバル関数（RecipeBox互換）
+// グローバル関数
 function showScreen(screenId) {
-    if (window.petitRecipe) {
-        window.petitRecipe.showScreen(screenId);
+    if (window.app) {
+        window.app.showScreen(screenId);
     }
 }
 
 // グローバルインスタンス
-let petitRecipe;
+let app;
 
 // DOMコンテンツ読み込み完了後に初期化
 document.addEventListener('DOMContentLoaded', function() {
-    petitRecipe = new PetitRecipe();
-    window.petitRecipe = petitRecipe; // グローバルアクセス用
+    app = new PetitRecipeApp();
+    window.app = app; // グローバルアクセス用
 });

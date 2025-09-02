@@ -29,60 +29,134 @@
     </script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- ヘッダー -->
-        <header class="app-header">
-            <div class="header-title">
-                <h1 id="app-title">🍳 Petit Recipe</h1>
-            </div>
-            <div class="header-actions">
-                <button class="header-btn back-btn" id="backBtn" style="display: none;" onclick="petitRecipe.goBack()">← 戻る</button>
-            </div>
-        </header>
-
-        <!-- メインコンテンツエリア -->
-        <main id="main-content" class="main-content">
+    <div id="app">
+        <!-- 料理レシピ画面 -->
+        <div id="recipes-screen" class="screen active">
+            <header class="screen-header">
+                <h1 class="app-title">🍳 Petit Recipe</h1>
+                <div class="header-actions">
+                    <!-- レシピ追加機能を削除 -->
+                </div>
+            </header>
             
-            <!-- レシピ一覧画面 -->
-            <div id="recipe-list-view" class="view active">
-                <section class="welcome-section card">
-                    <h2>📖 レシピ一覧</h2>
-                    <p>お気に入りのレシピを見つけましょう</p>
-                </section>
+            <div class="screen-content">
+                <div class="search-container">
+                    <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
+                </div>
                 
-                <section id="recipes-container" class="recipes-container">
-                    <!-- レシピアイテムがここに動的に表示される -->
-                </section>
-            </div>
-            
-            <!-- レシピ詳細画面 -->
-            <div id="recipe-detail-view" class="view">
-                <div id="recipe-detail-content">
-                    <!-- レシピ詳細がここに動的に表示される -->
+                <div class="sort-tabs">
+                    <button class="sort-tab active" data-sort="time">時系列</button>
+                    <button class="sort-tab" data-sort="name">あいうえお順</button>
+                    <button class="sort-tab" data-sort="popular">🔥人気順</button>
+                </div>
+                
+                <div id="recipes-list" class="recipes-list">
+                    <!-- レシピ一覧がここに表示される -->
                 </div>
             </div>
-            
-        </main>
+        </div>
 
-        <!-- フッター -->
-        <footer class="app-footer">
-            <p>&copy; 2024 Petit Recipe - シンプルなデジタルレシピ帳</p>
-        </footer>
+        <!-- レシピ詳細画面 -->
+        <div id="recipe-detail-screen" class="screen">
+            <header class="screen-header">
+                <button class="back-button" onclick="showScreen('recipes-screen')">← 戻る</button>
+                <h2 id="recipe-detail-title">レシピ詳細</h2>
+            </header>
+            
+            <div class="screen-content">
+                <!-- 分量調整 -->
+                <div class="portion-adjustment">
+                    <h3>人数調整</h3>
+                    <div class="portion-slider-container">
+                        <label for="portion-slider">人数: <span id="portion-value">1</span>人前</label>
+                        <input type="range" id="portion-slider" min="1" max="4" value="1" class="portion-slider">
+                        <div class="portion-markers">
+                            <span>1人</span>
+                            <span>2人</span>
+                            <span>3人</span>
+                            <span>4人</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 材料リスト -->
+                <div class="ingredients-section">
+                    <h3>材料</h3>
+                    <div id="ingredients-list" class="ingredients-list">
+                        <!-- 材料がここに表示される -->
+                    </div>
+                </div>
+
+                <!-- 手順 -->
+                <div class="steps-section">
+                    <h3>手順</h3>
+                    <div id="steps-list" class="steps-list">
+                        <!-- 手順がここに表示される -->
+                    </div>
+                </div>
+
+                <!-- 追加情報 -->
+                <div class="additional-info">
+                    <div class="info-grid">
+                        <div class="info-item" id="recipe-category"></div>
+                        <div class="info-item" id="recipe-yield"></div>
+                        <div class="info-item" id="recipe-equipment"></div>
+                        <div class="info-item" id="recipe-cooking-time"></div>
+                    </div>
+                </div>
+
+                <!-- バージョン履歴 -->
+                <div class="version-history">
+                    <h3>改良履歴</h3>
+                    <div id="version-list" class="version-list">
+                        <!-- バージョン履歴がここに表示される -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- アプリケーションスクリプト -->
     <script src="script.js"></script>
     
-    <!-- Service Worker登録 -->
+    <!-- APK Status Bar初期化 -->
+    <script>
+        // APK環境でのStatus Bar設定
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+                try {
+                    console.log('🔧 APK Status Bar初期化開始');
+                    
+                    // Status Barプラグインが利用可能な場合のみ実行
+                    if (window.Capacitor.Plugins.StatusBar) {
+                        await window.Capacitor.Plugins.StatusBar.setStyle({
+                            style: 'DARK'
+                        });
+                        await window.Capacitor.Plugins.StatusBar.setBackgroundColor({
+                            color: '#667eea'
+                        });
+                        await window.Capacitor.Plugins.StatusBar.setOverlaysWebView({
+                            overlay: false
+                        });
+                        console.log('✅ APK Status Bar設定完了');
+                    }
+                } catch (error) {
+                    console.log('⚠️ Status Bar設定失敗:', error);
+                }
+            }
+        });
+    </script>
+    
+    <!-- Service Worker登録 (PWA対応) -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                .then(function(registration) {
-                    console.log('✅ Service Worker登録成功:', registration.scope);
-                }, function(err) {
-                    console.log('❌ Service Worker登録失敗:', err);
-                });
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker登録成功:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Service Worker登録失敗:', error);
+                    });
             });
         }
     </script>

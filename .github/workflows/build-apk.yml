@@ -197,22 +197,24 @@ jobs:
         # APK署名 (signature scheme v2対応)
         $BUILD_TOOLS_PATH/apksigner sign \
           --ks ../../../../../../template-release.keystore \
-          --ks-key-alias ${{ env.KEY_ALIAS }} \
+          --ks-key-alias "$KEY_ALIAS" \
           --ks-pass env:KEYSTORE_PASSWORD \
           --key-pass env:KEY_PASSWORD \
-          --out pwa-app_${{ env.VERSION_TAG }}.apk \
+          --out pwa-app_$VERSION_TAG.apk \
           app-release-unsigned.apk
         
         # 署名検証
-        $BUILD_TOOLS_PATH/apksigner verify pwa-app_${{ env.VERSION_TAG }}.apk
+        $BUILD_TOOLS_PATH/apksigner verify pwa-app_$VERSION_TAG.apk
         
-        echo "🎯 署名完了 (v2対応): pwa-app_${{ env.VERSION_TAG }}.apk"
+        echo "🎯 署名完了 (v2対応): pwa-app_$VERSION_TAG.apk"
 
     - name: Verify APK
+      env:
+        VERSION_TAG: ${{ env.VERSION_TAG }}
       run: |
         echo "🔍 APK検証開始"
         
-        APK_PATH="android/app/build/outputs/apk/release/pwa-app_${{ env.VERSION_TAG }}.apk"
+        APK_PATH="android/app/build/outputs/apk/release/pwa-app_$VERSION_TAG.apk"
         
         if [ -f "$APK_PATH" ]; then
           APK_SIZE=$(du -h "$APK_PATH" | cut -f1)

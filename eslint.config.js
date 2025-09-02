@@ -22,7 +22,7 @@ export default [
   },
   // sw.jsファイルには特別にサービスワーカー環境を適用
   {
-    files: ["sw.js"],
+    files: ["**/sw.js"],
     languageOptions: {
       globals: {
         ...globals.serviceworker,

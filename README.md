@@ -1,243 +1,134 @@
-# 🚀 PWA→APK 開発テンプレート
+# 🍳 Petit Recipe
 
-最速でPWAからAPKへの変換開発を開始できる完全なテンプレートプロジェクトです。
+**RecipeBox UI統合レシピアプリ** - HTML/CSS/JS → PWA → Android APK
 
-## ✨ 特徴
+25種類の厳選レシピ内蔵、検索・分量調整機能付きの実用的な料理アプリです。
 
-- 📱 **PWA完全対応** - Service Worker, manifest.json, オフライン動作
-- 📦 **APK自動ビルド** - GitHub ActionsでプッシュするだけでAPK生成
-- 🎨 **レスポンシブUI** - モバイル・デスクトップ両対応
-- ⚙️ **設定システム** - LocalStorage自動保存
-- 🔧 **Capacitor統合** - Web→ネイティブ変換
-- 🚀 **即座に開始可能** - クローンして即開発開始
+## ✨ 主な機能
 
-## 🎯 使用方法
+- 📖 **25レシピ内蔵** - 豚の角煮、玄米甘酒、カスタードプリンなど多彩なレシピ
+- 🔍 **高速検索** - レシピ名・材料名による瞬時検索
+- 📊 **スマート分量調整** - 1〜4人前まで自動計算
+- 🎨 **RecipeBox UI** - 美しい紫グラデーションテーマ
+- 📱 **PWA対応** - オフライン利用可能
+- 🤖 **Android APK** - GitHub Actionsによる自動ビルド
+- ⚡ **高速動作** - バニラJavaScript実装
 
-### 1. テンプレート取得
-```bash
-# このリポジトリをクローン
-git clone https://github.com/YOUR_USERNAME/pwa-to-apk-template.git my-new-app
-cd my-new-app
+## 🏗️ 技術スタック
 
-# 依存関係インストール
-npm install
-```
+- **フロントエンド**: HTML5, CSS3, Vanilla JavaScript
+- **PWA**: Service Worker, Manifest
+- **モバイル**: Capacitor.js
+- **ビルド**: GitHub Actions
+- **UI/UX**: RecipeBox統合デザイン
 
-### 2. カスタマイズ
-```bash
-# package.json の情報を更新
-nano package.json  # name, version, author等
+## 🎯 対応プラットフォーム
 
-# manifest.json を更新  
-nano manifest.json  # アプリ名, 説明, テーマカラー等
+- ✅ Web ブラウザ (Chrome, Firefox, Safari, Edge)
+- ✅ Android APK (7.0+)
+- ✅ PWA インストール
+- ✅ オフライン動作
 
-# capacitor.config.ts を更新
-nano capacitor.config.ts  # appId, appName
-```
+## 🚀 使い方
 
-### 3. アイコン設置
-```bash
-# icons/ フォルダに自分のアイコンを配置
-# 詳細は icons/README.md を参照
-```
+### Web版
+1. https://bochang999.github.io/petit-recipe でアクセス
+2. ブラウザでPWAとしてインストール可能
 
-### 4. 開発開始
+### Android版
+1. [Releases](https://github.com/bochang999/petit-recipe/releases)からAPKダウンロード
+2. インストール・実行
+
+## 🧪 開発・ビルド
+
 ```bash
 # 開発サーバー起動
-npm run dev
+python -m http.server 8000
 
-# ブラウザで http://localhost:8080 を開く
-```
-
-### 5. GitHub設定（APK自動ビルド用）
-
-#### 5-1. GitHub Secrets設定（オプション）
-リポジトリの Settings > Secrets and variables > Actions で以下を設定:
-
-```bash
-# 本番用キーストア（推奨）
-KEYSTORE_B64="[base64エンコードされたキーストアファイル]"
-KEYSTORE_PASSWORD="your-keystore-password"  
-KEY_ALIAS="your-key-alias"
-KEY_PASSWORD="your-key-password"
-```
-
-**注意**: 未設定の場合はテンプレート用キーストアが自動生成されます。
-
-#### 5-2. 自動ビルド開始
-```bash
-# mainブランチにプッシュすると自動でAPKビルド開始
-git add .
-git commit -m "Initial setup"
+# APKビルド (GitHub Actions)
 git push origin main
+# → 自動でAPK生成・リリース
 ```
 
 ## 📁 プロジェクト構造
 
 ```
-pwa-to-apk-template/
-├── index.html              # メインHTML
-├── style.css               # スタイルシート（レスポンシブ）
-├── script.js               # メインロジック（クラスベース）
-├── manifest.json           # PWA設定
-├── sw.js                   # Service Worker
-├── capacitor.config.ts     # Capacitor設定
-├── package.json            # パッケージ設定
-├── .github/workflows/      # GitHub Actions設定
-│   └── build-apk.yml      # APK自動ビルド
-└── icons/                  # アイコン各サイズ
-    ├── README.md          # アイコン設置ガイド
-    └── *.png              # 各サイズのアイコン
+petit-recipe/
+├── index.html          # メインHTMLファイル
+├── script.js           # アプリケーションロジック
+├── recipes-data.js     # レシピデータ(APK安全)
+├── style.css           # RecipeBoxテーマCSS
+├── src/data/           # 元レシピJSONデータ
+├── icons/              # PWA/APKアイコン
+├── capacitor.config.ts # Capacitor設定
+└── android/           # Androidビルド
 ```
 
-## 🛠️ 開発コマンド
+## 🍽️ レシピ一覧
 
-```bash
-# 開発サーバー起動
-npm run dev
-npm run serve
+1. **豚の角煮** (中級・90分) - 本格的な和食の定番
+2. **玄米甘酒** (初級・10時間) - 発酵食品
+3. **塩ダレ** (初級・5分) - 万能調味料
+4. **カスタードプリン** (中級・45分) - 手作りデザート
+5. **チョコレートムース** (初級・15分) - 簡単スイーツ
+6. **カラメルソース** (中級・15分) - デザート用
+7. **うなぎの蒲焼のタレ** (初級・10分) - 専門店の味
+8. **至高の沼** (初級・60分) - 話題の健康料理
 
-# Capacitor操作
-npm run capacitor:init      # 初期化
-npm run capacitor:sync      # 同期
-npm run android:build       # Android APKビルド（ローカル）
+## 🔧 技術詳細
 
-# その他
-npm run build              # ビルド
-npm run test               # テスト
-```
+- **データ読み込み**: 3段階フォールバック方式
+  1. グローバル埋め込みデータ (APK安全)
+  2. Capacitor Filesystem API (ネイティブ)
+  3. fetch API (Web)
+- **UI**: safe-area-inset対応、ステータスバー重複回避
+- **検索**: リアルタイム絞り込み
+- **ソート**: 時系列・あいうえお・人気順
 
-## 📱 機能詳細
+## 📱 APK詳細
 
-### PWA機能
-- ✅ **オフライン動作** - Service Workerによるキャッシュ
-- ✅ **インストール可能** - ブラウザからアプリとしてインストール
-- ✅ **プッシュ通知** - 通知機能（設定次第）
-- ✅ **バックグラウンド同期** - オフライン時の同期
+- **ターゲット**: Android 7.0 (API 24)+
+- **サイズ**: ~10MB
+- **権限**: インターネット、ストレージ
+- **署名**: GitHub Actions自動署名
 
-### APK機能  
-- ✅ **ネイティブ動作** - Capacitorによる変換
-- ✅ **Status Bar対応** - Android Status Bar最適化
-- ✅ **自動署名** - GitHub Actionsで署名済みAPK生成
-- ✅ **リリース対応** - 本番環境用APK対応
+## 📲 APK更新手順（ユーザー向け）
 
-### UI機能
-- ✅ **レスポンシブデザイン** - 全デバイス対応
-- ✅ **ダークモード対応** - システム設定連動
-- ✅ **アクセシビリティ** - キーボード操作・フォーカス管理
-- ✅ **タッチ操作最適化** - モバイル操作に最適化
+### 更新の確認方法
+1. [Releases](https://github.com/bochang999/petit-recipe/releases) ページでバージョンを確認
+2. インストール済みアプリのバージョンと比較
 
-## 🔧 カスタマイズガイド
+### 更新手順
+1. **バックアップ（推奨）**: 現在のアプリデータを確認
+2. **APKダウンロード**: 最新リリースからAPKファイルを取得
+3. **インストール実行**:
+   - ダウンロードしたAPKファイルをタップ
+   - 「不明なソース」を許可（初回のみ）
+   - 「更新」をタップして上書きインストール
+4. **動作確認**: アプリを起動して正常動作を確認
 
-### 基本情報変更
+### 注意事項
+- ⚠️ **同一署名**: GitHub Actions署名により、上書き更新が可能
+- ⚠️ **データ保持**: 通常はデータ消失なし（念のためバックアップ推奨）
+- ⚠️ **Android設定**: 「不明なソース」許可が必要
+- ⚠️ **互換性**: Android 7.0+ で動作確認済み
 
-1. **package.json**
-```json
-{
-  "name": "your-app-name",
-  "version": "1.0.0", 
-  "description": "あなたのアプリの説明",
-  "author": "Your Name <your.email@example.com>"
-}
-```
+### トラブルシューティング
+**「アプリがインストールされませんでした」エラー**:
+- 署名の不一致: 古いアプリをアンインストール後、再インストール
+- 容量不足: ストレージ容量を確認
+- Playプロテクト: 一時的に無効化を検討
 
-2. **manifest.json**
-```json
-{
-  "name": "Your App Name",
-  "short_name": "YourApp",
-  "description": "あなたのアプリの説明",
-  "theme_color": "#YourColor"
-}
-```
+## 🤝 貢献・開発
 
-3. **capacitor.config.ts**
-```typescript
-const config: CapacitorConfig = {
-  appId: 'com.yourcompany.yourapp',
-  appName: 'Your App Name',
-  // ...
-};
-```
+このプロジェクトは実用的なレシピアプリの開発事例として公開されています。
 
-### デザインカスタマイズ
-
-**style.css のCSS変数を変更:**
-```css
-:root {
-    --primary-color: #YourPrimaryColor;
-    --secondary-color: #YourSecondaryColor;
-    /* ... */
-}
-```
-
-### 機能追加
-
-**script.js のPWATemplateクラスを拡張:**
-```javascript
-class YourApp extends PWATemplate {
-    constructor() {
-        super();
-        // あなたの初期化処理
-    }
-    
-    // あなたの機能を追加
-    yourCustomMethod() {
-        // ...
-    }
-}
-
-const app = new YourApp();
-```
-
-## 📋 トラブルシューティング
-
-### よくある問題
-
-#### APKビルドが失敗する
-- GitHub Secretsの設定を確認
-- capacitor.config.tsのappIdが重複していないか確認
-- Java/Node.jsバージョンを確認
-
-#### PWAが動作しない
-- manifest.jsonの構文エラーを確認
-- Service Workerがブロックされていないか確認
-- HTTPSで動作しているか確認（localhost除く）
-
-#### アイコンが表示されない
-- icons/フォルダのファイル存在を確認
-- manifest.jsonのpaths設定を確認
-- ブラウザキャッシュをクリア
-
-## 🔗 参考リンク
-
-- [PWA Builder](https://www.pwabuilder.com/)
-- [Capacitor Documentation](https://capacitorjs.com/docs)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Web App Manifest](https://developer.mozilla.org/en-US/docs/Web/Manifest)
-- [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
-
-## 📄 ライセンス
-
-MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照
-
-## 🤝 コントリビューション
-
-1. このリポジトリをフォーク
-2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add amazing feature'`)
-4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-5. Pull Requestを作成
-
-## 📝 更新履歴
-
-### v1.0.0 (Initial Release)
-- ✅ PWA→APK変換テンプレート完成
-- ✅ GitHub Actions自動ビルド
-- ✅ Capacitor統合
-- ✅ レスポンシブUI
-- ✅ アイコンシステム
+- Issue・PR歓迎
+- レシピ追加提案歓迎
+- UI/UX改善提案歓迎
 
 ---
 
-**🚀 Happy Coding!** このテンプレートを使って素晴らしいアプリを作成してください！
+**🤖 Generated with [Claude Code](https://claude.ai/code)**
+
+© 2024 Bochang Lab. MIT License.

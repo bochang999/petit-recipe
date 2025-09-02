@@ -1,6 +1,6 @@
 // Service Worker for PWA Template
-const STATIC_CACHE_NAME = 'pwa-template-static-v1.0.0';
-const DYNAMIC_CACHE_NAME = 'pwa-template-dynamic-v1.0.0';
+const STATIC_CACHE_NAME = 'pwa-template-static-v2.0.0';
+const DYNAMIC_CACHE_NAME = 'pwa-template-dynamic-v2.0.0';
 
 // キャッシュするファイルリスト
 const STATIC_FILES = [
@@ -9,6 +9,7 @@ const STATIC_FILES = [
     './style.css',
     './script.js',
     './manifest.json',
+    './src/data/recipes.json',
     './icons/icon-192x192.png',
     './icons/icon-512x512.png',
     './icons/apple-touch-icon.png',

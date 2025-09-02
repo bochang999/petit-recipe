@@ -28,16 +28,26 @@ class PetitRecipeApp {
     // レシピデータの読み込み
     async loadRecipes() {
         try {
+            console.log('🔄 レシピデータ読み込み開始...');
             const response = await fetch('src/data/recipes.json');
+            console.log('📡 Fetch response:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const petitRecipes = await response.json();
+            console.log('📋 生データ:', petitRecipes.length + '件', petitRecipes);
             
             // petit-recipe形式をRecipeBox形式に変換
             this.recipes = petitRecipes.map(recipe => this.convertPetitToRecipeBox(recipe));
             this.filteredRecipes = [...this.recipes];
             
             console.log('📖 レシピデータ読み込み完了:', this.recipes.length + '件');
+            console.log('✅ 変換後データ:', this.recipes);
         } catch (error) {
             console.error('❌ レシピデータ読み込み失敗:', error);
+            console.error('❌ エラー詳細:', error.message, error.stack);
             // フォールバック用のダミーデータ
             this.recipes = [{
                 id: "recipe_1",
@@ -50,18 +60,20 @@ class PetitRecipeApp {
                 difficulty: "初級"
             }];
             this.filteredRecipes = [...this.recipes];
+            console.log('🔄 フォールバックデータを使用:', this.recipes.length + '件');
         }
     }
 
     // petit-recipe形式をRecipeBox形式に変換
     convertPetitToRecipeBox(petitRecipe) {
-        return {
+        console.log('🔄 変換中:', petitRecipe.title, petitRecipe);
+        const converted = {
             id: `recipe_${petitRecipe.id}`,
             name: petitRecipe.title,
             category: this.getCategoryFromTitle(petitRecipe.title),
             createdAt: '2024-01-01',
             updatedAt: '2024-01-01',
-            servings: parseInt(petitRecipe.servings) || 1,
+            servings: this.parseServings(petitRecipe.servings),
             cookTime: petitRecipe.cookTime || '30分',
             difficulty: petitRecipe.difficulty || '初級',
             ingredients: this.parseIngredients(petitRecipe.ingredients || []),
@@ -71,6 +83,18 @@ class PetitRecipeApp {
                 { version: '1.0', date: '2024-01-01', changes: '初版作成' }
             ]
         };
+        console.log('✅ 変換結果:', converted);
+        return converted;
+    }
+
+    // 人数の解析
+    parseServings(servings) {
+        if (typeof servings === 'number') return servings;
+        if (typeof servings === 'string') {
+            const match = servings.match(/(\d+)/);
+            return match ? parseInt(match[1]) : 1;
+        }
+        return 1;
     }
 
     // 材料の解析
@@ -142,13 +166,20 @@ class PetitRecipeApp {
 
     // レシピ一覧の表示
     renderRecipes() {
+        console.log('🎨 レシピ一覧表示開始:', this.filteredRecipes.length + '件');
         const recipesList = document.getElementById('recipes-list');
-        if (!recipesList) return;
+        if (!recipesList) {
+            console.error('❌ recipes-list要素が見つかりません');
+            return;
+        }
 
         if (this.filteredRecipes.length === 0) {
+            console.log('⚠️ 表示するレシピがありません');
             recipesList.innerHTML = '<div class="no-recipes">レシピがありません</div>';
             return;
         }
+
+        console.log('📋 表示データ:', this.filteredRecipes);
 
         const recipesHtml = this.filteredRecipes.map(recipe => {
             const categoryIcon = this.getCategoryIcon(recipe.category);

@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Petit Recipe</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
@@ -131,7 +131,7 @@
                     // Status Barプラグインが利用可能な場合のみ実行
                     if (window.Capacitor.Plugins.StatusBar) {
                         await window.Capacitor.Plugins.StatusBar.setStyle({
-                            style: 'DARK'
+                            style: 'LIGHT'
                         });
                         await window.Capacitor.Plugins.StatusBar.setBackgroundColor({
                             color: '#667eea'

@@ -29,14 +29,47 @@ class PetitRecipeApp {
     async loadRecipes() {
         try {
             console.log('🔄 レシピデータ読み込み開始...');
-            const response = await fetch('src/data/recipes.json');
-            console.log('📡 Fetch response:', response.status, response.statusText);
+            console.log('🌐 現在のURL:', window.location.href);
+            console.log('📱 Capacitor環境:', typeof window.Capacitor !== 'undefined');
             
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            let petitRecipes;
+            
+            // 1. まずgrlobalのRECIPE_DATAを確認
+            if (typeof window.RECIPE_DATA !== 'undefined' && Array.isArray(window.RECIPE_DATA)) {
+                console.log('✅ グローバルレシピデータを使用:', window.RECIPE_DATA.length + '件');
+                petitRecipes = window.RECIPE_DATA;
+            } else {
+                console.log('⚠️ グローバルデータなし、fetchを試行');
+                
+                // 2. Capacitor環境での特別処理
+                if (typeof window.Capacitor !== 'undefined' && window.Capacitor.isNativePlatform()) {
+                    console.log('📱 ネイティブAPK環境でのデータ読み込み');
+                    try {
+                        // CapacitorのFilesystemプラグインを使用してアセットにアクセス
+                        const { Filesystem, Directory } = window.Capacitor.Plugins;
+                        const result = await Filesystem.readFile({
+                            path: 'public/src/data/recipes.json',
+                            directory: Directory.Application
+                        });
+                        petitRecipes = JSON.parse(atob(result.data));
+                        console.log('✅ Capacitor経由でデータ読み込み成功');
+                    } catch (capacitorError) {
+                        console.log('⚠️ Capacitorアクセス失敗、通常fetch試行:', capacitorError.message);
+                        throw capacitorError;
+                    }
+                } else {
+                    // 3. Web環境での通常fetch
+                    console.log('🌐 Web環境での通常fetch');
+                    const response = await fetch('src/data/recipes.json');
+                    console.log('📡 Fetch response:', response.status, response.statusText);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    petitRecipes = await response.json();
+                }
             }
             
-            const petitRecipes = await response.json();
             console.log('📋 生データ:', petitRecipes.length + '件', petitRecipes);
             
             // petit-recipe形式をRecipeBox形式に変換
@@ -48,7 +81,9 @@ class PetitRecipeApp {
         } catch (error) {
             console.error('❌ レシピデータ読み込み失敗:', error);
             console.error('❌ エラー詳細:', error.message, error.stack);
-            // フォールバック用のダミーデータ
+            
+            // 最後の手段: フォールバックデータ
+            console.log('🆘 フォールバックデータを使用');
             this.recipes = [{
                 id: "recipe_1",
                 name: "サンプルレシピ",
@@ -60,7 +95,7 @@ class PetitRecipeApp {
                 difficulty: "初級"
             }];
             this.filteredRecipes = [...this.recipes];
-            console.log('🔄 フォールバックデータを使用:', this.recipes.length + '件');
+            console.log('🔄 フォールバックデータ:', this.recipes.length + '件');
         }
     }
 

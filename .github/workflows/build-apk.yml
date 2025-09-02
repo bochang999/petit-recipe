@@ -180,11 +180,6 @@ jobs:
 
     - name: Sign APK with apksigner
       id: sign_apk
-      env:
-        KEY_ALIAS: ${{ env.KEY_ALIAS }}
-        KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD }}
-        KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
-        VERSION_TAG: ${{ env.VERSION_TAG }}
       run: |
         echo "✍️ APK署名開始 (Modern apksigner)"
         

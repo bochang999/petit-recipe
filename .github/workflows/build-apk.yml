@@ -198,9 +198,21 @@ jobs:
         BUILD_TOOLS_PATH=$(ls -d $ANDROID_HOME/build-tools/* | sort -r | head -n 1)
         echo "🔧 使用build-tools: $BUILD_TOOLS_PATH"
         
-        # APK署名 (signature scheme v2対応)
+        # APK署名 (signature scheme v2対応) - 実際に存在するkeystoreファイルを使用
+        if [ -f "../../../../../../petit-recipe-release-keystore.jks" ]; then
+          KEYSTORE_FILE="../../../../../../petit-recipe-release-keystore.jks"
+        elif [ -f "../../../../../../template-release.keystore" ]; then
+          KEYSTORE_FILE="../../../../../../template-release.keystore"
+        else
+          echo "❌ キーストアファイルが見つかりません"
+          ls -la ../../../../../../*.keystore ../../../../../../*.jks 2>/dev/null || echo "キーストアファイルが存在しません"
+          exit 1
+        fi
+        
+        echo "🔑 使用キーストア: $KEYSTORE_FILE"
+        
         $BUILD_TOOLS_PATH/apksigner sign \
-          --ks ../../../../../../petit-recipe-release-keystore.jks \
+          --ks "$KEYSTORE_FILE" \
           --ks-key-alias "$KEY_ALIAS" \
           --ks-pass env:KEYSTORE_PASSWORD \
           --key-pass env:KEY_PASSWORD \

@@ -10,15 +10,18 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
-      }
+      },
     },
     rules: {
-      "no-unused-vars": ["warn", { 
-        "args": "none", 
-        "varsIgnorePattern": "^_|showScreen",
-        "caughtErrors": "none"
-      }]
-    }
+      "no-unused-vars": [
+        "warn",
+        {
+          args: "none",
+          varsIgnorePattern: "^_|showScreen",
+          caughtErrors: "none",
+        },
+      ],
+    },
   },
   // sw.jsファイルには特別にサービスワーカー環境を適用
   {
@@ -26,7 +29,7 @@ export default [
     languageOptions: {
       globals: {
         ...globals.serviceworker,
-      }
-    }
-  }
+      },
+    },
+  },
 ];

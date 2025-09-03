@@ -188,6 +188,8 @@ jobs:
         KEY_PASSWORD: ${{ env.KEY_PASSWORD }}
         VERSION_TAG: ${{ env.VERSION_TAG }}
       run: |
+        echo "デバッグ情報：ワークフローが読み込んだエイリアス名は -> [${{ secrets.KEY_ALIAS }}] です"
+        
         echo "✍️ APK署名開始 (Modern apksigner)"
         
         cd android/app/build/outputs/apk/release

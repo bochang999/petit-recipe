@@ -34,16 +34,16 @@ class PetitRecipeApp {
 
       let petitRecipes;
 
-      // 1. まずgrlobalのRECIPE_DATAを確認
+      // 1. まずgrlobalのPETIT_RECIPE_DATAを確認
       if (
-        typeof window.RECIPE_DATA !== "undefined" &&
-        Array.isArray(window.RECIPE_DATA)
+        typeof window.PETIT_RECIPE_DATA !== "undefined" &&
+        Array.isArray(window.PETIT_RECIPE_DATA)
       ) {
         console.log(
           "✅ グローバルレシピデータを使用:",
-          window.RECIPE_DATA.length + "件",
+          window.PETIT_RECIPE_DATA.length + "件",
         );
-        petitRecipes = window.RECIPE_DATA;
+        petitRecipes = window.PETIT_RECIPE_DATA;
       } else {
         console.log("⚠️ グローバルデータなし、fetchを試行");
 

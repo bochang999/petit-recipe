@@ -136,9 +136,14 @@ jobs:
         
         # distディレクトリ作成とファイルコピー
         mkdir -p dist
-        cp index.html style.css script.js manifest.json sw.js dist/
+        cp index.html style.css script.js manifest.json sw.js recipes-data.js dist/
         
-        echo "✅ ウェブアセット準備完了"
+        # iconsディレクトリも含める
+        if [ -d "icons" ]; then
+          cp -r icons dist/
+        fi
+        
+        echo "✅ ウェブアセット準備完了（recipes-data.js含む）"
 
     - name: Initialize and Sync Capacitor Project
       run: |

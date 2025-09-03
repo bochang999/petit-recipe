@@ -120,7 +120,7 @@ jobs:
           echo "KEY_PASSWORD=template2024" >> $GITHUB_ENV
         else
           echo "✅ GitHub Secrets設定済み - 本番キーストア使用"
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > petit-recipe-release.keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > petit-recipe-release-keystore.jks
           
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
@@ -200,7 +200,7 @@ jobs:
         
         # APK署名 (signature scheme v2対応)
         $BUILD_TOOLS_PATH/apksigner sign \
-          --ks ../../../../../../petit-recipe-release.keystore \
+          --ks ../../../../../../petit-recipe-release-keystore.jks \
           --ks-key-alias "$KEY_ALIAS" \
           --ks-pass env:KEYSTORE_PASSWORD \
           --key-pass env:KEY_PASSWORD \

@@ -537,12 +537,6 @@ class PetitRecipeApp {
   }
 }
 
-// グローバル関数（HTML onclick属性で使用）
-function showScreen(screenId) {
-  if (window.app) {
-    window.app.showScreen(screenId);
-  }
-}
 
 // グローバルインスタンス
 let app;

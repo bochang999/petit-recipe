@@ -102,7 +102,7 @@ async function handleNavigate(request) {
     // ネットワークを最初に試す
     const networkResponse = await fetch(request);
     return networkResponse;
-  } catch (error) {
+  } catch {
     // ネットワークが失敗した場合はキャッシュからindex.htmlを返す
     console.log("🌐 オフライン: キャッシュからindex.htmlを返します");
     const cache = await caches.open(STATIC_CACHE_NAME);
@@ -154,7 +154,7 @@ async function handleOtherRequests(request) {
     }
 
     return networkResponse;
-  } catch (error) {
+  } catch {
     const cache = await caches.open(DYNAMIC_CACHE_NAME);
     const cachedResponse = await cache.match(request);
 
@@ -175,7 +175,7 @@ async function updateCache(request) {
       await cache.put(request, networkResponse);
       console.log("🔄 キャッシュ更新:", request.url);
     }
-  } catch (error) {
+  } catch {
     // バックグラウンド更新なのでエラーは無視
   }
 }

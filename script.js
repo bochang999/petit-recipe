@@ -255,11 +255,6 @@ class PetitRecipeApp {
 
     const recipesHtml = this.filteredRecipes
       .map((recipe) => {
-        const categoryIcon = this.getCategoryIcon(recipe.category);
-        const difficultyClass = recipe.difficulty
-          ? recipe.difficulty.replace("級", "").toLowerCase()
-          : "";
-
         return `
                 <div class="recipe-card" onclick="app.showRecipeDetail('${recipe.id}')">
                     <div class="recipe-header">
@@ -435,24 +430,6 @@ class PetitRecipeApp {
     this.renderRecipes();
   }
 
-  // レシピソート
-  sortRecipes(sortType) {
-    switch (sortType) {
-      case "time":
-        this.filteredRecipes.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-        );
-        break;
-      case "name":
-        this.filteredRecipes.sort((a, b) => a.name.localeCompare(b.name, "ja"));
-        break;
-      case "popular":
-        // 人気順はランダム（実際のアプリでは使用回数等でソート）
-        this.filteredRecipes.sort(() => Math.random() - 0.5);
-        break;
-    }
-    this.renderRecipes();
-  }
 
   // 画面切り替え
   showScreen(screenId) {

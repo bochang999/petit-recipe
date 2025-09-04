@@ -62,7 +62,7 @@ html, body {
 .screen-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: 2.5rem 1rem 1rem; /* RecipeBox style large top padding for status bar buffer */
+    padding: 4rem 1rem 1rem; /* Extra large top padding for status bar buffer - increased from 2.5rem */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -289,7 +289,7 @@ html, body {
 .screen-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
-    padding: 2.5rem 1rem 1rem; /* RecipeBox style large top padding for status bar buffer */
+    padding: 4rem 1rem 1rem; /* Extra large top padding for status bar buffer - increased from 2.5rem */
     display: flex;
     justify-content: space-between;
     align-items: center;

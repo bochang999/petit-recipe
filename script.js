@@ -310,10 +310,9 @@ class PetitRecipeApp {
       portionValue.textContent = "1";
     }
 
-    // 材料・手順・追加情報の表示
+    // 材料・手順の表示
     this.renderIngredients(recipe);
     this.renderSteps(recipe);
-    this.renderAdditionalInfo(recipe);
   }
 
   // 材料リストのレンダリング
@@ -354,46 +353,6 @@ class PetitRecipeApp {
     stepsList.innerHTML = stepsHtml;
   }
 
-  // 追加情報のレンダリング
-  renderAdditionalInfo(recipe) {
-    const categoryElement = document.getElementById("recipe-category");
-    const yieldElement = document.getElementById("recipe-yield");
-    const equipmentElement = document.getElementById("recipe-equipment");
-    const cookingTimeElement = document.getElementById("recipe-cooking-time");
-
-    if (categoryElement) {
-      categoryElement.innerHTML = `<strong>カテゴリ:</strong> ${this.getCategoryName(recipe.category)}`;
-    }
-    if (yieldElement) {
-      yieldElement.innerHTML = `<strong>分量:</strong> ${recipe.yield || recipe.servings + "人前"}`;
-    }
-    if (cookingTimeElement) {
-      cookingTimeElement.innerHTML = `<strong>調理時間:</strong> ${recipe.cookTime}`;
-    }
-    if (equipmentElement) {
-      const equipment = recipe.equipment
-        ? recipe.equipment.join(", ")
-        : recipe.difficulty || "なし";
-      equipmentElement.innerHTML = `<strong>器具・難易度:</strong> ${equipment}`;
-    }
-
-    // バージョン履歴
-    const versionList = document.getElementById("version-list");
-    if (versionList && recipe.versions) {
-      const versionsHtml = recipe.versions
-        .map(
-          (version) => `
-                <div class="version-item">
-                    <span class="version-number">v${version.version}</span>
-                    <span class="version-date">${version.date}</span>
-                    <span class="version-changes">${version.changes}</span>
-                </div>
-            `,
-        )
-        .join("");
-      versionList.innerHTML = versionsHtml;
-    }
-  }
 
   // 分量調整
   updatePortion(portion) {

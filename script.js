@@ -14,6 +14,18 @@ class PetitRecipeApp {
   async init() {
     console.log("🍳 Petit Recipe with RecipeBox UI 初期化開始");
 
+    // ▼▼▼ StatusBar JavaScript configuration for proper safe area handling ▼▼▼
+    if (typeof window.Capacitor !== "undefined" && window.Capacitor.Plugins.StatusBar) {
+      try {
+        await window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: false });
+        await window.Capacitor.Plugins.StatusBar.setStyle({ style: 'LIGHT' });
+        await window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: '#3498db' });
+        console.log("✅ StatusBar JavaScript configuration applied");
+      } catch (error) {
+        console.warn("⚠️ StatusBar configuration failed:", error);
+      }
+    }
+
     // レシピデータの読み込み
     await this.loadRecipes();
 

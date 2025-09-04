@@ -11,8 +11,14 @@ const config: CapacitorConfig = {
       overlaysWebView: false,
     },
   },
+  server: {
+    androidScheme: 'https'
+  },
   android: {
     allowMixedContent: true,
+    webContentsDebuggingEnabled: true,
+    // ▼▼▼ Add contentInset setting for status bar handling ▼▼▼
+    contentInset: 'never'
   },
 };
 

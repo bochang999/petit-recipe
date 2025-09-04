@@ -148,7 +148,6 @@ jobs:
     - name: Initialize and Sync Capacitor Project
       run: |
         echo "🔄 Capacitorプロジェクト準備開始"
-        npx cap add android
         npx cap sync android
         echo "✅ Capacitorプロジェクト準備完了"
 

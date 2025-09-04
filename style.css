@@ -62,7 +62,6 @@ html, body {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 1rem;
-    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
     display: flex;
     justify-content: space-between;
     align-items: center;

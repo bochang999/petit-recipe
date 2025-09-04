@@ -1,26 +1,44 @@
 {
   "root": true,
-  "env": {
-    "browser": true,
-    "es2021": true
-  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint/eslint-plugin"],
   "extends": [
-    "eslint:recommended"
+    "eslint:recommended",
+    "@typescript-eslint/recommended"
   ],
   "parserOptions": {
     "ecmaVersion": 12,
     "sourceType": "module"
   },
   "rules": {
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "warn",
     "no-undef": "error"
   },
   "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "env": {
+        "browser": true,
+        "es2021": true
+      }
+    },
     {
       "files": ["sw.js", "dist/sw.js"],
       "env": {
         "serviceworker": true,
         "es2021": true
+      }
+    },
+    {
+      "files": ["*.js"],
+      "env": {
+        "browser": true,
+        "es2021": true
+      },
+      "rules": {
+        "@typescript-eslint/no-require-imports": "off",
+        "no-undef": "off"
       }
     }
   ],

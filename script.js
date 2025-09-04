@@ -15,12 +15,18 @@ class PetitRecipeApp {
     console.log("🍳 Petit Recipe with RecipeBox UI 初期化開始");
 
     // ▼▼▼ StatusBar JavaScript configuration for proper safe area handling ▼▼▼
-    if (typeof window.Capacitor !== "undefined" && window.Capacitor.Plugins.StatusBar) {
+    if (typeof window.Capacitor !== "undefined") {
       try {
-        await window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: false });
-        await window.Capacitor.Plugins.StatusBar.setStyle({ style: 'LIGHT' });
-        await window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: '#3498db' });
-        console.log("✅ StatusBar JavaScript configuration applied");
+        // Import StatusBar plugin properly for Capacitor 7.0+
+        const { StatusBar } = window.Capacitor.Plugins;
+        if (StatusBar) {
+          await StatusBar.setOverlaysWebView({ overlay: false });
+          await StatusBar.setStyle({ style: 'LIGHT' });
+          await StatusBar.setBackgroundColor({ color: '#3498db' });
+          console.log("✅ StatusBar JavaScript configuration applied");
+        } else {
+          console.warn("⚠️ StatusBar plugin not available");
+        }
       } catch (error) {
         console.warn("⚠️ StatusBar configuration failed:", error);
       }
@@ -72,6 +78,9 @@ class PetitRecipeApp {
           try {
             // CapacitorのFilesystemプラグインを使用してアセットにアクセス
             const { Filesystem, Directory } = window.Capacitor.Plugins;
+            if (!Filesystem || !Directory) {
+              throw new Error("Filesystem plugin not available");
+            }
             const result = await Filesystem.readFile({
               path: "public/src/data/recipes.json",
               directory: Directory.Application,

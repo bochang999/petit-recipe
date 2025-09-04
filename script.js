@@ -7,6 +7,7 @@ class PetitRecipeApp {
     this.currentRecipe = null;
     this.currentPortion = 1;
     this.currentScreen = "recipes-screen";
+    this.viewCounts = {};
     this.init();
   }
 
@@ -15,6 +16,9 @@ class PetitRecipeApp {
 
     // レシピデータの読み込み
     await this.loadRecipes();
+
+    // 閲覧数データの読み込み
+    this.loadViewCounts();
 
     // イベントリスナー設定
     this.setupEventListeners();
@@ -259,13 +263,12 @@ class PetitRecipeApp {
         return `
                 <div class="recipe-card" onclick="app.showRecipeDetail('${recipe.id}')">
                     <div class="recipe-header">
-                        <div class="recipe-icon">${categoryIcon}</div>
                         <div class="recipe-meta">
                             <h3 class="recipe-title">${recipe.name}</h3>
                             <div class="recipe-tags">
                                 <span class="recipe-time">⏱️ ${recipe.cookTime}</span>
                                 <span class="recipe-servings">👥 ${recipe.servings}人前</span>
-                                ${recipe.difficulty ? `<span class="recipe-difficulty ${difficultyClass}">${recipe.difficulty}</span>` : ""}
+                                <span class="recipe-views">👁️ ${this.getViewCount(recipe.id)}</span>
                             </div>
                         </div>
                     </div>
@@ -295,6 +298,9 @@ class PetitRecipeApp {
 
     this.currentRecipe = recipe;
     this.currentPortion = 1;
+
+    // 閲覧数をインクリメント
+    this.incrementViewCount(recipeId);
 
     // レシピ詳細画面に切り替え
     this.showScreen("recipe-detail-screen");
@@ -496,6 +502,85 @@ class PetitRecipeApp {
     if (amount < 1) return amount.toFixed(1);
     if (amount % 1 === 0) return Math.round(amount);
     return amount.toFixed(1);
+  }
+
+  // 閲覧数データの読み込み
+  loadViewCounts() {
+    try {
+      const saved = localStorage.getItem('petit-recipe-viewcounts');
+      if (saved) {
+        this.viewCounts = JSON.parse(saved);
+        console.log('📊 閲覧数データ読み込み:', this.viewCounts);
+      } else {
+        this.viewCounts = {};
+        console.log('📊 閲覧数データ初期化');
+      }
+    } catch (error) {
+      console.error('❌ 閲覧数データ読み込み失敗:', error);
+      this.viewCounts = {};
+    }
+  }
+
+  // 閲覧数データの保存
+  saveViewCounts() {
+    try {
+      localStorage.setItem('petit-recipe-viewcounts', JSON.stringify(this.viewCounts));
+      console.log('💾 閲覧数データ保存完了:', this.viewCounts);
+    } catch (error) {
+      console.error('❌ 閲覧数データ保存失敗:', error);
+    }
+  }
+
+  // 閲覧数のインクリメント
+  incrementViewCount(recipeId) {
+    if (!this.viewCounts[recipeId]) {
+      this.viewCounts[recipeId] = 0;
+    }
+    this.viewCounts[recipeId]++;
+    console.log(`📈 レシピ ${recipeId} 閲覧数: ${this.viewCounts[recipeId]}`);
+    this.saveViewCounts();
+  }
+
+  // レシピの閲覧数取得
+  getViewCount(recipeId) {
+    return this.viewCounts[recipeId] || 0;
+  }
+
+  // レシピのソート
+  sortRecipes(sortType) {
+    console.log(`🔄 レシピソート開始: ${sortType}`);
+    
+    switch (sortType) {
+      case 'time':
+        // 時系列順（デフォルト順序）
+        this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
+          return this.recipes.indexOf(a) - this.recipes.indexOf(b);
+        });
+        break;
+        
+      case 'name':
+        // あいうえお順
+        this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
+          return a.name.localeCompare(b.name, 'ja', { numeric: true });
+        });
+        break;
+        
+      case 'popular':
+        // 人気順（閲覧数の多い順）
+        this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
+          const viewCountA = this.getViewCount(a.id);
+          const viewCountB = this.getViewCount(b.id);
+          return viewCountB - viewCountA; // 降順
+        });
+        break;
+        
+      default:
+        console.warn('⚠️ 不明なソートタイプ:', sortType);
+        break;
+    }
+    
+    console.log(`✅ ソート完了: ${this.filteredRecipes.length}件`);
+    this.renderRecipes();
   }
 }
 

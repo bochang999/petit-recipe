@@ -1,17 +1,17 @@
 {
-    "name": "PWA Template",
-    "short_name": "PWATemplate",
-    "description": "PWA→APK変換開発テンプレート",
-    "version": "1.0.0",
+    "name": "Petit Recipe",
+    "short_name": "PetitRecipe",
+    "description": "シンプルで使いやすいレシピ管理アプリ",
+    "version": "2.0.0",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
     "orientation": "portrait-primary",
-    "theme_color": "#2C3E50",
+    "theme_color": "#3498db",
     "background_color": "#FFFFFF",
     "lang": "ja",
     "dir": "ltr",
-    "categories": ["productivity", "utilities", "developer"],
+    "categories": ["food", "lifestyle", "utilities"],
     "prefer_related_applications": false,
     "icons": [
         {
@@ -99,10 +99,10 @@
     ],
     "shortcuts": [
         {
-            "name": "カウンター",
-            "short_name": "Counter",
-            "description": "カウンター機能を直接開く",
-            "url": "./?shortcut=counter",
+            "name": "レシピ検索",
+            "short_name": "Search",
+            "description": "レシピを検索する",
+            "url": "./?search=true",
             "icons": [
                 {
                     "src": "icons/icon-192x192.png",
@@ -112,10 +112,10 @@
             ]
         },
         {
-            "name": "設定",
-            "short_name": "Settings",
-            "description": "設定画面を直接開く",
-            "url": "./?shortcut=settings",
+            "name": "人気レシピ",
+            "short_name": "Popular",
+            "description": "人気レシピを表示",
+            "url": "./?sort=popular",
             "icons": [
                 {
                     "src": "icons/icon-192x192.png",

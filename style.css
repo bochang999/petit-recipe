@@ -1,9 +1,9 @@
 /* ===== Petit Recipe CSS ===== */
 
-/* CSS Variables for consistent theming - RecipeBox Purple Theme */
+/* CSS Variables for consistent theming - Nordic Blue Theme */
 :root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
     --success-color: #27AE60;
     --warning-color: #F39C12;
     --danger-color: #E74C3C;
@@ -65,14 +65,13 @@ html, body {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 1rem;
+    padding-top: calc(1rem + env(safe-area-inset-top, 20px));
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: var(--box-shadow);
     position: relative;
     z-index: 100;
-    /* APK環境でのステータスバー回避 */
-    margin-top: env(safe-area-inset-top, 0);
 }
 
 .app-title {
@@ -164,7 +163,7 @@ html, body {
 .recipe-card {
     background: var(--recipe-card-bg);
     border-radius: var(--border-radius);
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: var(--box-shadow);
     cursor: pointer;
     transition: var(--transition);
@@ -184,20 +183,15 @@ html, body {
     margin-bottom: 1rem;
 }
 
-.recipe-icon {
-    font-size: 2rem;
-    flex-shrink: 0;
-}
-
 .recipe-meta {
     flex: 1;
 }
 
 .recipe-title {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--text-color);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .recipe-tags {
@@ -209,14 +203,14 @@ html, body {
 
 .recipe-time,
 .recipe-servings,
-.recipe-difficulty {
+.recipe-views {
     color: var(--medium-gray);
     font-weight: 500;
 }
 
-.recipe-difficulty.初 { color: var(--success-color); }
-.recipe-difficulty.中 { color: var(--warning-color); }
-.recipe-difficulty.上 { color: var(--danger-color); }
+.recipe-views {
+    color: var(--primary-color);
+}
 
 .recipe-preview {
     color: var(--medium-gray);

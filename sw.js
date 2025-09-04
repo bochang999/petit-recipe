@@ -1,6 +1,6 @@
 // Service Worker for PWA Template
-const STATIC_CACHE_NAME = "pwa-template-static-v2.0.0";
-const DYNAMIC_CACHE_NAME = "pwa-template-dynamic-v2.0.0";
+const STATIC_CACHE_NAME = "pwa-template-static-v3.0.0";
+const DYNAMIC_CACHE_NAME = "pwa-template-dynamic-v3.0.0";
 
 // キャッシュするファイルリスト
 const STATIC_FILES = [

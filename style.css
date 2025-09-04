@@ -31,9 +31,6 @@ html, body {
     background: linear-gradient(135deg, #f5f5ff 0%, #ebe6ff 100%);
     min-height: 100vh;
     overflow-x: hidden;
-    /* APK環境でのステータスバー対応 */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* App Container */
@@ -65,12 +62,13 @@ html, body {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     padding: 1rem;
-    padding-top: calc(1rem + env(safe-area-inset-top, 30px));
+    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: var(--box-shadow);
-    position: relative;
+    position: sticky;
+    top: 0;
     z-index: 100;
 }
 

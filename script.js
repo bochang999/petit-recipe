@@ -262,18 +262,14 @@ class PetitRecipeApp {
                             <h3 class="recipe-title">${recipe.name}</h3>
                             <div class="recipe-tags">
                                 <span class="recipe-time">⏱️ ${recipe.cookTime}</span>
-                                <span class="recipe-servings">👥 ${recipe.servings}人前</span>
-                                <span class="recipe-views">👁️ ${this.getViewCount(recipe.id)}</span>
+                                <span class="recipe-views">🍴 ${this.getViewCount(recipe.id)}</span>
                             </div>
                         </div>
                     </div>
                     <div class="recipe-preview">
                         <strong>材料:</strong> ${recipe.ingredients
-                          .slice(0, 3)
                           .map((ing) => ing.name)
-                          .join(
-                            ", ",
-                          )}${recipe.ingredients.length > 3 ? "..." : ""}
+                          .join(", ")}
                     </div>
                 </div>
             `;

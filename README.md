@@ -4,6 +4,8 @@
 
 25種類の厳選レシピ内蔵、検索・分量調整機能付きの実用的な料理アプリです。
 
+<!-- Android StatusBar fix: AppTheme.NoActionBarLaunch updated -->
+
 ## ✨ 主な機能
 
 - 📖 **25レシピ内蔵** - 豚の角煮、玄米甘酒、カスタードプリンなど多彩なレシピ

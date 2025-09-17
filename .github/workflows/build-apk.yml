@@ -221,13 +221,13 @@ jobs:
           --ks-key-alias "$KEY_ALIAS" \
           --ks-pass env:KEYSTORE_PASSWORD \
           --key-pass env:KEY_PASSWORD \
-          --out pwa-app_$VERSION_TAG.apk \
+          --out petit-recipe_$VERSION_TAG.apk \
           app-release-unsigned.apk
         
         # 署名検証
-        $BUILD_TOOLS_PATH/apksigner verify pwa-app_$VERSION_TAG.apk
+        $BUILD_TOOLS_PATH/apksigner verify petit-recipe_$VERSION_TAG.apk
         
-        echo "🎯 署名完了 (v2対応): pwa-app_$VERSION_TAG.apk"
+        echo "🎯 署名完了 (v2対応): petit-recipe_$VERSION_TAG.apk"
 
     - name: Verify APK
       env:
@@ -235,7 +235,7 @@ jobs:
       run: |
         echo "🔍 APK検証開始"
         
-        APK_PATH="android/app/build/outputs/apk/release/pwa-app_$VERSION_TAG.apk"
+        APK_PATH="android/app/build/outputs/apk/release/petit-recipe_$VERSION_TAG.apk"
         
         if [ -f "$APK_PATH" ]; then
           APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
@@ -251,8 +251,8 @@ jobs:
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: PWA-APP-APK-${{ env.VERSION_TAG }}
-        path: android/app/build/outputs/apk/release/pwa-app_${{ env.VERSION_TAG }}.apk
+        name: PETIT-RECIPE-APK-${{ env.VERSION_TAG }}
+        path: android/app/build/outputs/apk/release/petit-recipe_${{ env.VERSION_TAG }}.apk
         retention-days: 30
 
     - name: Create Release (on main branch)
@@ -262,9 +262,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ env.VERSION_TAG }}
-        release_name: PWA App v${{ env.VERSION_TAG }}
+        release_name: Petit Recipe v${{ env.VERSION_TAG }}
         body: |
-          ## 📱 PWA App APK v${{ env.VERSION_TAG }}
+          ## 📱 Petit Recipe APK v${{ env.VERSION_TAG }}
           
           ### ✨ アプリ機能
           - 📱 PWA (Progressive Web App) 対応
@@ -284,7 +284,7 @@ jobs:
           2. Android端末にインストール
           3. PWAアプリを利用開始
           
-          **APKファイル**: PWA-APP-APK-${{ env.VERSION_TAG }}
+          **APKファイル**: PETIT-RECIPE-APK-${{ env.VERSION_TAG }}
         draft: false
         prerelease: false
 
@@ -301,10 +301,10 @@ jobs:
         echo "| コミット | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📦 成果物" >> $GITHUB_STEP_SUMMARY
-        echo "- APKファイル: \`pwa-app_${{ env.VERSION_TAG }}.apk\`" >> $GITHUB_STEP_SUMMARY
-        echo "- アーティファクト: PWA-APP-APK-${{ env.VERSION_TAG }}" >> $GITHUB_STEP_SUMMARY
+        echo "- APKファイル: \`petit-recipe_${{ env.VERSION_TAG }}.apk\`" >> $GITHUB_STEP_SUMMARY
+        echo "- アーティファクト: PETIT-RECIPE-APK-${{ env.VERSION_TAG }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "🚀 **PWA App APKビルドが正常に完了しました！**" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 **Petit Recipe APKビルドが正常に完了しました！**" >> $GITHUB_STEP_SUMMARY
 
     # SonarCloud Scan - Optional code quality check
     # Disabled for now to avoid authentication issues

@@ -1,6 +1,6 @@
 {
   "name": "petit-recipe",
-  "version": "1.0.0",
+  "version": "1.0.52",
   "type": "module",
   "description": "シンプルで使いやすいデジタルレシピ帳アプリ",
   "main": "index.html",
@@ -74,18 +74,18 @@
     "not ie 11"
   ],
   "pwa": {
-    "name": "PWA Template",
-    "short_name": "PWATemplate",
-    "theme_color": "#2C3E50",
+    "name": "Petit Recipe",
+    "short_name": "PetitRecipe",
+    "theme_color": "#3498db",
     "background_color": "#FFFFFF",
     "start_url": "./",
     "display": "standalone",
     "orientation": "portrait"
   },
   "capacitor": {
-    "appId": "com.example.pwatemplate",
-    "appName": "PWA Template",
-    "webDir": "./",
+    "appId": "com.bochang.petitrecipe",
+    "appName": "Petit Recipe",
+    "webDir": "dist",
     "bundledWebRuntime": false
   }
 }

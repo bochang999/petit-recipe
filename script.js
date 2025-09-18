@@ -18,8 +18,8 @@ function addDebugLog(message) {
   }
 }
 
-// 🔧 テスト関数
-function testSort(sortType) {
+// 🔧 テスト関数 (グローバルスコープ)
+window.testSort = function(sortType) {
   addDebugLog(`🔘 物理テストボタン: ${sortType}`);
   if (window.app && typeof window.app.sortRecipes === 'function') {
     addDebugLog(`✅ app.sortRecipes関数が存在`);
@@ -30,8 +30,8 @@ function testSort(sortType) {
   }
 }
 
-// 📱 ログ表示
-function showLogs() {
+// 📱 ログ表示 (グローバルスコープ)
+window.showLogs = function() {
   const logDiv = document.getElementById('debug-logs');
   const logContent = document.getElementById('log-content');
 

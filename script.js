@@ -1,7 +1,7 @@
 // Petit Recipe App JavaScript - RecipeBox UI Integration
 
 // ▼▼▼ Phase 3: Neural Network (Native Integration) ▼▼▼
-import { App } from '@capacitor/app';
+// import { App } from '@capacitor/app'; // Webブラウザ環境ではエラーになるためコメントアウト
 // ▲▲▲ Native Integration Imports ▲▲▲
 
 class PetitRecipeApp {

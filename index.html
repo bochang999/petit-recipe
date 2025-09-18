@@ -57,9 +57,21 @@
                 <!-- 🧪 デバッグ用物理ボタン -->
                 <div style="margin: 20px; padding: 15px; border: 2px dashed #007bff; background: #f0f8ff;">
                     <h3 style="margin: 0 0 10px 0; color: #007bff;">🧪 デバッグテスト</h3>
-                    <button onclick="testSort('time')" style="margin: 5px; padding: 10px; font-size: 16px;">時系列テスト</button>
-                    <button onclick="testSort('name')" style="margin: 5px; padding: 10px; font-size: 16px;">あいうえおテスト</button>
-                    <button onclick="testSort('popular')" style="margin: 5px; padding: 10px; font-size: 16px;">人気順テスト</button>
+
+                    <!-- 基本JavaScript実行テスト -->
+                    <div style="margin-bottom: 10px;">
+                        <button onclick="alert('JavaScript動作OK!')" style="margin: 5px; padding: 10px; font-size: 16px; background: #dc3545; color: white;">🔧 JS基本テスト</button>
+                        <button onclick="document.getElementById('test-result').innerHTML='ボタン動作OK!' + new Date().toLocaleTimeString()" style="margin: 5px; padding: 10px; font-size: 16px; background: #ffc107;">🎯 DOM操作テスト</button>
+                        <div id="test-result" style="padding: 5px; background: #fff; border: 1px solid #ccc; margin-top: 5px; min-height: 20px;"></div>
+                    </div>
+
+                    <!-- script.js関数テスト -->
+                    <div style="margin-bottom: 10px;">
+                        <button onclick="testSort('time')" style="margin: 5px; padding: 10px; font-size: 16px;">時系列テスト</button>
+                        <button onclick="testSort('name')" style="margin: 5px; padding: 10px; font-size: 16px;">あいうえおテスト</button>
+                        <button onclick="testSort('popular')" style="margin: 5px; padding: 10px; font-size: 16px;">人気順テスト</button>
+                    </div>
+
                     <button onclick="showLogs()" style="margin: 5px; padding: 10px; font-size: 16px; background: #28a745; color: white;">ログ表示</button>
                 </div>
 

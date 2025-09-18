@@ -1,7 +1,7 @@
 // Petit Recipe App JavaScript - RecipeBox UI Integration
 
 // ▼▼▼ Phase 3: Neural Network (Native Integration) ▼▼▼
-// import { App } from '@capacitor/app'; // Webブラウザ環境ではエラーになるためコメントアウト
+// 動的インポート: ブラウザ/Capacitor環境で条件分岐
 // ▲▲▲ Native Integration Imports ▲▲▲
 
 class PetitRecipeApp {
@@ -293,7 +293,7 @@ class PetitRecipeApp {
   }
 
   // ネイティブリスナー設定
-  setupNativeListeners() {
+  async setupNativeListeners() {
     // 重複登録防止
     if (this.nativeListenersRegistered) {
       console.log('⚠️ ネイティブリスナー既に登録済み');
@@ -301,33 +301,42 @@ class PetitRecipeApp {
     }
 
     // Capacitor環境チェック
-    if (typeof window.Capacitor !== "undefined" &&
-        window.Capacitor.Plugins &&
-        window.Capacitor.Plugins.App) {
+    if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform()) {
+      try {
+        // 動的インポート: ブラウザ環境では失敗しても続行
+        const { App } = await import('@capacitor/app');
 
-      // backButtonハンドラー
-      this.backButtonHandler = () => {
-        console.log('🔙 ネイティブ戻るボタン押下検出');
-        this.handleNativeBackButton();
-      };
+        // backButtonハンドラー
+        this.backButtonHandler = () => {
+          console.log('🔙 ネイティブ戻るボタン押下検出');
+          this.handleNativeBackButton();
+        };
 
-      window.Capacitor.Plugins.App.addListener('backButton', this.backButtonHandler);
-      this.nativeListenersRegistered = true;
-      console.log('✅ ネイティブリスナー設定完了');
+        await App.addListener('backButton', this.backButtonHandler);
+        this.nativeListenersRegistered = true;
+        console.log('✅ ネイティブリスナー設定完了');
+      } catch (error) {
+        console.log('ℹ️ Capacitorプラグインインポート失敗 (ブラウザ環境):', error.message);
+      }
     } else {
       console.log('ℹ️ Capacitor環境ではありません - ネイティブリスナー不要');
     }
   }
 
   // ネイティブ戻るボタン処理
-  handleNativeBackButton() {
+  async handleNativeBackButton() {
     if (this.history.length > 1) {
       console.log('📱 アプリ内ナビゲーション実行');
       this.navigateBack();
     } else {
       console.log('🚪 アプリ終了');
-      if (window.Capacitor && window.Capacitor.Plugins.App) {
-        window.Capacitor.Plugins.App.exitApp();
+      if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform()) {
+        try {
+          const { App } = await import('@capacitor/app');
+          await App.exitApp();
+        } catch (error) {
+          console.log('ℹ️ アプリ終了処理失敗 (ブラウザ環境):', error.message);
+        }
       }
     }
   }

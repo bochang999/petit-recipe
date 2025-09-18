@@ -19,6 +19,10 @@ class PetitRecipeApp {
       currentScreen: 'recipes-screen',
       selectedRecipeId: null
     };
+
+    // ネイティブリスナー管理用
+    this.nativeListenersRegistered = false;
+    this.backButtonHandler = null;
     // ▲▲▲ App Memory Implementation ▲▲▲
 
     this.init();
@@ -283,6 +287,49 @@ class PetitRecipeApp {
         this.updatePortion(e.target.value);
       });
     }
+
+    // ▼▼▼ Phase 3: ネイティブイベント統合 ▼▼▼
+    this.setupNativeListeners();
+  }
+
+  // ネイティブリスナー設定
+  setupNativeListeners() {
+    // 重複登録防止
+    if (this.nativeListenersRegistered) {
+      console.log('⚠️ ネイティブリスナー既に登録済み');
+      return;
+    }
+
+    // Capacitor環境チェック
+    if (typeof window.Capacitor !== "undefined" &&
+        window.Capacitor.Plugins &&
+        window.Capacitor.Plugins.App) {
+
+      // backButtonハンドラー
+      this.backButtonHandler = () => {
+        console.log('🔙 ネイティブ戻るボタン押下検出');
+        this.handleNativeBackButton();
+      };
+
+      window.Capacitor.Plugins.App.addListener('backButton', this.backButtonHandler);
+      this.nativeListenersRegistered = true;
+      console.log('✅ ネイティブリスナー設定完了');
+    } else {
+      console.log('ℹ️ Capacitor環境ではありません - ネイティブリスナー不要');
+    }
+  }
+
+  // ネイティブ戻るボタン処理
+  handleNativeBackButton() {
+    if (this.history.length > 1) {
+      console.log('📱 アプリ内ナビゲーション実行');
+      this.navigateBack();
+    } else {
+      console.log('🚪 アプリ終了');
+      if (window.Capacitor && window.Capacitor.Plugins.App) {
+        window.Capacitor.Plugins.App.exitApp();
+      }
+    }
   }
 
   // レシピ一覧の表示
@@ -339,6 +386,9 @@ class PetitRecipeApp {
 
     this.currentRecipe = recipe;
     this.currentPortion = 1;
+
+    // ★★★ 重要: selectedRecipeIdの更新 ★★★
+    this.state.selectedRecipeId = recipeId;
 
     // 閲覧数をインクリメント
     this.incrementViewCount(recipeId);
@@ -688,18 +738,5 @@ document.addEventListener("DOMContentLoaded", function () {
   app = new PetitRecipeApp();
   window.app = app; // グローバルアクセス用
 
-  // ▼▼▼ Phase 3: Neural Network (Native Integration) ▼▼▼
-  // Capacitor backButton統合
-  App.addListener('backButton', () => {
-    console.log('🔙 ネイティブ戻るボタン押下検出');
-    if (app.history.length > 1) {
-      console.log('📱 アプリ内ナビゲーション実行');
-      app.navigateBack();
-    } else {
-      console.log('🚪 アプリ終了');
-      App.exitApp();
-    }
-  });
-  console.log('✅ ネイティブ統合完了: backButton対応済み');
-  // ▲▲▲ Native Integration Complete ▲▲▲
+  // ネイティブリスナーはsetupEventListeners()内で管理
 });

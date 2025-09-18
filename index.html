@@ -53,6 +53,21 @@
                 <div id="recipes-list" class="recipes-list">
                     <!-- レシピ一覧がここに表示される -->
                 </div>
+
+                <!-- 🧪 デバッグ用物理ボタン -->
+                <div style="margin: 20px; padding: 15px; border: 2px dashed #007bff; background: #f0f8ff;">
+                    <h3 style="margin: 0 0 10px 0; color: #007bff;">🧪 デバッグテスト</h3>
+                    <button onclick="testSort('time')" style="margin: 5px; padding: 10px; font-size: 16px;">時系列テスト</button>
+                    <button onclick="testSort('name')" style="margin: 5px; padding: 10px; font-size: 16px;">あいうえおテスト</button>
+                    <button onclick="testSort('popular')" style="margin: 5px; padding: 10px; font-size: 16px;">人気順テスト</button>
+                    <button onclick="showLogs()" style="margin: 5px; padding: 10px; font-size: 16px; background: #28a745; color: white;">ログ表示</button>
+                </div>
+
+                <!-- 🖥️ ログ表示エリア -->
+                <div id="debug-logs" style="margin: 20px; padding: 15px; background: #000; color: #0f0; font-family: monospace; max-height: 300px; overflow-y: auto; display: none;">
+                    <h4 style="color: #0f0; margin: 0 0 10px 0;">📱 ログ出力</h4>
+                    <div id="log-content"></div>
+                </div>
             </div>
         </div>
 

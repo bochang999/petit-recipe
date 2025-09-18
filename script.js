@@ -4,6 +4,43 @@
 // 動的インポート: ブラウザ/Capacitor環境で条件分岐
 // ▲▲▲ Native Integration Imports ▲▲▲
 
+// 🧪 デバッグログ管理
+let debugLogs = [];
+function addDebugLog(message) {
+  const timestamp = new Date().toLocaleTimeString();
+  const logEntry = `[${timestamp}] ${message}`;
+  debugLogs.push(logEntry);
+  console.log(logEntry);
+
+  // 最新20件のみ保持
+  if (debugLogs.length > 20) {
+    debugLogs.shift();
+  }
+}
+
+// 🔧 テスト関数
+function testSort(sortType) {
+  addDebugLog(`🔘 物理テストボタン: ${sortType}`);
+  if (window.app && typeof window.app.sortRecipes === 'function') {
+    addDebugLog(`✅ app.sortRecipes関数が存在`);
+    window.app.sortRecipes(sortType);
+  } else {
+    addDebugLog(`❌ app.sortRecipes関数が見つからない`);
+    addDebugLog(`🔍 window.app = ${typeof window.app}`);
+  }
+}
+
+// 📱 ログ表示
+function showLogs() {
+  const logDiv = document.getElementById('debug-logs');
+  const logContent = document.getElementById('log-content');
+
+  if (logDiv && logContent) {
+    logContent.innerHTML = debugLogs.join('<br>');
+    logDiv.style.display = logDiv.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
 class PetitRecipeApp {
   constructor() {
     this.recipes = [];
@@ -258,7 +295,7 @@ class PetitRecipeApp {
 
   // イベントリスナー設定
   setupEventListeners() {
-    console.log('🎧 setupEventListeners開始');
+    addDebugLog('🎧 setupEventListeners開始');
     // 検索機能
     const searchInput = document.getElementById("recipe-search");
     if (searchInput) {
@@ -270,7 +307,7 @@ class PetitRecipeApp {
     // ソートタブ
     document.querySelectorAll(".sort-tab").forEach((tab) => {
       tab.addEventListener("click", (e) => {
-        console.log('🔘 ソートボタンクリック検出:', e.target.textContent);
+        addDebugLog('🔘 ソートボタンクリック検出: ' + e.target.textContent);
 
         // アクティブタブの切り替え
         document
@@ -279,7 +316,7 @@ class PetitRecipeApp {
         e.target.classList.add("active");
 
         const sortType = e.target.dataset.sort;
-        console.log('📊 ソートタイプ:', sortType);
+        addDebugLog('📊 ソートタイプ: ' + sortType);
         this.sortRecipes(sortType);
       });
     });
@@ -706,7 +743,7 @@ class PetitRecipeApp {
 
   // レシピのソート
   sortRecipes(sortType) {
-    console.log(`🔄 レシピソート開始: ${sortType}`);
+    addDebugLog('🔄 レシピソート開始: ' + sortType);
     
     switch (sortType) {
       case 'time':

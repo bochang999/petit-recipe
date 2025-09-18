@@ -739,4 +739,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window.app = app; // グローバルアクセス用
 
   // ネイティブリスナーはsetupEventListeners()内で管理
+
+  // 🧪 初期化完了確認テスト
+  alert("初期化完了");
 });

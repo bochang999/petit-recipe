@@ -258,6 +258,7 @@ class PetitRecipeApp {
 
   // イベントリスナー設定
   setupEventListeners() {
+    console.log('🎧 setupEventListeners開始');
     // 検索機能
     const searchInput = document.getElementById("recipe-search");
     if (searchInput) {
@@ -269,6 +270,8 @@ class PetitRecipeApp {
     // ソートタブ
     document.querySelectorAll(".sort-tab").forEach((tab) => {
       tab.addEventListener("click", (e) => {
+        console.log('🔘 ソートボタンクリック検出:', e.target.textContent);
+
         // アクティブタブの切り替え
         document
           .querySelectorAll(".sort-tab")
@@ -276,6 +279,7 @@ class PetitRecipeApp {
         e.target.classList.add("active");
 
         const sortType = e.target.dataset.sort;
+        console.log('📊 ソートタイプ:', sortType);
         this.sortRecipes(sortType);
       });
     });

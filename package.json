@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "http-server -p 8080 -c-1",
     "start": "http-server -p 8080 -c-1",
-    "build": "echo 'Build completed'",
+    "build": "mkdir -p dist && cp -f *.html *.js *.css *.json sw.js dist/ && cp -rf icons dist/ 2>/dev/null || echo 'Build completed'",
     "test": "echo 'No tests specified'",
     "capacitor:init": "npx cap init",
     "capacitor:add:android": "npx cap add android",

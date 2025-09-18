@@ -1,5 +1,9 @@
 // Petit Recipe App JavaScript - RecipeBox UI Integration
 
+// ▼▼▼ Phase 3: Neural Network (Native Integration) ▼▼▼
+import { App } from '@capacitor/app';
+// ▲▲▲ Native Integration Imports ▲▲▲
+
 class PetitRecipeApp {
   constructor() {
     this.recipes = [];
@@ -8,6 +12,15 @@ class PetitRecipeApp {
     this.currentPortion = 1;
     this.currentScreen = "recipes-screen";
     this.viewCounts = {};
+
+    // ▼▼▼ Phase 1: App Memory (State Management) ▼▼▼
+    this.history = [];
+    this.state = {
+      currentScreen: 'recipes-screen',
+      selectedRecipeId: null
+    };
+    // ▲▲▲ App Memory Implementation ▲▲▲
+
     this.init();
   }
 
@@ -38,11 +51,27 @@ class PetitRecipeApp {
     // 閲覧数データの読み込み
     this.loadViewCounts();
 
+    // ▼▼▼ Phase 1: State Restoration ▼▼▼
+    // アプリ状態の復元
+    const stateRestored = this.loadState();
+    if (stateRestored) {
+      console.log('🔄 前回の状態を復元:', this.state);
+      // 復元された状態に基づいて画面を表示
+      this.showScreen(this.state.currentScreen);
+
+      // レシピ詳細画面の場合、レシピも復元
+      if (this.state.currentScreen === 'recipe-detail-screen' && this.state.selectedRecipeId) {
+        this.showRecipeDetail(this.state.selectedRecipeId);
+      }
+    } else {
+      console.log('🆕 初回起動またはクリーン初期化');
+      // 初期画面表示
+      this.renderRecipes();
+    }
+    // ▲▲▲ State Restoration ▲▲▲
+
     // イベントリスナー設定
     this.setupEventListeners();
-
-    // 初期画面表示
-    this.renderRecipes();
 
     console.log("✅ Petit Recipe 初期化完了");
   }
@@ -407,8 +436,17 @@ class PetitRecipeApp {
   }
 
 
-  // 画面切り替え
+  // ▼▼▼ Phase 2: Enhanced Screen Navigation ▼▼▼
+  // 画面切り替え（履歴管理機能付き）
   showScreen(screenId) {
+    // 現在の画面が同じ場合は何もしない
+    if (this.state.currentScreen === screenId) {
+      console.log('📱 同じ画面のため切り替えスキップ:', screenId);
+      return;
+    }
+
+    console.log(`🔄 画面遷移: ${this.state.currentScreen} → ${screenId}`);
+
     // すべての画面を非表示
     document.querySelectorAll(".screen").forEach((screen) => {
       screen.classList.remove("active");
@@ -418,9 +456,69 @@ class PetitRecipeApp {
     const targetScreen = document.getElementById(screenId);
     if (targetScreen) {
       targetScreen.classList.add("active");
+
+      // ▼▼▼ Phase 2: State & History Management ▼▼▼
+      // 状態を更新
+      this.state.currentScreen = screenId;
+
+      // 履歴に追加（同じ画面の連続は避ける）
+      if (this.history.length === 0 || this.history[this.history.length - 1] !== screenId) {
+        this.history.push(screenId);
+        console.log('📚 履歴追加:', this.history);
+      }
+
+      // 状態を永続化
+      this.saveState();
+      // ▲▲▲ State & History Management ▲▲▲
+
+      // 古い currentScreen プロパティとの互換性のため
       this.currentScreen = screenId;
+    } else {
+      console.error('❌ 画面要素が見つかりません:', screenId);
     }
   }
+
+  // 戻るナビゲーション
+  navigateBack() {
+    console.log('⬅️ 戻る操作開始');
+
+    if (this.history.length <= 1) {
+      console.log('📚 履歴が少ないため、デフォルト画面に戻ります');
+      this.showScreen('recipes-screen');
+      return;
+    }
+
+    // 現在の画面を履歴から削除
+    this.history.pop();
+
+    // 前の画面を取得
+    const previousScreen = this.history[this.history.length - 1];
+    console.log('📚 前の画面:', previousScreen);
+
+    // 前の画面を表示（showScreenは履歴に追加するが、すでに存在するのでスキップされる）
+    this.state.currentScreen = previousScreen;
+    this.currentScreen = previousScreen;
+
+    // 画面切り替え（履歴追加はしない）
+    document.querySelectorAll(".screen").forEach((screen) => {
+      screen.classList.remove("active");
+    });
+
+    const targetScreen = document.getElementById(previousScreen);
+    if (targetScreen) {
+      targetScreen.classList.add("active");
+      console.log(`✅ 戻り完了: ${previousScreen}`);
+
+      // レシピ一覧画面に戻る場合は、レシピを再描画
+      if (previousScreen === 'recipes-screen') {
+        this.renderRecipes();
+      }
+
+      // 状態を保存
+      this.saveState();
+    }
+  }
+  // ▲▲▲ Enhanced Screen Navigation ▲▲▲
 
   // カテゴリアイコンの取得
   getCategoryIcon(category) {
@@ -484,6 +582,50 @@ class PetitRecipeApp {
     }
   }
 
+  // ▼▼▼ Phase 1: State Management Methods ▼▼▼
+  // アプリ状態の保存
+  saveState() {
+    try {
+      const stateData = {
+        currentScreen: this.state.currentScreen,
+        selectedRecipeId: this.state.selectedRecipeId,
+        history: this.history
+      };
+      localStorage.setItem('petit-recipe-state', JSON.stringify(stateData));
+      console.log('💾 アプリ状態保存完了:', stateData);
+    } catch (error) {
+      console.error('❌ アプリ状態保存失敗:', error);
+    }
+  }
+
+  // アプリ状態の読み込み
+  loadState() {
+    try {
+      const saved = localStorage.getItem('petit-recipe-state');
+      if (saved) {
+        const stateData = JSON.parse(saved);
+        this.state.currentScreen = stateData.currentScreen || 'recipes-screen';
+        this.state.selectedRecipeId = stateData.selectedRecipeId || null;
+        this.history = stateData.history || [];
+        console.log('📂 アプリ状態読み込み完了:', stateData);
+        return true;
+      } else {
+        console.log('📂 アプリ状態初期化');
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ アプリ状態読み込み失敗:', error);
+      // フォールバック：デフォルト状態
+      this.state = {
+        currentScreen: 'recipes-screen',
+        selectedRecipeId: null
+      };
+      this.history = [];
+      return false;
+    }
+  }
+  // ▲▲▲ State Management Methods ▲▲▲
+
   // 閲覧数のインクリメント
   incrementViewCount(recipeId) {
     if (!this.viewCounts[recipeId]) {
@@ -545,4 +687,19 @@ let app;
 document.addEventListener("DOMContentLoaded", function () {
   app = new PetitRecipeApp();
   window.app = app; // グローバルアクセス用
+
+  // ▼▼▼ Phase 3: Neural Network (Native Integration) ▼▼▼
+  // Capacitor backButton統合
+  App.addListener('backButton', () => {
+    console.log('🔙 ネイティブ戻るボタン押下検出');
+    if (app.history.length > 1) {
+      console.log('📱 アプリ内ナビゲーション実行');
+      app.navigateBack();
+    } else {
+      console.log('🚪 アプリ終了');
+      App.exitApp();
+    }
+  });
+  console.log('✅ ネイティブ統合完了: backButton対応済み');
+  // ▲▲▲ Native Integration Complete ▲▲▲
 });

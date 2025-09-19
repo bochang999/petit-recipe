@@ -569,6 +569,12 @@ class PetitRecipeApp {
         debugAreaDetail.style.display = screenId === 'recipe-detail-screen' ? 'block' : 'none';
       }
 
+      // レシピ一覧画面の場合はレシピリストを描画
+      if (screenId === 'recipes-screen') {
+        this.renderRecipes();
+        console.log('🎨 レシピ一覧画面でレシピリスト描画実行');
+      }
+
       // ▼▼▼ Phase 2: State & History Management ▼▼▼
       // 状態を更新
       this.state.currentScreen = screenId;

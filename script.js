@@ -557,17 +557,6 @@ class PetitRecipeApp {
     if (targetScreen) {
       targetScreen.classList.add("active");
 
-      // デバッグエリア表示制御
-      const debugArea = document.querySelector('.debug-area');
-      if (debugArea) {
-        debugArea.style.display = screenId === 'recipes-screen' ? 'block' : 'none';
-      }
-
-      // レシピ詳細画面のデバッグエリア表示制御
-      const debugAreaDetail = document.querySelector('.debug-area-detail');
-      if (debugAreaDetail) {
-        debugAreaDetail.style.display = screenId === 'recipe-detail-screen' ? 'block' : 'none';
-      }
 
       // レシピ一覧画面の場合はレシピリストを描画
       if (screenId === 'recipes-screen') {

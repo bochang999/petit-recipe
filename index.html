@@ -35,6 +35,7 @@
             <header class="screen-header">
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
+                    <button class="settings-button" onclick="window.app.showSettings()">⚙️</button>
                     <!-- レシピ追加機能を削除 -->
                 </div>
             </header>
@@ -54,6 +55,12 @@
                     <!-- レシピ一覧がここに表示される -->
                 </div>
 
+                <!-- ▼▼▼ BOC-98: Floating Action Button for Recipe Addition ▼▼▼ -->
+                <button class="fab" onclick="window.app.showAddRecipeScreen()" title="新しいレシピを追加">
+                    ➕
+                </button>
+                <!-- ▲▲▲ BOC-98: Recipe Addition Button ▲▲▲ -->
+
             </div>
         </div>
 
@@ -62,6 +69,16 @@
             <header class="screen-header">
                 <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 id="recipe-detail-title">レシピ詳細</h2>
+                <!-- ▼▼▼ BOC-99: Edit/Delete Action Buttons ▼▼▼ -->
+                <div class="header-actions">
+                    <button class="action-btn edit-btn" onclick="window.app.startEditRecipe()" title="レシピを編集">
+                        ✏️
+                    </button>
+                    <button class="action-btn delete-btn" onclick="window.app.confirmDeleteRecipe()" title="レシピを削除">
+                        🗑️
+                    </button>
+                </div>
+                <!-- ▲▲▲ BOC-99: Edit/Delete Buttons ▲▲▲ -->
             </header>
 
 
@@ -107,6 +124,207 @@
                 </div>
             </div>
         </div>
+
+        <!-- ▼▼▼ BOC-98: Recipe Addition Screen ▼▼▼ -->
+        <div id="add-recipe-screen" class="screen">
+            <header class="screen-header">
+                <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
+                <h2 class="screen-title">新しいレシピを追加</h2>
+            </header>
+
+            <div class="screen-content">
+                <!-- ▼▼▼ BOC-99: Edit Mode Indicator ▼▼▼ -->
+                <div id="edit-mode-indicator" class="edit-mode-indicator" style="display: none;">
+                    ✏️ 編集モード: レシピを更新しています
+                </div>
+                <!-- ▲▲▲ BOC-99: Edit Mode Indicator ▲▲▲ -->
+
+                <form id="add-recipe-form" class="recipe-form">
+                    <!-- レシピ名 -->
+                    <div class="form-group">
+                        <label for="recipe-title" class="form-label">レシピ名 *</label>
+                        <input
+                            type="text"
+                            id="recipe-title"
+                            name="title"
+                            class="form-input"
+                            placeholder="例: チキンカレー"
+                            required
+                        >
+                    </div>
+
+                    <!-- 分量 -->
+                    <div class="form-group">
+                        <label for="recipe-servings" class="form-label">分量</label>
+                        <input
+                            type="text"
+                            id="recipe-servings"
+                            name="servings"
+                            class="form-input"
+                            placeholder="例: 4人前"
+                            value="1人前"
+                        >
+                    </div>
+
+                    <!-- 調理時間 -->
+                    <div class="form-group">
+                        <label for="recipe-cooktime" class="form-label">調理時間</label>
+                        <input
+                            type="text"
+                            id="recipe-cooktime"
+                            name="cookTime"
+                            class="form-input"
+                            placeholder="例: 30分"
+                            value="未設定"
+                        >
+                    </div>
+
+                    <!-- 難易度 -->
+                    <div class="form-group">
+                        <label for="recipe-difficulty" class="form-label">難易度</label>
+                        <select id="recipe-difficulty" name="difficulty" class="form-select">
+                            <option value="初級">初級</option>
+                            <option value="中級">中級</option>
+                            <option value="上級">上級</option>
+                        </select>
+                    </div>
+
+                    <!-- 材料 -->
+                    <div class="form-group">
+                        <label for="recipe-ingredients" class="form-label">材料 *</label>
+                        <textarea
+                            id="recipe-ingredients"
+                            name="ingredients"
+                            class="form-textarea"
+                            placeholder="材料を1行ずつ入力してください&#10;例:&#10;鶏もも肉 300g&#10;玉ねぎ 1個&#10;カレールウ 1箱"
+                            rows="6"
+                            required
+                        ></textarea>
+                        <div class="form-help">各材料を改行で区切って入力してください</div>
+                    </div>
+
+                    <!-- 手順 -->
+                    <div class="form-group">
+                        <label for="recipe-instructions" class="form-label">作り方 *</label>
+                        <textarea
+                            id="recipe-instructions"
+                            name="instructions"
+                            class="form-textarea"
+                            placeholder="手順を1行ずつ入力してください&#10;例:&#10;玉ねぎを薄切りにする&#10;鶏肉を一口大に切る&#10;フライパンで炒める"
+                            rows="8"
+                            required
+                        ></textarea>
+                        <div class="form-help">各手順を改行で区切って入力してください</div>
+                    </div>
+
+                    <!-- アクションボタン -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="window.app.navigateBack()">
+                            キャンセル
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-icon">💾</span>
+                            レシピを保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- ▲▲▲ BOC-98: Recipe Addition Screen ▲▲▲ -->
+
+        <!-- ▼▼▼ BOC-99: Delete Confirmation Modal ▼▼▼ -->
+        <div id="delete-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h3 class="modal-title">レシピを削除しますか？</h3>
+                <p class="modal-message">
+                    <span id="delete-recipe-name"></span>を削除しようとしています。<br>
+                    この操作は取り消すことができません。
+                </p>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-cancel" onclick="window.app.cancelDeleteRecipe()">
+                        キャンセル
+                    </button>
+                    <button class="modal-btn modal-btn-delete" onclick="window.app.executeDeleteRecipe()">
+                        削除する
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- ▲▲▲ BOC-99: Delete Confirmation Modal ▲▲▲ -->
+
+        <!-- ▼▼▼ BOC-100: Settings Screen ▼▼▼ -->
+        <div id="settings-screen" class="screen">
+            <header class="screen-header">
+                <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
+                <h2 class="screen-title">設定</h2>
+            </header>
+
+            <div class="screen-content">
+                <div class="settings-section">
+                    <h3>データ管理</h3>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>データをエクスポート（バックアップ）</h4>
+                                <p>全てのレシピと閲覧データをJSONファイルで保存します</p>
+                            </div>
+                            <button class="setting-button primary" onclick="window.app.exportData()">
+                                📦 エクスポート
+                            </button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>データをインポート（リストア）</h4>
+                                <p>バックアップファイルからデータを復元します</p>
+                                <small class="warning">⚠️ 現在のデータは全て上書きされます</small>
+                            </div>
+                            <button class="setting-button danger" onclick="window.app.importData()">
+                                📥 インポート
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>アプリ情報</h3>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>バージョン</h4>
+                                <p id="app-version">Petit Recipe v3.0</p>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>データベース状態</h4>
+                                <p id="db-status">読み込み中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ▼▼▼ BOC-100: Import Confirmation Modal ▼▼▼ -->
+        <div id="import-confirmation-modal" class="modal">
+            <div class="modal-content">
+                <h3>⚠️ データインポート確認</h3>
+                <p>現在のデータは<strong>すべて上書き</strong>されます。</p>
+                <p>この操作は<strong>元に戻せません</strong>。</p>
+                <p>本当によろしいですか？</p>
+
+                <div class="modal-buttons">
+                    <button class="modal-button cancel" onclick="window.app.cancelImport()">キャンセル</button>
+                    <button class="modal-button danger" onclick="window.app.confirmImport()">上書きする</button>
+                </div>
+            </div>
+        </div>
+        <!-- ▲▲▲ BOC-100: Import Confirmation Modal ▲▲▲ -->
+
+        <!-- Hidden file input for import -->
+        <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="window.app.handleFileSelection(event)">
+        <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->
     </div>
 
     <!-- レシピデータファイル読み込み（APK環境対応） -->

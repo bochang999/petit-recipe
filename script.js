@@ -539,8 +539,8 @@ class PetitRecipeApp {
   // ▼▼▼ Phase 2: Enhanced Screen Navigation ▼▼▼
   // 画面切り替え（履歴管理機能付き）
   showScreen(screenId) {
-    // 現在の画面が同じ場合は何もしない
-    if (this.state.currentScreen === screenId) {
+    // レシピ詳細画面の場合は同じ画面でも再表示を許可
+    if (this.state.currentScreen === screenId && screenId !== 'recipe-detail-screen') {
       console.log('📱 同じ画面のため切り替えスキップ:', screenId);
       return;
     }
@@ -556,6 +556,18 @@ class PetitRecipeApp {
     const targetScreen = document.getElementById(screenId);
     if (targetScreen) {
       targetScreen.classList.add("active");
+
+      // デバッグエリア表示制御
+      const debugArea = document.querySelector('.debug-area');
+      if (debugArea) {
+        debugArea.style.display = screenId === 'recipes-screen' ? 'block' : 'none';
+      }
+
+      // レシピ詳細画面のデバッグエリア表示制御
+      const debugAreaDetail = document.querySelector('.debug-area-detail');
+      if (debugAreaDetail) {
+        debugAreaDetail.style.display = screenId === 'recipe-detail-screen' ? 'block' : 'none';
+      }
 
       // ▼▼▼ Phase 2: State & History Management ▼▼▼
       // 状態を更新

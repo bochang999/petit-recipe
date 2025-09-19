@@ -54,19 +54,19 @@
                     <!-- レシピ一覧がここに表示される -->
                 </div>
 
-                <!-- 🧪 デバッグ用物理ボタン -->
-                <div style="margin: 20px; padding: 15px; border: 2px dashed #007bff; background: #f0f8ff;">
-                    <h3 style="margin: 0 0 10px 0; color: #007bff;">🧪 デバッグテスト</h3>
+                <!-- 🧪 デバッグ用物理ボタン (レシピ一覧のみ表示) -->
+                <div class="debug-area" style="margin: 10px; padding: 7px; border: 2px dashed #007bff; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); display: none;">
+                    <h3 style="margin: 0 0 5px 0; color: white;">🧪 デバッグテスト</h3>
 
                     <!-- 基本JavaScript実行テスト -->
-                    <div style="margin-bottom: 10px;">
+                    <div style="margin-bottom: 5px;">
                         <button onclick="alert('JavaScript動作OK!')" style="margin: 5px; padding: 10px; font-size: 16px; background: #dc3545; color: white;">🔧 JS基本テスト</button>
                         <button onclick="document.getElementById('test-result').innerHTML='ボタン動作OK!' + new Date().toLocaleTimeString()" style="margin: 5px; padding: 10px; font-size: 16px; background: #ffc107;">🎯 DOM操作テスト</button>
                         <div id="test-result" style="padding: 5px; background: #fff; border: 1px solid #ccc; margin-top: 5px; min-height: 20px;"></div>
                     </div>
 
                     <!-- script.js関数テスト -->
-                    <div style="margin-bottom: 10px;">
+                    <div style="margin-bottom: 5px;">
                         <button onclick="testSort('time')" style="margin: 5px; padding: 10px; font-size: 16px;">時系列テスト</button>
                         <button onclick="testSort('name')" style="margin: 5px; padding: 10px; font-size: 16px;">あいうえおテスト</button>
                         <button onclick="testSort('popular')" style="margin: 5px; padding: 10px; font-size: 16px;">人気順テスト</button>
@@ -86,10 +86,18 @@
         <!-- レシピ詳細画面 -->
         <div id="recipe-detail-screen" class="screen">
             <header class="screen-header">
-                <button class="back-button" onclick="showScreen('recipes-screen')">← 戻る</button>
+                <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 id="recipe-detail-title">レシピ詳細</h2>
             </header>
-            
+
+            <!-- 🧪 レシピ詳細用デバッグエリア -->
+            <div class="debug-area-detail" style="margin: 5px; padding: 5px; border: 1px solid #28a745; background: #e8f5e9; display: none;">
+                <strong style="color: #2e7d32;">🧪 戻るボタンデバッグ</strong>
+                <button onclick="alert('戻るボタンテスト: window.app=' + (window.app ? 'あり' : 'なし'))" style="margin: 3px; padding: 5px; font-size: 12px; background: #ff9800;">戻るボタンテスト</button>
+                <button onclick="window.app && window.app.navigateBack ? window.app.navigateBack() : alert('navigateBack関数なし')" style="margin: 3px; padding: 5px; font-size: 12px; background: #4caf50;">直接戻る実行</button>
+                <button onclick="addDebugLog('戻るボタン押下: ' + new Date().toLocaleTimeString())" style="margin: 3px; padding: 5px; font-size: 12px; background: #2196f3;">ログ追加</button>
+            </div>
+
             <div class="screen-content">
                 <!-- 分量調整 -->
                 <div class="portion-adjustment">

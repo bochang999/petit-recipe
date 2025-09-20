@@ -304,23 +304,24 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- ▼▼▼ BOC-100: Import Confirmation Modal ▼▼▼ -->
-        <div id="import-confirmation-modal" class="modal">
-            <div class="modal-content">
-                <h3>⚠️ データインポート確認</h3>
-                <p>現在のデータは<strong>すべて上書き</strong>されます。</p>
-                <p>この操作は<strong>元に戻せません</strong>。</p>
-                <p>本当によろしいですか？</p>
+            <!-- ▼▼▼ BOC-100: Import Confirmation Modal (Settings Screen Scoped) ▼▼▼ -->
+            <div id="import-confirmation-modal" class="modal">
+                <div class="modal-content">
+                    <h3>⚠️ データインポート確認</h3>
+                    <p>現在のデータは<strong>すべて上書き</strong>されます。</p>
+                    <p>この操作は<strong>元に戻せません</strong>。</p>
+                    <p>本当よろしいですか？</p>
 
-                <div class="modal-buttons">
-                    <button class="modal-button cancel" onclick="window.app.cancelImport()">キャンセル</button>
-                    <button class="modal-button danger" onclick="window.app.confirmImport()">上書きする</button>
+                    <div class="modal-buttons">
+                        <button class="modal-button cancel" onclick="window.app.cancelImport()">キャンセル</button>
+                        <button class="modal-button danger" onclick="window.app.confirmImport()">上書きする</button>
+                    </div>
                 </div>
             </div>
+            <!-- ▲▲▲ BOC-100: Import Confirmation Modal ▲▲▲ -->
         </div>
-        <!-- ▲▲▲ BOC-100: Import Confirmation Modal ▲▲▲ -->
+
 
         <!-- ▼▼▼ BOC-100: Mobile Debug Panel ▼▼▼ -->
         <div id="mobile-debug-panel" class="mobile-debug-panel" style="display: none;">

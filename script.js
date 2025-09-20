@@ -1930,21 +1930,36 @@ class PetitRecipeApp {
     try {
       addBOC100Log('📱 ネイティブファイル保存開始', 'info');
 
-      // Capacitor プラグインの存在確認
-      if (!window.Capacitor || !window.Capacitor.Plugins) {
-        throw new Error('Capacitor プラグインが利用できません');
+      // Capacitor プラットフォーム確認
+      if (!window.Capacitor || !window.Capacitor.isNativePlatform()) {
+        throw new Error('ネイティブプラットフォームではありません');
       }
 
-      const { Filesystem, Directory } = window.Capacitor.Plugins;
+      // プラットフォーム準備完了を待つ
+      await window.Capacitor.Plugins.Device.getInfo();
+      addBOC100Log('✅ Capacitor プラットフォーム初期化確認完了', 'success');
 
-      // Filesystem プラグインの存在確認
-      if (!Filesystem || !Directory) {
-        throw new Error('Filesystem プラグインが初期化されていません');
+      // Capacitor 7.x 形式での Filesystem プラグイン取得
+      const { Filesystem } = window.Capacitor.Plugins;
+
+      if (!Filesystem || typeof Filesystem.writeFile !== 'function') {
+        throw new Error('Filesystem プラグインが利用できません');
       }
 
-      // より安全なDirectory.Data（アプリ専用）を使用
-      const targetDirectory = Directory.Data || Directory.Documents;
-      addBOC100Log(`📂 保存先: ${targetDirectory === Directory.Data ? 'Data' : 'Documents'}ディレクトリ`, 'info');
+      // Directory 定数を直接定義（Capacitor 7.x互換）
+      const DirectoryType = {
+        Documents: 'DOCUMENTS',
+        Data: 'DATA',
+        Library: 'LIBRARY',
+        Cache: 'CACHE',
+        External: 'EXTERNAL',
+        ExternalStorage: 'EXTERNAL_STORAGE'
+      };
+
+      // より安全なData（アプリ専用）を優先使用
+      const targetDirectory = DirectoryType.Data;
+      addBOC100Log(`📂 保存先ディレクトリ: ${targetDirectory}`, 'info');
+      addBOC100Log(`📄 ファイル名: ${filename}`, 'info');
 
       const result = await Filesystem.writeFile({
         path: filename,
@@ -1953,15 +1968,16 @@ class PetitRecipeApp {
         encoding: 'utf8'
       });
 
-      addBOC100Log(`✅ ファイル保存成功: ${result.uri}`, 'success');
+      addBOC100Log(`✅ ファイル保存成功: ${result.uri || 'パス不明'}`, 'success');
       return {
         success: true,
-        path: result.uri,
-        message: `ファイル「${filename}」を${targetDirectory === Directory.Data ? 'アプリデータ' : 'Documents'}フォルダに保存しました`
+        path: result.uri || filename,
+        message: `ファイル「${filename}」をアプリデータフォルダに保存しました`
       };
 
     } catch (error) {
       addBOC100Log(`❌ ネイティブファイル保存エラー: ${error.message}`, 'error');
+      addBOC100Log(`🔧 エラー詳細: ${JSON.stringify(error)}`, 'error');
       throw new Error(`ネイティブファイル保存失敗: ${error.message}`);
     }
   }

@@ -149,6 +149,10 @@ class LocalRecipeDatabase {
       await this.migrateFromStaticData();
     } else {
       console.log('✅ localStorageデータ存在確認済み');
+
+      // ▼▼▼ BOC-100: 既存データのID統一化チェック ▼▼▼
+      await this.checkAndFixExistingDataIds();
+      // ▲▲▲ BOC-100: 既存データのID統一化チェック ▲▲▲
     }
 
     return this.loadRecipes();
@@ -176,8 +180,25 @@ class LocalRecipeDatabase {
         return;
       }
 
-      // localStorageに保存
-      this.saveRecipes(staticData);
+      // ▼▼▼ BOC-100: Recipe ID統一化システム ▼▼▼
+      // 静的データのIDを統一フォーマット (recipe_X) に変換
+      const unifiedRecipes = staticData.map(recipe => {
+        const originalId = recipe.id;
+        const unifiedId = originalId.startsWith('recipe_') ? originalId : `recipe_${originalId}`;
+
+        console.log(`🔄 ID変換: "${originalId}" → "${unifiedId}"`);
+
+        return {
+          ...recipe,
+          id: unifiedId
+        };
+      });
+
+      console.log(`✅ ID統一化完了: ${unifiedRecipes.length}件のレシピを変換`);
+      // ▲▲▲ BOC-100: Recipe ID統一化システム ▲▲▲
+
+      // 統一されたデータをlocalStorageに保存
+      this.saveRecipes(unifiedRecipes);
 
       // バージョン情報も保存
       localStorage.setItem(this.VERSION_KEY, this.CURRENT_VERSION);
@@ -198,6 +219,85 @@ class LocalRecipeDatabase {
       throw new Error(`Migration failed: ${error.message}`);
     }
   }
+
+  // ▼▼▼ BOC-100: 既存データID統一化チェック・修正 ▼▼▼
+  async checkAndFixExistingDataIds() {
+    try {
+      console.log('🔍 既存データのID形式チェック開始');
+
+      const existingRecipes = this.loadRecipes();
+      let needsFixing = false;
+
+      // 古いID形式 ("1", "2", "4") のレシピがあるかチェック
+      const oldFormatRecipes = existingRecipes.filter(recipe =>
+        !recipe.id.startsWith('recipe_') && /^\d+$/.test(recipe.id)
+      );
+
+      if (oldFormatRecipes.length > 0) {
+        console.log(`🔧 古いID形式のレシピを発見: ${oldFormatRecipes.length}件`);
+        needsFixing = true;
+
+        // ID統一化実行
+        const fixedRecipes = existingRecipes.map(recipe => {
+          if (!recipe.id.startsWith('recipe_') && /^\d+$/.test(recipe.id)) {
+            const oldId = recipe.id;
+            const newId = `recipe_${oldId}`;
+            console.log(`🔄 ID修正: "${oldId}" → "${newId}"`);
+
+            return {
+              ...recipe,
+              id: newId
+            };
+          }
+          return recipe;
+        });
+
+        // 修正されたデータを保存
+        this.saveRecipes(fixedRecipes);
+        console.log(`✅ 既存データID統一化完了: ${oldFormatRecipes.length}件修正`);
+
+        // 閲覧数データも修正が必要かチェック
+        this.fixViewCountIds(oldFormatRecipes);
+      } else {
+        console.log('✅ 既存データのID形式は正常です');
+      }
+
+    } catch (error) {
+      console.error('❌ 既存データID統一化エラー:', error);
+    }
+  }
+
+  // 閲覧数データのID修正
+  fixViewCountIds(oldFormatRecipes) {
+    try {
+      const viewCountsJson = localStorage.getItem('petit_recipe_view_counts');
+      if (!viewCountsJson) return;
+
+      const viewCounts = JSON.parse(viewCountsJson);
+      let updated = false;
+
+      oldFormatRecipes.forEach(recipe => {
+        const oldId = recipe.id.replace('recipe_', ''); // recipe_1 → 1
+        const newId = `recipe_${oldId}`;
+
+        if (viewCounts[oldId] !== undefined) {
+          viewCounts[newId] = viewCounts[oldId];
+          delete viewCounts[oldId];
+          updated = true;
+          console.log(`🔄 閲覧数ID修正: "${oldId}" → "${newId}"`);
+        }
+      });
+
+      if (updated) {
+        localStorage.setItem('petit_recipe_view_counts', JSON.stringify(viewCounts));
+        console.log('✅ 閲覧数データID統一化完了');
+      }
+
+    } catch (error) {
+      console.error('❌ 閲覧数データID修正エラー:', error);
+    }
+  }
+  // ▲▲▲ BOC-100: 既存データID統一化チェック・修正 ▲▲▲
 
   // localStorageからレシピデータを読み込み
   loadRecipes() {
@@ -351,11 +451,20 @@ class LocalRecipeDatabase {
   getRecipeById(recipeId) {
     try {
       console.log('🔍 レシピ取得開始 ID:', recipeId);
+      addBOC100Log(`🔍 getRecipeById呼び出し: ID="${recipeId}" (型: ${typeof recipeId})`, 'info');
 
       const recipes = this.loadRecipes();
+      addBOC100Log(`📊 取得したレシピ総数: ${recipes.length}件`, 'info');
+
+      if (recipes.length > 0) {
+        const allIds = recipes.map(r => `"${r.id}"`);
+        addBOC100Log(`🆔 データベース内全ID: ${allIds.join(', ')}`, 'info');
+      }
+
       const recipe = recipes.find(r => r.id === recipeId);
 
       if (!recipe) {
+        addBOC100Log(`❌ レシピ検索失敗: "${recipeId}" が見つかりません`, 'error');
         throw new Error(`Recipe not found with ID: ${recipeId}`);
       }
 
@@ -1609,13 +1718,19 @@ class PetitRecipeApp {
 
   // レシピ編集開始 - 詳細画面から呼び出される
   startEditRecipe() {
+    console.log('🔘 startEditRecipe()メソッドが呼び出されました'); // ← 診断ログ追加
+    addBOC100Log('🔘 startEditRecipe()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
     try {
       const currentRecipeId = this.state.selectedRecipeId;
+      addBOC100Log(`🎯 編集対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`, 'info');
+
       if (!currentRecipeId) {
+        addBOC100Log('❌ 編集対象レシピIDが未設定', 'error');
         throw new Error('No recipe selected for editing');
       }
 
       console.log('📝 レシピ編集開始:', currentRecipeId);
+      addBOC100Log(`📝 レシピ編集開始: ${currentRecipeId}`, 'info');
 
       // 編集モード設定
       this.editMode = 'edit';
@@ -1739,13 +1854,19 @@ class PetitRecipeApp {
 
   // レシピ削除確認開始
   confirmDeleteRecipe() {
+    console.log('🔘 confirmDeleteRecipe()メソッドが呼び出されました'); // ← 診断ログ追加
+    addBOC100Log('🔘 confirmDeleteRecipe()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
     try {
       const currentRecipeId = this.state.selectedRecipeId;
+      addBOC100Log(`🎯 削除対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`, 'info');
+
       if (!currentRecipeId) {
+        addBOC100Log('❌ 削除対象レシピIDが未設定', 'error');
         throw new Error('No recipe selected for deletion');
       }
 
       console.log('🗑️ 削除確認開始:', currentRecipeId);
+      addBOC100Log(`🗑️ 削除確認開始: ${currentRecipeId}`, 'info');
 
       // レシピ名取得・モーダル表示
       const recipe = this.recipeDB.getRecipeById(currentRecipeId);
@@ -1935,9 +2056,11 @@ class PetitRecipeApp {
         throw new Error('ネイティブプラットフォームではありません');
       }
 
-      // プラットフォーム準備完了を待つ
-      await window.Capacitor.Plugins.Device.getInfo();
-      addBOC100Log('✅ Capacitor プラットフォーム初期化確認完了', 'success');
+      // プラットフォーム基本確認（Device依存を削除）
+      if (!window.Capacitor.Plugins) {
+        throw new Error('Capacitor プラグインシステムが利用できません');
+      }
+      addBOC100Log('✅ Capacitor プラットフォーム基本確認完了', 'success');
 
       // Capacitor 7.x 形式での Filesystem プラグイン取得
       const { Filesystem } = window.Capacitor.Plugins;

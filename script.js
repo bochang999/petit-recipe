@@ -879,6 +879,12 @@ class PetitRecipeApp {
       );
       this.filteredRecipes = [...this.recipes];
 
+      // ▼▼▼ BOC-100: Recipe Loading Debug ▼▼▼
+      addBOC100Log(`📖 レシピ読み込み完了: ${this.recipes.length}件`, 'success');
+      addBOC100Log(`🔢 読み込まれたレシピID: ${this.recipes.map(r => r.id).join(', ')}`, 'info');
+      addBOC100Log(`🧪 ID "recipe_4" 存在確認: ${this.recipes.some(r => r.id === 'recipe_4') ? 'あり' : 'なし'}`, this.recipes.some(r => r.id === 'recipe_4') ? 'success' : 'error');
+      // ▲▲▲ BOC-100: Recipe Loading Debug ▲▲▲
+
       console.log("📖 BOC-97: レシピデータ読み込み完了:", this.recipes.length + "件");
       console.log("✅ 変換後データ:", this.recipes);
     } catch (error) {
@@ -1143,6 +1149,16 @@ class PetitRecipeApp {
       addBOC100Log(`🆔 全レシピID一覧: ${allIds.join(', ')}`, 'info');
     }
     // ▲▲▲ BOC-100: Recipe ID Logging ▲▲▲
+
+    // ▼▼▼ BOC-100: Recipe Search Debug ▼▼▼
+    addBOC100Log(`🔍 レシピ検索実行: 検索ID="${recipeId}" 対象配列長=${this.recipes.length}`, 'info');
+
+    // デバッグ用: 最初の3件のIDを表示
+    if (this.recipes.length > 0) {
+      const sampleIds = this.recipes.slice(0, 3).map(r => `"${r.id}"`);
+      addBOC100Log(`🔍 検索対象の先頭3件ID: ${sampleIds.join(', ')}`, 'info');
+    }
+    // ▲▲▲ BOC-100: Recipe Search Debug ▲▲▲
 
     const recipe = this.recipes.find((r) => r.id === recipeId);
     if (!recipe) {
@@ -2222,4 +2238,50 @@ function testBOC100Functions() {
 
   addBOC100Log('🧪 BOC-100機能テスト完了', 'success');
 }
+
+// ▼▼▼ BOC-100: Recipe ID Diagnostic Function ▼▼▼
+function diagnoseRecipeIdProblem() {
+  addBOC100Log('🔬 Recipe ID問題診断開始', 'info');
+
+  if (!window.app) {
+    addBOC100Log('❌ window.app未定義', 'error');
+    return;
+  }
+
+  // 1. App.recipes配列の状態確認
+  const appRecipes = window.app.recipes;
+  addBOC100Log(`📊 App.recipes配列長: ${appRecipes ? appRecipes.length : '未定義'}`, 'info');
+
+  if (appRecipes && appRecipes.length > 0) {
+    // 全IDを表示
+    const allIds = appRecipes.map(r => r.id);
+    addBOC100Log(`🆔 全レシピID: ${allIds.join(', ')}`, 'info');
+
+    // 特定のIDテスト
+    const testIds = ['recipe_4', '4', 'recipe_1'];
+    testIds.forEach(testId => {
+      const found = appRecipes.find(r => r.id === testId);
+      addBOC100Log(`🧪 ID "${testId}" 検索: ${found ? `✅ 発見 - ${found.name}` : '❌ 見つからず'}`, found ? 'success' : 'error');
+    });
+
+    // サンプルレシピの詳細表示
+    const sampleRecipe = appRecipes[0];
+    addBOC100Log(`📋 サンプルレシピ: ID="${sampleRecipe.id}" name="${sampleRecipe.name}"`, 'info');
+  }
+
+  // 2. FilteredRecipes配列の状態確認
+  const filteredRecipes = window.app.filteredRecipes;
+  addBOC100Log(`📊 FilteredRecipes配列長: ${filteredRecipes ? filteredRecipes.length : '未定義'}`, 'info');
+
+  // 3. Static dataの確認
+  if (window.PETIT_RECIPE_DATA) {
+    addBOC100Log(`📂 静的データ: ${window.PETIT_RECIPE_DATA.length}件`, 'info');
+    const staticSample = window.PETIT_RECIPE_DATA.slice(0, 3).map(r => `ID:"${r.id}"`);
+    addBOC100Log(`📋 静的データサンプル: ${staticSample.join(', ')}`, 'info');
+  }
+
+  addBOC100Log('🔬 Recipe ID問題診断完了', 'success');
+}
+// ▲▲▲ BOC-100: Recipe ID Diagnostic Function ▲▲▲
+
 // ▲▲▲ BOC-100: Mobile Debug System & State Logging ▲▲▲

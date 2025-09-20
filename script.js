@@ -1866,7 +1866,7 @@ class PetitRecipeApp {
   }
 
   // データエクスポート処理
-  exportData() {
+  async exportData() {
     console.log('🔘 exportData()メソッドが呼び出されました'); // ← 診断ログ追加
     addBOC100Log('🔘 exportData()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
     try {
@@ -1883,8 +1883,9 @@ class PetitRecipeApp {
       // JSON文字列変換（見やすい形式）
       const jsonString = JSON.stringify(exportData, null, 2);
 
-      // ダウンロード処理
-      this.downloadFile(jsonString, filename, 'application/json');
+      // ▼▼▼ BOC-100: Async File Save with Platform Detection ▼▼▼
+      const saveResult = await this.downloadFile(jsonString, filename, 'application/json');
+      // ▲▲▲ BOC-100: Async File Save ▲▲▲
 
       console.log('✅ データエクスポート完了:', {
         filename: filename,
@@ -1893,8 +1894,14 @@ class PetitRecipeApp {
         size: (jsonString.length / 1024).toFixed(1) + 'KB'
       });
 
-      this.showSuccessMessage(`バックアップファイル「${filename}」をダウンロードしました`);
+      // ▼▼▼ BOC-100: Platform-specific Success Message ▼▼▼
+      this.showSuccessMessage(saveResult.message);
       addBOC100Log(`✅ エクスポート完了: ${filename}`, 'success');
+
+      if (saveResult.path) {
+        addBOC100Log(`📂 保存場所: ${saveResult.path}`, 'info');
+      }
+      // ▲▲▲ BOC-100: Platform-specific Success Message ▲▲▲
 
     } catch (error) {
       console.error('❌ データエクスポートエラー:', error);
@@ -1903,8 +1910,54 @@ class PetitRecipeApp {
     }
   }
 
-  // ファイルダウンロード処理
-  downloadFile(content, filename, mimeType) {
+  // ▼▼▼ BOC-100: Platform-aware File Saving ▼▼▼
+  async downloadFile(content, filename, mimeType) {
+    // プラットフォーム検出
+    const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
+    addBOC100Log(`🔍 プラットフォーム検出: ${isNative ? 'ネイティブAPK' : 'Webブラウザ'}`, 'info');
+
+    if (isNative) {
+      // ネイティブ環境: Capacitor Filesystem API使用
+      return await this.saveFileNative(content, filename);
+    } else {
+      // Web環境: 従来のダウンロード方式
+      return this.saveFileWeb(content, filename, mimeType);
+    }
+  }
+
+  // ネイティブ環境でのファイル保存
+  async saveFileNative(content, filename) {
+    try {
+      addBOC100Log('📱 ネイティブファイル保存開始', 'info');
+
+      // Capacitor Filesystem プラグインをインポート
+      const { Filesystem, Directory } = window.Capacitor.Plugins;
+
+      // Documentsディレクトリに保存
+      const result = await Filesystem.writeFile({
+        path: filename,
+        data: content,
+        directory: Directory.Documents,
+        encoding: 'utf8'
+      });
+
+      addBOC100Log(`✅ ファイル保存成功: ${result.uri}`, 'success');
+      return {
+        success: true,
+        path: result.uri,
+        message: `ファイル「${filename}」をDocumentsフォルダに保存しました`
+      };
+
+    } catch (error) {
+      addBOC100Log(`❌ ネイティブファイル保存エラー: ${error.message}`, 'error');
+      throw new Error(`ネイティブファイル保存失敗: ${error.message}`);
+    }
+  }
+
+  // Web環境でのファイル保存（従来方式）
+  saveFileWeb(content, filename, mimeType) {
+    addBOC100Log('🌐 Webファイルダウンロード開始', 'info');
+
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
 
@@ -1919,7 +1972,14 @@ class PetitRecipeApp {
 
     // メモリ解放
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    addBOC100Log(`✅ Webダウンロード完了: ${filename}`, 'success');
+    return {
+      success: true,
+      message: `ファイル「${filename}」をダウンロードしました`
+    };
   }
+  // ▲▲▲ BOC-100: Platform-aware File Saving ▲▲▲
 
   // データインポート処理開始
   importData() {

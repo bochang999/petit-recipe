@@ -322,6 +322,25 @@
         </div>
         <!-- ▲▲▲ BOC-100: Import Confirmation Modal ▲▲▲ -->
 
+        <!-- ▼▼▼ BOC-100: Mobile Debug Panel ▼▼▼ -->
+        <div id="mobile-debug-panel" class="mobile-debug-panel" style="display: none;">
+            <div class="debug-header">
+                <h4>🐛 BOC-100 Debug Monitor</h4>
+                <div class="debug-controls">
+                    <button class="debug-btn test" onclick="testBOC100Functions()">🧪 Test</button>
+                    <button class="debug-btn clear" onclick="clearBOC100Logs()">🗑️ Clear</button>
+                    <button class="debug-btn close" onclick="toggleMobileDebug()">✕</button>
+                </div>
+            </div>
+            <div id="mobile-debug-content" class="debug-content">
+                <!-- ログがここに表示されます -->
+            </div>
+        </div>
+
+        <!-- Debug toggle button (floating) -->
+        <button id="debug-toggle-btn" class="debug-toggle-btn" onclick="toggleMobileDebug()">🐛</button>
+        <!-- ▲▲▲ BOC-100: Mobile Debug Panel ▲▲▲ -->
+
         <!-- Hidden file input for import -->
         <input type="file" id="import-file-input" accept=".json" style="display: none;" onchange="window.app.handleFileSelection(event)">
         <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->

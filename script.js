@@ -4,8 +4,10 @@
 // 動的インポート: ブラウザ/Capacitor環境で条件分岐
 // ▲▲▲ Native Integration Imports ▲▲▲
 
-// 🧪 デバッグログ管理
+// 🧪 デバッグログ管理 - Enhanced for BOC-100 Mobile Debugging
 let debugLogs = [];
+let boc100Logs = []; // BOC-100専用ログ
+
 function addDebugLog(message) {
   const timestamp = new Date().toLocaleTimeString();
   const logEntry = `[${timestamp}] ${message}`;
@@ -15,6 +17,44 @@ function addDebugLog(message) {
   // 最新20件のみ保持
   if (debugLogs.length > 20) {
     debugLogs.shift();
+  }
+}
+
+// ▼▼▼ BOC-100: Mobile Debug Logger ▼▼▼
+function addBOC100Log(message, type = 'info') {
+  const timestamp = new Date().toLocaleTimeString();
+  const logEntry = {
+    time: timestamp,
+    message: message,
+    type: type, // 'info', 'success', 'error', 'event'
+    id: Date.now()
+  };
+
+  boc100Logs.push(logEntry);
+  console.log(`[BOC-100 ${type.toUpperCase()}] ${message}`);
+
+  // 最新30件のみ保持
+  if (boc100Logs.length > 30) {
+    boc100Logs.shift();
+  }
+
+  // リアルタイム更新
+  updateMobileDebugPanel();
+}
+
+// モバイルデバッグパネル更新
+function updateMobileDebugPanel() {
+  const panel = document.getElementById('mobile-debug-panel');
+  const content = document.getElementById('mobile-debug-content');
+
+  if (panel && content) {
+    content.innerHTML = boc100Logs.map(log => {
+      const typeClass = `debug-${log.type}`;
+      return `<div class="${typeClass}">[${log.time}] ${log.message}</div>`;
+    }).join('');
+
+    // 自動スクロール
+    content.scrollTop = content.scrollHeight;
   }
 }
 
@@ -39,6 +79,56 @@ window.showLogs = function() {
     logContent.innerHTML = debugLogs.join('<br>');
     logDiv.style.display = logDiv.style.display === 'none' ? 'block' : 'none';
   }
+}
+
+// ▼▼▼ BOC-100: Mobile Debug Panel Controls ▼▼▼
+window.toggleMobileDebug = function() {
+  const panel = document.getElementById('mobile-debug-panel');
+  if (panel) {
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    addBOC100Log('モバイルデバッグパネル切り替え', 'info');
+  }
+}
+
+window.clearBOC100Logs = function() {
+  boc100Logs.length = 0;
+  updateMobileDebugPanel();
+  addBOC100Log('ログクリア完了', 'info');
+}
+
+window.testBOC100Functions = function() {
+  addBOC100Log('🧪 BOC-100機能テスト開始', 'event');
+
+  // window.appの存在確認
+  if (window.app) {
+    addBOC100Log('✅ window.app 存在確認OK', 'success');
+
+    // showSettingsメソッド確認
+    if (typeof window.app.showSettings === 'function') {
+      addBOC100Log('✅ showSettings メソッド存在', 'success');
+    } else {
+      addBOC100Log('❌ showSettings メソッド未存在', 'error');
+    }
+
+    // exportDataメソッド確認
+    if (typeof window.app.exportData === 'function') {
+      addBOC100Log('✅ exportData メソッド存在', 'success');
+    } else {
+      addBOC100Log('❌ exportData メソッド未存在', 'error');
+    }
+
+    // importDataメソッド確認
+    if (typeof window.app.importData === 'function') {
+      addBOC100Log('✅ importData メソッド存在', 'success');
+    } else {
+      addBOC100Log('❌ importData メソッド未存在', 'error');
+    }
+
+  } else {
+    addBOC100Log('❌ window.app が未定義', 'error');
+  }
+
+  addBOC100Log('🧪 BOC-100機能テスト完了', 'event');
 }
 
 // ▼▼▼ BOC-97: Data Persistence Layer - localStorage Migration System ▼▼▼
@@ -1613,8 +1703,11 @@ class PetitRecipeApp {
 
   // 設定画面表示
   showSettings() {
+    console.log('🔘 showSettings()メソッドが呼び出されました'); // ← 診断ログ追加
+    addBOC100Log('🔘 showSettings()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
     try {
       console.log('⚙️ 設定画面表示');
+      addBOC100Log('⚙️ 設定画面表示処理開始', 'info');
 
       // 履歴に現在の画面を追加
       this.history.push(this.currentScreen);
@@ -1627,9 +1720,11 @@ class PetitRecipeApp {
       this.updateSettingsInfo();
 
       console.log('✅ 設定画面表示完了');
+      addBOC100Log('✅ 設定画面表示完了', 'success');
 
     } catch (error) {
       console.error('❌ 設定画面表示エラー:', error);
+      addBOC100Log(`❌ 設定画面表示エラー: ${error.message}`, 'error');
       this.showErrorMessage('設定画面の表示に失敗しました');
     }
   }
@@ -1667,8 +1762,11 @@ class PetitRecipeApp {
 
   // データエクスポート処理
   exportData() {
+    console.log('🔘 exportData()メソッドが呼び出されました'); // ← 診断ログ追加
+    addBOC100Log('🔘 exportData()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
     try {
       console.log('📦 データエクスポート処理開始');
+      addBOC100Log('📦 データエクスポート処理開始', 'info');
 
       // データベースからエクスポートデータ取得
       const exportData = this.recipeDB.exportAllData();
@@ -1691,9 +1789,11 @@ class PetitRecipeApp {
       });
 
       this.showSuccessMessage(`バックアップファイル「${filename}」をダウンロードしました`);
+      addBOC100Log(`✅ エクスポート完了: ${filename}`, 'success');
 
     } catch (error) {
       console.error('❌ データエクスポートエラー:', error);
+      addBOC100Log(`❌ エクスポートエラー: ${error.message}`, 'error');
       this.showErrorMessage(`エクスポートに失敗しました: ${error.message}`);
     }
   }
@@ -1718,8 +1818,11 @@ class PetitRecipeApp {
 
   // データインポート処理開始
   importData() {
+    console.log('🔘 importData()メソッドが呼び出されました'); // ← 診断ログ追加
+    addBOC100Log('🔘 importData()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
     try {
       console.log('📥 データインポート処理開始');
+      addBOC100Log('📥 データインポート処理開始', 'info');
 
       // ファイル選択ダイアログをトリガー
       const fileInput = document.getElementById('import-file-input');
@@ -1731,6 +1834,7 @@ class PetitRecipeApp {
 
     } catch (error) {
       console.error('❌ インポート開始エラー:', error);
+      addBOC100Log(`❌ インポート開始エラー: ${error.message}`, 'error');
       this.showErrorMessage('インポート処理の開始に失敗しました');
     }
   }
@@ -1903,4 +2007,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 🧪 初期化完了確認テスト
   alert("初期化完了");
+
+  // ▼▼▼ BOC-100: Mobile Debug System Initialization ▼▼▼
+  addBOC100Log('🚀 Petit Recipe App 初期化完了', 'success');
+  addBOC100Log('📱 モバイルデバッグシステム準備完了', 'info');
+  addBOC100Log('🔘 右下の🐛ボタンでデバッグパネル表示可能', 'info');
+  // ▲▲▲ BOC-100: Mobile Debug System ▲▲▲
 });

@@ -1930,14 +1930,26 @@ class PetitRecipeApp {
     try {
       addBOC100Log('📱 ネイティブファイル保存開始', 'info');
 
-      // Capacitor Filesystem プラグインをインポート
+      // Capacitor プラグインの存在確認
+      if (!window.Capacitor || !window.Capacitor.Plugins) {
+        throw new Error('Capacitor プラグインが利用できません');
+      }
+
       const { Filesystem, Directory } = window.Capacitor.Plugins;
 
-      // Documentsディレクトリに保存
+      // Filesystem プラグインの存在確認
+      if (!Filesystem || !Directory) {
+        throw new Error('Filesystem プラグインが初期化されていません');
+      }
+
+      // より安全なDirectory.Data（アプリ専用）を使用
+      const targetDirectory = Directory.Data || Directory.Documents;
+      addBOC100Log(`📂 保存先: ${targetDirectory === Directory.Data ? 'Data' : 'Documents'}ディレクトリ`, 'info');
+
       const result = await Filesystem.writeFile({
         path: filename,
         data: content,
-        directory: Directory.Documents,
+        directory: targetDirectory,
         encoding: 'utf8'
       });
 
@@ -1945,7 +1957,7 @@ class PetitRecipeApp {
       return {
         success: true,
         path: result.uri,
-        message: `ファイル「${filename}」をDocumentsフォルダに保存しました`
+        message: `ファイル「${filename}」を${targetDirectory === Directory.Data ? 'アプリデータ' : 'Documents'}フォルダに保存しました`
       };
 
     } catch (error) {

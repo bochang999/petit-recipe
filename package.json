@@ -47,7 +47,7 @@
   "homepage": "https://github.com/YOUR_USERNAME/pwa-to-apk-template#readme",
   "dependencies": {
     "@capacitor/core": "^7.0.0",
-    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/filesystem": "^7.1.4",
     "@capacitor/preferences": "^7.0.0"
   },
   "devDependencies": {

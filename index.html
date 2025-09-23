@@ -362,78 +362,44 @@
         <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->
     </div>
 
-    <!-- BOC-107: Local Recipe Manager - Excel-like immediate file operations -->
+    <!-- BOC-107: Layered Data Architecture - Excel-like Recipe System -->
     <script type="module">
-        import { localRecipeManager } from './local-recipe-manager.js';
+        import { initializeRecipeArchitecture } from './recipe-architecture-init.js';
 
         // Initialize global data structure for legacy compatibility
         window.PETIT_RECIPE_DATA = [];
 
-        // Excel-like initialization - immediate local data access
-        async function initializeLocalRecipes() {
+        // Excel-like architecture initialization
+        async function startRecipeSystem() {
             try {
-                console.log('🚀 BOC-107: Initializing Excel-like local recipe system...');
+                console.log('🚀 BOC-107: Starting Layered Data Architecture...');
+                console.log('🎯 Excel-like operations: Add→Save→Immediate Display');
 
-                // Load recipes from local storage (immediate, no APK rebuild needed)
-                const recipes = await localRecipeManager.initialize();
+                const success = await initializeRecipeArchitecture();
 
-                // Convert to legacy format for UI compatibility
-                window.PETIT_RECIPE_DATA = recipes.map(recipe => ({
-                    id: recipe.id,
-                    title: recipe.name,
-                    servings: `${recipe.servings}人前`,
-                    cookTime: recipe.cookTime,
-                    ingredients: recipe.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
-                    instructions: recipe.steps
-                }));
-
-                console.log(`✅ Local recipes loaded: ${window.PETIT_RECIPE_DATA.length} recipes`);
-                console.log('🎉 Excel-like system ready - no APK rebuild needed for recipe changes!');
-
-                // Refresh display if app is ready
-                if (window.app && window.app.renderRecipes) {
-                    window.app.renderRecipes();
+                if (success) {
+                    console.log('✅ Layered Architecture ready - Excel-like operations enabled');
+                    console.log('🎉 No APK rebuild needed for recipe changes!');
+                } else {
+                    console.log('⚠️ Architecture in fallback mode');
                 }
-
-                return recipes;
             } catch (error) {
-                console.error('❌ Local recipe initialization failed:', error);
-                window.PETIT_RECIPE_DATA = [];
-                return [];
+                console.error('❌ Architecture startup failed:', error);
             }
         }
 
-        // Excel-like force refresh function
+        // Legacy compatibility wrapper for forceRefreshLocalRecipes
         window.forceRefreshLocalRecipes = async function() {
-            try {
-                console.log('🔄 Force refreshing local recipes...');
-                const recipes = await localRecipeManager.forceRefresh();
-
-                window.PETIT_RECIPE_DATA = recipes.map(recipe => ({
-                    id: recipe.id,
-                    title: recipe.name,
-                    servings: `${recipe.servings}人前`,
-                    cookTime: recipe.cookTime,
-                    ingredients: recipe.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
-                    instructions: recipe.steps
-                }));
-
-                if (window.app && window.app.renderRecipes) {
-                    window.app.renderRecipes();
-                }
-
-                console.log(`✅ Refreshed: ${recipes.length} recipes`);
-                return recipes;
-            } catch (error) {
-                console.error('❌ Force refresh failed:', error);
+            if (window.forceRefreshRecipes) {
+                return await window.forceRefreshRecipes();
+            } else {
+                console.log('⚠️ Architecture not ready, using fallback refresh');
+                location.reload();
             }
         };
 
-        // Global access to recipe manager
-        window.localRecipeManager = localRecipeManager;
-
-        // Initialize immediately
-        initializeLocalRecipes();
+        // Start the new architecture immediately
+        startRecipeSystem();
     </script>
     <script src="local-recipe-ui-integration.js"></script>
     <script type="module" src="script.js"></script>

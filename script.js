@@ -2091,18 +2091,24 @@ class PetitRecipeApp {
       addBOC100Log(`📂 保存先ディレクトリ: ${targetDirectory} (storage/emulated/0/Documents/)`, 'info');
       addBOC100Log(`📄 ファイル名: ${filename}`, 'info');
 
+      // BOC-104: petit-recipe/ サブディレクトリ作成・保存
+      const subDirectory = 'petit-recipe';
+      const fullPath = `${subDirectory}/${filename}`;
+      addBOC100Log(`📁 サブディレクトリ作成: ${subDirectory}/`, 'info');
+
       const result = await Filesystem.writeFile({
-        path: filename,
+        path: fullPath,
         data: content,
         directory: targetDirectory,
-        encoding: 'utf8'
+        encoding: 'utf8',
+        recursive: true  // BOC-104: ディレクトリ自動作成
       });
 
       addBOC100Log(`✅ ファイル保存成功: ${result.uri || 'パス不明'}`, 'success');
       return {
         success: true,
-        path: result.uri || filename,
-        message: `ファイル「${filename}」をDocumentsフォルダに保存しました`
+        path: result.uri || fullPath,
+        message: `ファイル「${filename}」をDocuments/petit-recipe/フォルダに保存しました`
       };
 
     } catch (error) {
@@ -2112,9 +2118,11 @@ class PetitRecipeApp {
     }
   }
 
-  // Web環境でのファイル保存（従来方式）
+  // Web環境でのファイル保存（開発・テスト用フォールバック）
+  // BOC-104: Capacitor-first戦略採用、本番環境はネイティブ保存を推奨
   saveFileWeb(content, filename, mimeType) {
-    addBOC100Log('🌐 Webファイルダウンロード開始', 'info');
+    addBOC100Log('🌐 Webファイルダウンロード開始（フォールバック）', 'info');
+    addBOC100Log('⚠️ 推奨: APK環境でのCapacitor Filesystem使用', 'warning');
 
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);

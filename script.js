@@ -417,7 +417,7 @@ class LocalRecipeDatabase {
     // オプショナルフィールドのデフォルト値設定
     const validatedRecipe = {
       title: recipe.title?.trim() || '',
-      ingredients: recipe.ingredients || [],
+      ingredients: window.app ? window.app.parseIngredients(recipe.ingredients || []) : recipe.ingredients || [],
       instructions: recipe.instructions || [],
       servings: recipe.servings || '1人前',
       cookTime: recipe.cookTime || '未設定',
@@ -2384,7 +2384,7 @@ class PetitRecipeApp {
   // レシピのソート
   sortRecipes(sortType) {
     addDebugLog('🔄 レシピソート開始: ' + sortType);
-    
+
     switch (sortType) {
       case 'time':
         // 時系列順（デフォルト順序）
@@ -2392,14 +2392,14 @@ class PetitRecipeApp {
           return this.recipes.indexOf(a) - this.recipes.indexOf(b);
         });
         break;
-        
+
       case 'name':
         // あいうえお順
         this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
           return a.name.localeCompare(b.name, 'ja', { numeric: true });
         });
         break;
-        
+
       case 'popular':
         // 人気順（閲覧数の多い順）
         this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
@@ -2408,12 +2408,12 @@ class PetitRecipeApp {
           return viewCountB - viewCountA; // 降順
         });
         break;
-        
+
       default:
         console.warn('⚠️ 不明なソートタイプ:', sortType);
         break;
     }
-    
+
     console.log(`✅ ソート完了: ${this.filteredRecipes.length}件`);
     this.renderRecipes();
   }
@@ -2912,14 +2912,18 @@ function forceUseGlobalRecipeData() {
       name: recipe.title,  // titleをnameに変換（アプリが期待する形式）
       cookTime: recipe.cookTime || "未設定",
       servings: recipe.servings || "適量",
-      // ingredients配列の正規化
-      ingredients: recipe.ingredients || [],
+      // ingredients: petit-recipe文字列配列 → RecipeBox{name,amount,unit}配列変換
+      ingredients: window.app ? window.app.parseIngredients(recipe.ingredients || []) : recipe.ingredients || [],
       // instructions配列の正規化
       instructions: recipe.instructions || []
     }));
 
     // アプリインスタンスが存在する場合、直接更新
     if (window.app) {
+      // デバッグ: 変換前後のデータ構造を確認
+      addBOC100Log(`🔍 変換前サンプル: ${JSON.stringify(window.PETIT_RECIPE_DATA[0]?.ingredients?.slice(0,2) || [])}`, 'debug');
+      addBOC100Log(`🔍 変換後サンプル: ${JSON.stringify(convertedRecipes[0]?.ingredients?.slice(0,2) || [])}`, 'debug');
+
       window.app.recipes = convertedRecipes;
       window.app.filteredRecipes = convertedRecipes;
       window.app.renderRecipes();

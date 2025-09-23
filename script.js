@@ -2778,7 +2778,7 @@ window.navigateBack = navigateBack;
 
 // JSON形式バリデーション
 function validateRecipeJSON(jsonData) {
-  const requiredFields = ['title', 'ingredients', 'instructions', 'cookTime', 'servings'];
+  const requiredFields = ['title', 'ingredients', 'instructions'];
 
   for (const field of requiredFields) {
     if (!jsonData[field]) {
@@ -2816,11 +2816,10 @@ function addAIProcessedRecipe(jsonData) {
     const newRecipe = {
       id: newId,
       title: jsonData.title,
-      servings: jsonData.servings,
+      servings: jsonData.servings || "適量",
       ingredients: jsonData.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
       instructions: jsonData.instructions,
-      cookTime: jsonData.cookTime,
-      difficulty: "初級" // デフォルト
+      cookTime: jsonData.cookTime || "未設定"
     };
 
     // データに追加

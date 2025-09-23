@@ -1021,13 +1021,20 @@ class PetitRecipeApp {
 
   // petit-recipe形式をRecipeBox形式に変換
   convertPetitToRecipeBox(petitRecipe) {
-    // ▼▼▼ BOC-100: ID変換詳細ログ ▼▼▼
+    // ▼▼▼ BOC-100: ID変換詳細ログ + 重複プレフィックス修正 ▼▼▼
     addBOC100Log(`🔄 レシピ変換開始: "${petitRecipe.title}"`, 'info');
     addBOC100Log(`🆔 変換前ID: "${petitRecipe.id}" (型: ${typeof petitRecipe.id})`, 'info');
 
-    const convertedId = `recipe_${petitRecipe.id}`;
-    addBOC100Log(`🔄 変換後ID: "${convertedId}"`, 'info');
-    // ▲▲▲ BOC-100: ID変換ログ ▲▲▲
+    // 🔧 重複プレフィックス問題修正: 既にrecipe_プレフィックスがある場合は追加しない
+    let convertedId;
+    if (String(petitRecipe.id).startsWith('recipe_')) {
+      convertedId = String(petitRecipe.id); // 既にプレフィックス付きの場合はそのまま使用
+      addBOC100Log(`✅ 既存プレフィックス検出: "${convertedId}" (変換不要)`, 'success');
+    } else {
+      convertedId = `recipe_${petitRecipe.id}`;
+      addBOC100Log(`🔄 プレフィックス追加: "${petitRecipe.id}" → "${convertedId}"`, 'info');
+    }
+    // ▲▲▲ BOC-100: ID変換ログ + 重複プレフィックス修正 ▲▲▲
 
     console.log("🔄 変換中:", petitRecipe.title, petitRecipe);
     const converted = {
@@ -2079,9 +2086,9 @@ class PetitRecipeApp {
         ExternalStorage: 'EXTERNAL_STORAGE'
       };
 
-      // より安全なData（アプリ専用）を優先使用
-      const targetDirectory = DirectoryType.Data;
-      addBOC100Log(`📂 保存先ディレクトリ: ${targetDirectory}`, 'info');
+      // ユーザー要求: Documents フォルダに保存 (storage/emulated/0/Documents/)
+      const targetDirectory = DirectoryType.Documents;
+      addBOC100Log(`📂 保存先ディレクトリ: ${targetDirectory} (storage/emulated/0/Documents/)`, 'info');
       addBOC100Log(`📄 ファイル名: ${filename}`, 'info');
 
       const result = await Filesystem.writeFile({
@@ -2095,7 +2102,7 @@ class PetitRecipeApp {
       return {
         success: true,
         path: result.uri || filename,
-        message: `ファイル「${filename}」をアプリデータフォルダに保存しました`
+        message: `ファイル「${filename}」をDocumentsフォルダに保存しました`
       };
 
     } catch (error) {

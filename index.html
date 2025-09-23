@@ -43,7 +43,7 @@
             <div class="screen-content">
                 <div class="search-container">
                     <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
-                    <button class="refresh-data-button" onclick="window.forceUseGlobalRecipeData()" title="最新レシピデータを反映">🔄</button>
+                    <button class="refresh-data-button" onclick="window.forceRefreshLocalRecipes()" title="ローカルレシピを即座リフレッシュ">🔄</button>
                 </div>
 
                 <div class="sort-tabs">
@@ -362,17 +362,23 @@
         <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->
     </div>
 
-    <!-- レシピデータファイル読み込み（APK環境対応） -->
-    <!-- BOC-107: Use recipes.json instead of recipes-data.js -->
-    <script>
-        // Load recipes from JSON file instead of embedded JS
+    <!-- BOC-107: Local Recipe Manager - Excel-like immediate file operations -->
+    <script type="module">
+        import { localRecipeManager } from './local-recipe-manager.js';
+
+        // Initialize global data structure for legacy compatibility
         window.PETIT_RECIPE_DATA = [];
 
-        async function loadRecipesFromJSON() {
+        // Excel-like initialization - immediate local data access
+        async function initializeLocalRecipes() {
             try {
-                const response = await fetch('./recipes.json');
-                const data = await response.json();
-                window.PETIT_RECIPE_DATA = data.recipes.map(recipe => ({
+                console.log('🚀 BOC-107: Initializing Excel-like local recipe system...');
+
+                // Load recipes from local storage (immediate, no APK rebuild needed)
+                const recipes = await localRecipeManager.initialize();
+
+                // Convert to legacy format for UI compatibility
+                window.PETIT_RECIPE_DATA = recipes.map(recipe => ({
                     id: recipe.id,
                     title: recipe.name,
                     servings: `${recipe.servings}人前`,
@@ -380,21 +386,56 @@
                     ingredients: recipe.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
                     instructions: recipe.steps
                 }));
-                console.log(`✅ Loaded ${window.PETIT_RECIPE_DATA.length} recipes from JSON`);
+
+                console.log(`✅ Local recipes loaded: ${window.PETIT_RECIPE_DATA.length} recipes`);
+                console.log('🎉 Excel-like system ready - no APK rebuild needed for recipe changes!');
+
                 // Refresh display if app is ready
                 if (window.app && window.app.renderRecipes) {
                     window.app.renderRecipes();
                 }
+
+                return recipes;
             } catch (error) {
-                console.error('❌ Failed to load recipes.json:', error);
-                // Fallback to empty array
+                console.error('❌ Local recipe initialization failed:', error);
                 window.PETIT_RECIPE_DATA = [];
+                return [];
             }
         }
 
-        // Load recipes immediately
-        loadRecipesFromJSON();
+        // Excel-like force refresh function
+        window.forceRefreshLocalRecipes = async function() {
+            try {
+                console.log('🔄 Force refreshing local recipes...');
+                const recipes = await localRecipeManager.forceRefresh();
+
+                window.PETIT_RECIPE_DATA = recipes.map(recipe => ({
+                    id: recipe.id,
+                    title: recipe.name,
+                    servings: `${recipe.servings}人前`,
+                    cookTime: recipe.cookTime,
+                    ingredients: recipe.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
+                    instructions: recipe.steps
+                }));
+
+                if (window.app && window.app.renderRecipes) {
+                    window.app.renderRecipes();
+                }
+
+                console.log(`✅ Refreshed: ${recipes.length} recipes`);
+                return recipes;
+            } catch (error) {
+                console.error('❌ Force refresh failed:', error);
+            }
+        };
+
+        // Global access to recipe manager
+        window.localRecipeManager = localRecipeManager;
+
+        // Initialize immediately
+        initializeLocalRecipes();
     </script>
+    <script src="local-recipe-ui-integration.js"></script>
     <script type="module" src="script.js"></script>
 
     <!-- APK Status Bar初期化 -->

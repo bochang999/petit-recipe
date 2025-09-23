@@ -10,6 +10,9 @@ const config: CapacitorConfig = {
       backgroundColor: "#3498db",
       overlaysWebView: false,
     },
+    Filesystem: {
+      ioTimeout: 10000,
+    },
   },
   server: {
     androidScheme: 'https'

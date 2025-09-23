@@ -975,15 +975,17 @@ class PetitRecipeApp {
         // フォールバック: 従来の方法でデータ取得
         let fallbackData = null;
 
-        // 1. まずglobalのPETIT_RECIPE_DATAを確認
+        // 1. まずglobalのPETIT_RECIPE_DATAを確認（強制優先）
         if (
           typeof window.PETIT_RECIPE_DATA !== "undefined" &&
-          Array.isArray(window.PETIT_RECIPE_DATA)
+          Array.isArray(window.PETIT_RECIPE_DATA) &&
+          window.PETIT_RECIPE_DATA.length > 0
         ) {
-          console.log("✅ グローバルレシピデータを使用:", window.PETIT_RECIPE_DATA.length + "件");
+          console.log("✅ グローバルレシピデータを強制使用:", window.PETIT_RECIPE_DATA.length + "件");
+          console.log("🔄 最新のrecipes-data.jsから読み込み - Capacitor環境でも適用");
           fallbackData = window.PETIT_RECIPE_DATA;
         } else {
-          console.log("⚠️ グローバルデータなし、fetchを試行");
+          console.log("⚠️ グローバルデータなしまたは空配列、fetchを試行");
 
           // 2. Capacitor環境での特別処理
           if (
@@ -2878,13 +2880,44 @@ function forceRefreshRecipeData() {
   localStorage.removeItem('petit_recipe_data');
   localStorage.removeItem('petit_recipe_version');
 
-  addBOC100Log('✅ localStorage クリア完了', 'success');
+  // Capacitor環境での追加クリア
+  if (typeof window.Capacitor !== 'undefined') {
+    addBOC100Log('📱 Capacitor環境: 追加データクリア実行', 'info');
+    // Capacitor固有のストレージもクリア
+    try {
+      sessionStorage.removeItem('petit_recipe_data');
+      sessionStorage.removeItem('petit_recipe_version');
+    } catch (e) {
+      console.log('SessionStorage clear failed:', e);
+    }
+  }
+
+  addBOC100Log('✅ localStorage + 環境固有データクリア完了', 'success');
   addBOC100Log('🔄 ページリロード実行中...', 'info');
 
   // ページリロード
   setTimeout(() => {
     location.reload();
   }, 1000);
+}
+
+// Capacitor環境での強制グローバルデータ使用
+function forceUseGlobalRecipeData() {
+  if (typeof window.PETIT_RECIPE_DATA !== 'undefined' && window.PETIT_RECIPE_DATA.length > 0) {
+    addBOC100Log(`🔄 グローバルデータ強制適用: ${window.PETIT_RECIPE_DATA.length}件`, 'info');
+
+    // アプリインスタンスが存在する場合、直接更新
+    if (window.app) {
+      window.app.recipes = window.PETIT_RECIPE_DATA;
+      window.app.filteredRecipes = window.PETIT_RECIPE_DATA;
+      window.app.renderRecipes();
+      addBOC100Log('✅ アプリデータ即座に更新完了', 'success');
+      showUserFeedback('🆕 最新のレシピデータを適用しました！', 'success');
+    }
+
+    return true;
+  }
+  return false;
 }
 
 // Gemini CLI処理後の自動リフレッシュチェック
@@ -2906,6 +2939,7 @@ function checkForNewRecipes() {
 
 // グローバル関数として登録
 window.forceRefreshRecipeData = forceRefreshRecipeData;
+window.forceUseGlobalRecipeData = forceUseGlobalRecipeData;
 window.checkForNewRecipes = checkForNewRecipes;
 
 // ▲▲▲ BOC-106: AI Recipe Integration Functions ▲▲▲

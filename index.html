@@ -9,12 +9,12 @@
     <meta name="theme-color" content="#3498db">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
+
     <!-- PWA Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    
+
     <!-- Capacitor プラグイン読み込み (APK環境での動作確保) -->
     <script>
         // APK環境でのCapacitor検出
@@ -39,19 +39,19 @@
                     <button class="ai-add-button" onclick="showAIRecipeInput()">🤖 AI追加</button>
                 </div>
             </header>
-            
+
             <div class="screen-content">
                 <div class="search-container">
                     <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
                     <button class="refresh-data-button" onclick="window.forceUseGlobalRecipeData()" title="最新レシピデータを反映">🔄</button>
                 </div>
-                
+
                 <div class="sort-tabs">
                     <button class="sort-tab active" data-sort="time">時系列</button>
                     <button class="sort-tab" data-sort="name">あいうえお順</button>
                     <button class="sort-tab" data-sort="popular">🔥人気順</button>
                 </div>
-                
+
                 <div id="recipes-list" class="recipes-list">
                     <!-- レシピ一覧がここに表示される -->
                 </div>
@@ -363,9 +363,40 @@
     </div>
 
     <!-- レシピデータファイル読み込み（APK環境対応） -->
-    <script src="recipes-data.js"></script>
+    <!-- BOC-107: Use recipes.json instead of recipes-data.js -->
+    <script>
+        // Load recipes from JSON file instead of embedded JS
+        window.PETIT_RECIPE_DATA = [];
+
+        async function loadRecipesFromJSON() {
+            try {
+                const response = await fetch('./recipes.json');
+                const data = await response.json();
+                window.PETIT_RECIPE_DATA = data.recipes.map(recipe => ({
+                    id: recipe.id,
+                    title: recipe.name,
+                    servings: `${recipe.servings}人前`,
+                    cookTime: recipe.cookTime,
+                    ingredients: recipe.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
+                    instructions: recipe.steps
+                }));
+                console.log(`✅ Loaded ${window.PETIT_RECIPE_DATA.length} recipes from JSON`);
+                // Refresh display if app is ready
+                if (window.app && window.app.renderRecipes) {
+                    window.app.renderRecipes();
+                }
+            } catch (error) {
+                console.error('❌ Failed to load recipes.json:', error);
+                // Fallback to empty array
+                window.PETIT_RECIPE_DATA = [];
+            }
+        }
+
+        // Load recipes immediately
+        loadRecipesFromJSON();
+    </script>
     <script type="module" src="script.js"></script>
-    
+
     <!-- APK Status Bar初期化 -->
     <script>
         // APK環境でのStatus Bar設定
@@ -373,7 +404,7 @@
             if (window.Capacitor && window.Capacitor.isNativePlatform()) {
                 try {
                     console.log('🔧 APK Status Bar初期化開始');
-                    
+
                     // Status Barプラグインが利用可能な場合のみ実行
                     if (window.Capacitor.Plugins.StatusBar) {
                         await window.Capacitor.Plugins.StatusBar.setStyle({
@@ -393,7 +424,7 @@
             }
         });
     </script>
-    
+
     <!-- Service Worker登録 (PWA対応) -->
     <script>
         if ('serviceWorker' in navigator) {

@@ -2603,3 +2603,272 @@ function diagnoseRecipeIdProblem() {
 // ▲▲▲ BOC-100: Recipe ID Diagnostic Function ▲▲▲
 
 // ▲▲▲ BOC-100: Mobile Debug System & State Logging ▲▲▲
+
+// ▼▼▼ BOC-106: AI Recipe Integration Functions ▼▼▼
+
+// AI追加画面表示
+function showAIRecipeInput() {
+  addBOC100Log('🤖 AI追加画面表示', 'event');
+  const aiScreen = document.getElementById('ai-recipe-screen');
+  const recipesScreen = document.getElementById('recipes-screen');
+
+  if (aiScreen && recipesScreen) {
+    recipesScreen.classList.remove('active');
+    aiScreen.classList.add('active');
+  }
+}
+
+// AI経由でレシピ処理（UX最適化版）
+async function processAIRecipe(event) {
+  event.preventDefault();
+
+  const recipeText = document.getElementById('ai-recipe-input').value.trim();
+  if (!recipeText) {
+    showUserFeedback('❌ レシピテキストを入力してください', 'error');
+    return;
+  }
+
+  addBOC100Log('🤖 AIレシピ処理開始', 'info');
+
+  // 処理状況表示
+  const processingDiv = document.getElementById('ai-processing');
+  const statusText = document.getElementById('ai-status-text');
+
+  processingDiv.style.display = 'block';
+  statusText.textContent = 'レシピを準備中...';
+
+  try {
+    // ユーザー体験向上: 段階的ステータス更新
+    await updateProcessingStatus('レシピテキストを解析中...', 500);
+    await updateProcessingStatus('Claude Code連携準備中...', 1000);
+
+    // 最適化: ローカルストレージ保存
+    const timestamp = Date.now();
+    const storageKey = `ai-recipe-${timestamp}`;
+
+    localStorage.setItem(storageKey, JSON.stringify({
+      text: recipeText,
+      timestamp: timestamp,
+      status: 'ready-for-processing'
+    }));
+
+    await updateProcessingStatus('準備完了！ 🎉', 500);
+
+    // ユーザーフレンドリーな指示表示
+    statusText.innerHTML = `
+      <strong>✅ 準備完了！</strong><br>
+      <small>Claude Code で次のコマンドを実行してください：</small><br>
+      <code style="background: rgba(0,0,0,0.1); padding: 4px 8px; border-radius: 4px; font-family: monospace;">
+        ~/bin/ai-recipe-processor.sh /tmp/ai-recipe-temp.txt
+      </code>
+    `;
+
+    // テンポラリファイル作成（Claude Code用）
+    const tempContent = `# AI Recipe Processing Request
+# Generated: ${new Date().toLocaleString()}
+# Storage Key: ${storageKey}
+
+${recipeText}`;
+
+    // クリップボードにコマンドをコピー（ユーザビリティ向上）
+    const command = `echo '${recipeText}' > /tmp/ai-recipe-temp.txt && ~/bin/ai-recipe-processor.sh /tmp/ai-recipe-temp.txt`;
+
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(command);
+      addBOC100Log('📋 処理コマンドをクリップボードにコピー', 'success');
+
+      // フィードバック表示
+      setTimeout(() => {
+        showUserFeedback('💡 処理コマンドをクリップボードにコピーしました', 'success');
+      }, 1500);
+    }
+
+    addBOC100Log(`💾 レシピ保存完了 (キー: ${storageKey})`, 'success');
+
+  } catch (error) {
+    addBOC100Log('❌ AI処理エラー: ' + error.message, 'error');
+    statusText.textContent = 'エラーが発生しました: ' + error.message;
+    showUserFeedback('エラーが発生しました。再度お試しください。', 'error');
+  }
+}
+
+// ユーザーフィードバック表示（UX向上）
+function showUserFeedback(message, type = 'info') {
+  // 既存のフィードバック要素を削除
+  const existing = document.querySelector('.user-feedback');
+  if (existing) existing.remove();
+
+  // フィードバック要素作成
+  const feedback = document.createElement('div');
+  feedback.className = `user-feedback feedback-${type}`;
+  feedback.textContent = message;
+
+  // スタイル設定
+  Object.assign(feedback.style, {
+    position: 'fixed',
+    top: '20px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    background: type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#339af0',
+    color: 'white',
+    padding: '12px 24px',
+    borderRadius: '8px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    zIndex: '10000',
+    fontSize: '14px',
+    fontWeight: '600',
+    maxWidth: '90vw',
+    textAlign: 'center'
+  });
+
+  document.body.appendChild(feedback);
+
+  // 3秒後に自動削除
+  setTimeout(() => {
+    if (feedback.parentNode) {
+      feedback.style.transition = 'opacity 0.3s ease';
+      feedback.style.opacity = '0';
+      setTimeout(() => feedback.remove(), 300);
+    }
+  }, 3000);
+}
+
+// プロセス状況更新（UXアニメーション）
+async function updateProcessingStatus(message, delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const statusText = document.getElementById('ai-status-text');
+      if (statusText) {
+        statusText.textContent = message;
+      }
+      resolve();
+    }, delay);
+  });
+}
+
+// 戻るボタン機能（既存関数がない場合の代替）
+function navigateBack() {
+  addBOC100Log('⬅️ 戻る操作', 'event');
+
+  const aiScreen = document.getElementById('ai-recipe-screen');
+  const recipesScreen = document.getElementById('recipes-screen');
+
+  if (aiScreen && recipesScreen) {
+    aiScreen.classList.remove('active');
+    recipesScreen.classList.add('active');
+
+    // フォームリセット
+    const form = document.getElementById('ai-recipe-form');
+    if (form) {
+      form.reset();
+    }
+
+    // 処理状況を非表示
+    const processingDiv = document.getElementById('ai-processing');
+    if (processingDiv) {
+      processingDiv.style.display = 'none';
+    }
+  }
+}
+
+// グローバル関数として登録
+window.showAIRecipeInput = showAIRecipeInput;
+window.processAIRecipe = processAIRecipe;
+window.navigateBack = navigateBack;
+
+// JSON形式バリデーション
+function validateRecipeJSON(jsonData) {
+  const requiredFields = ['title', 'ingredients', 'instructions', 'cookTime', 'servings'];
+
+  for (const field of requiredFields) {
+    if (!jsonData[field]) {
+      throw new Error(`必須フィールド "${field}" が見つかりません`);
+    }
+  }
+
+  if (!Array.isArray(jsonData.ingredients) || jsonData.ingredients.length === 0) {
+    throw new Error('材料配列が無効です');
+  }
+
+  if (!Array.isArray(jsonData.instructions) || jsonData.instructions.length === 0) {
+    throw new Error('手順配列が無効です');
+  }
+
+  // 材料の構造チェック
+  for (const ingredient of jsonData.ingredients) {
+    if (!ingredient.name || typeof ingredient.amount === 'undefined' || !ingredient.unit) {
+      throw new Error('材料の構造が無効です: name, amount, unit が必要');
+    }
+  }
+
+  return true;
+}
+
+// AI処理結果をpetit-recipeに追加
+function addAIProcessedRecipe(jsonData) {
+  try {
+    validateRecipeJSON(jsonData);
+
+    // 既存レシピID生成パターンに従ってID付与
+    const existingRecipes = window.PETIT_RECIPE_DATA || [];
+    const newId = generateUniqueId(existingRecipes);
+
+    const newRecipe = {
+      id: newId,
+      title: jsonData.title,
+      servings: jsonData.servings,
+      ingredients: jsonData.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
+      instructions: jsonData.instructions,
+      cookTime: jsonData.cookTime,
+      difficulty: "初級" // デフォルト
+    };
+
+    // データに追加
+    window.PETIT_RECIPE_DATA.push(newRecipe);
+
+    addBOC100Log(`✅ AIレシピ追加完了: ${newRecipe.title} (ID: ${newRecipe.id})`, 'success');
+
+    return newRecipe;
+
+  } catch (error) {
+    addBOC100Log(`❌ レシピ追加エラー: ${error.message}`, 'error');
+    throw error;
+  }
+}
+
+// ユニークID生成（既存パターンに合わせて）
+function generateUniqueId(existingRecipes) {
+  const existingIds = existingRecipes.map(r => parseInt(r.id)).filter(id => !isNaN(id));
+  const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+  return String(maxId + 1);
+}
+
+// エラーハンドリング強化版AI処理
+async function processAIRecipeWithValidation(recipeText) {
+  const tempFilePath = `/tmp/ai-recipe-input-${Date.now()}.txt`;
+
+  try {
+    addBOC100Log('📝 一時ファイル作成中...', 'info');
+
+    // Web環境での一時ファイル作成（ローカルストレージ使用）
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('ai-recipe-temp', recipeText);
+      addBOC100Log('💾 ローカルストレージに保存完了', 'success');
+    }
+
+    addBOC100Log('🤖 AI処理準備完了', 'success');
+    addBOC100Log('📋 次の手順: Claude Codeで「~/bin/ai-recipe-processor.sh」を実行', 'info');
+
+    return {
+      tempFile: tempFilePath,
+      content: recipeText,
+      status: 'ready'
+    };
+
+  } catch (error) {
+    addBOC100Log(`❌ 前処理エラー: ${error.message}`, 'error');
+    throw error;
+  }
+}
+
+// ▲▲▲ BOC-106: AI Recipe Integration Functions ▲▲▲

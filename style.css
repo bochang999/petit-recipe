@@ -1607,6 +1607,61 @@ html, body {
     transform: scale(0.95);
 }
 
+/* BOC-106: AI Recipe Input Styles */
+.ai-add-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 8px;
+}
+
+.ai-add-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.ai-processing {
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.ai-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.ai-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(102, 126, 234, 0.3);
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#ai-status-text {
+    color: #667eea;
+    font-weight: 600;
+    margin: 0;
+}
+
 /* スマートフォン向け調整 */
 @media (max-width: 768px) {
     .mobile-debug-panel {
@@ -1631,6 +1686,11 @@ html, body {
         width: 45px;
         height: 45px;
         font-size: 18px;
+    }
+
+    .ai-add-button {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 }
 /* ▲▲▲ BOC-100: Mobile Debug Panel Styles ▲▲▲ */

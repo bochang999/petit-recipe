@@ -569,6 +569,52 @@ class LocalRecipeDatabase {
     }
   }
 
+  // ▼▼▼ BOC-105: レシピ複製機能 ▼▼▼
+  // レシピ複製メソッド - 指定IDのレシピを複製して新規レシピとして保存
+  duplicateRecipe(originalRecipeId) {
+    try {
+      console.log('📋 レシピ複製開始 ID:', originalRecipeId);
+
+      // Step 1: 元レシピ取得・検証
+      const originalRecipe = this.getRecipeById(originalRecipeId);
+      if (!originalRecipe) {
+        throw new Error(`Original recipe not found: ${originalRecipeId}`);
+      }
+
+      console.log('📋 複製元レシピ:', originalRecipe.title);
+
+      // Step 2: 新ID生成（重複回避）
+      const newId = this.generateRecipeId();
+      console.log('🆔 新レシピID生成:', newId);
+
+      // Step 3: 複製オブジェクト作成
+      const duplicatedRecipe = {
+        ...originalRecipe,
+        id: newId,
+        title: `${originalRecipe.title} のコピー`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Step 4: 複製レシピを新規追加として保存
+      const savedRecipe = this.addRecipe(duplicatedRecipe);
+
+      console.log('✅ レシピ複製完了:', {
+        originalId: originalRecipeId,
+        originalTitle: originalRecipe.title,
+        newId: savedRecipe.id,
+        newTitle: savedRecipe.title
+      });
+
+      return savedRecipe;
+
+    } catch (error) {
+      console.error('❌ レシピ複製エラー:', error);
+      throw new Error(`Failed to duplicate recipe: ${error.message}`);
+    }
+  }
+  // ▲▲▲ BOC-105: レシピ複製機能 ▲▲▲
+
   // CRUD操作統計取得
   getCRUDStats() {
     try {
@@ -1931,6 +1977,51 @@ class PetitRecipeApp {
   }
 
   // ▲▲▲ BOC-99: Recipe Edit/Delete Implementation ▲▲▲
+
+  // ▼▼▼ BOC-105: Recipe Duplication Feature ▼▼▼
+
+  // レシピ複製実行
+  async duplicateRecipe() {
+    console.log('🔘 duplicateRecipe()メソッドが呼び出されました');
+    addBOC100Log('🔘 duplicateRecipe()メソッドが呼び出されました', 'event');
+    try {
+      const currentRecipeId = this.state.selectedRecipeId;
+      addBOC100Log(`🎯 複製対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`, 'info');
+
+      if (!currentRecipeId) {
+        addBOC100Log('❌ 複製対象レシピIDが未設定', 'error');
+        throw new Error('No recipe selected for duplication');
+      }
+
+      console.log('📋 レシピ複製開始:', currentRecipeId);
+      addBOC100Log(`📋 レシピ複製開始: ${currentRecipeId}`, 'info');
+
+      // データベースから複製実行
+      const duplicatedRecipe = this.recipeDB.duplicateRecipe(currentRecipeId);
+
+      // 成功メッセージ
+      this.showSuccessMessage(`「${duplicatedRecipe.title}」を作成しました`);
+      addBOC100Log(`✅ 複製完了: ${duplicatedRecipe.title}`, 'success');
+
+      // レシピ一覧を再読み込み・再描画
+      await this.refreshRecipeList();
+
+      // 複製されたレシピの詳細画面に遷移
+      setTimeout(() => {
+        this.showRecipeDetail(duplicatedRecipe.id);
+        addBOC100Log(`🔍 複製レシピ詳細表示: ${duplicatedRecipe.id}`, 'info');
+      }, 100); // 画面遷移後に詳細表示
+
+      console.log('✅ レシピ複製完了:', duplicatedRecipe.id);
+
+    } catch (error) {
+      console.error('❌ レシピ複製エラー:', error);
+      addBOC100Log(`❌ 複製エラー: ${error.message}`, 'error');
+      this.showErrorMessage(`レシピの複製に失敗しました: ${error.message}`);
+    }
+  }
+
+  // ▲▲▲ BOC-105: Recipe Duplication Feature ▲▲▲
 
   // ▼▼▼ BOC-100: Settings and Backup/Restore UI Methods ▼▼▼
 

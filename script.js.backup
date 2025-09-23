@@ -2916,6 +2916,7 @@ function forceUseGlobalRecipeData() {
       ingredients: recipe.ingredients || [],
       // instructions配列の正規化
       instructions: recipe.instructions || []
+      servings: recipe.servings || "適量"
     }));
 
     // アプリインスタンスが存在する場合、直接更新

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Recipe JSON Generator - BOC-108</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>BOC-108: Recipe JSON Generator</h1>
+    <button onclick="generateJSON()">Convert to JSON</button>
+    <button onclick="downloadJSON()">Download recipes.json</button>
+
+    <div id="output"></div>
+    <textarea id="jsonOutput" style="width: 100%; height: 400px; font-family: monospace;"></textarea>
+
+    <script src="recipes-data.js"></script>
+    <script src="convert-to-json.js"></script>
+
+    <script>
+        let convertedData = null;
+
+        function generateJSON() {
+            const outputDiv = document.getElementById('output');
+            const textarea = document.getElementById('jsonOutput');
+
+            try {
+                convertedData = convertLegacyToJSON();
+
+                if (!convertedData) {
+                    outputDiv.innerHTML = '<p style="color: red;">❌ Conversion failed: No data found</p>';
+                    return;
+                }
+
+                const validation = validateRecipeData(convertedData);
+
+                if (!validation.valid) {
+                    outputDiv.innerHTML = `<p style="color: red;">❌ Validation failed: ${validation.error}</p>`;
+                    return;
+                }
+
+                outputDiv.innerHTML = `
+                    <p style="color: green;">✅ Conversion successful!</p>
+                    <p>📊 Total recipes: ${validation.totalRecipes}</p>
+                    <p>🔄 Data structure: JavaScript → JSON</p>
+                    <p>📋 Ingredients format: String array → Object array</p>
+                `;
+
+                textarea.value = JSON.stringify(convertedData, null, 2);
+
+            } catch (error) {
+                outputDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                console.error('Conversion error:', error);
+            }
+        }
+
+        function downloadJSON() {
+            if (!convertedData) {
+                alert('Please generate JSON first');
+                return;
+            }
+
+            const blob = new Blob([JSON.stringify(convertedData, null, 2)], {
+                type: 'application/json'
+            });
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recipes.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('recipes.json downloaded successfully!');
+        }
+
+        // Auto-generate on load for quick testing
+        window.addEventListener('load', () => {
+            console.log('🔄 Auto-generating JSON for BOC-108...');
+            generateJSON();
+        });
+    </script>
+</body>
+</html>

@@ -958,12 +958,68 @@ class PetitRecipeApp {
     console.log("✅ Petit Recipe 初期化完了");
   }
 
-  // ▼▼▼ BOC-97: Updated Recipe Loading with localStorage Priority ▼▼▼
+  // ▼▼▼ BOC-108: File-Based Recipe Loading System ▼▼▼
+  async loadRecipesFromJSON() {
+    try {
+      addDebugLog('📋 BOC-108: Trying to load recipes.json...');
+
+      const response = await fetch('./recipes.json');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.recipes || !Array.isArray(data.recipes)) {
+        throw new Error('Invalid JSON structure: missing recipes array');
+      }
+
+      addDebugLog(`✅ BOC-108: recipes.json loaded - ${data.recipes.length} recipes`);
+      addDebugLog(`📊 JSON version: ${data.version}, updated: ${data.lastUpdated}`);
+
+      // JSON format is already in the correct structure for UI
+      return data.recipes.map(recipe => ({
+        id: recipe.id,
+        name: recipe.name,
+        category: "main", // Default category
+        servings: recipe.servings,
+        ingredients: recipe.ingredients, // Already in {name, amount, unit} format
+        steps: recipe.steps,
+        cookTime: recipe.cookTime,
+        difficulty: "中級" // Default difficulty
+      }));
+
+    } catch (error) {
+      addDebugLog(`❌ BOC-108: recipes.json load failed - ${error.message}`);
+      return null;
+    }
+  }
+
+  // ▼▼▼ BOC-108: Updated Recipe Loading with JSON Priority ▼▼▼
   async loadRecipes() {
     try {
-      console.log("🔄 BOC-97: localStorage優先レシピデータ読み込み開始...");
+      console.log("🔄 BOC-108: File-based recipe loading system start...");
 
-      // STEP 1: localStorage Database Initialization
+      // STEP 1: Try recipes.json first (BOC-108 implementation)
+      const jsonRecipes = await this.loadRecipesFromJSON();
+      if (jsonRecipes && jsonRecipes.length > 0) {
+        console.log("✅ recipes.json loaded successfully:", jsonRecipes.length + " recipes");
+        addDebugLog(`📋 BOC-108: JSON file loaded - ${jsonRecipes.length} recipes`);
+
+        this.recipes = jsonRecipes;
+        this.filteredRecipes = [...this.recipes];
+
+        // ▼▼▼ BOC-100: Recipe Loading Debug ▼▼▼
+        addBOC100Log(`📖 BOC-108: JSON recipes loaded: ${this.recipes.length}件`, 'success');
+        addBOC100Log(`🔢 JSON recipe IDs: ${this.recipes.map(r => r.id).join(', ')}`, 'info');
+        // ▲▲▲ BOC-100: Recipe Loading Debug ▲▲▲
+
+        console.log("📖 BOC-108: JSON recipe loading completed:", this.recipes.length + " recipes");
+        return; // Skip legacy loading
+      }
+
+      // STEP 2: Fallback to localStorage Database Initialization
+      console.log("⚠️ recipes.json failed, falling back to localStorage...");
       const petitRecipes = await this.recipeDB.initialize();
 
       // STEP 2: データが取得できた場合の処理
@@ -2901,7 +2957,43 @@ function forceRefreshRecipeData() {
   }, 1000);
 }
 
-// Capacitor環境での強制グローバルデータ使用
+// ▼▼▼ BOC-108: Enhanced Recipe Data Reload Function ▼▼▼
+async function forceReloadRecipes() {
+  try {
+    addBOC100Log('🔄 BOC-108: Starting recipe reload...', 'info');
+
+    // Clear all caches
+    localStorage.clear();
+    sessionStorage.clear();
+    addBOC100Log('🧹 Cache cleared', 'info');
+
+    if (window.app) {
+      // Try recipes.json first
+      const jsonRecipes = await window.app.loadRecipesFromJSON();
+      if (jsonRecipes && jsonRecipes.length > 0) {
+        window.app.recipes = jsonRecipes;
+        window.app.filteredRecipes = [...jsonRecipes];
+        window.app.renderRecipes();
+
+        addBOC100Log(`✅ BOC-108: JSON reload successful - ${jsonRecipes.length} recipes`, 'success');
+        showUserFeedback(`recipes.jsonから${jsonRecipes.length}件のレシピを再読み込みしました`, 'success');
+        return;
+      }
+    }
+
+    // Fallback to global data if JSON fails
+    addBOC100Log('⚠️ JSON loading failed, trying legacy data...', 'info');
+    const fallbackSuccess = forceUseGlobalRecipeData();
+    if (!fallbackSuccess) {
+      throw new Error('Both JSON and legacy data sources failed');
+    }
+  } catch (error) {
+    addBOC100Log(`❌ BOC-108: Reload failed - ${error.message}`, 'error');
+    showUserFeedback('再読み込みエラー: ' + error.message, 'error');
+  }
+}
+
+// Capacitor環境での強制グローバルデータ使用 (Legacy fallback for BOC-108)
 function forceUseGlobalRecipeData() {
   if (typeof window.PETIT_RECIPE_DATA !== 'undefined' && window.PETIT_RECIPE_DATA.length > 0) {
     addBOC100Log(`🔄 グローバルデータ強制適用: ${window.PETIT_RECIPE_DATA.length}件`, 'info');
@@ -2961,6 +3053,7 @@ function checkForNewRecipes() {
 
 // グローバル関数として登録
 window.forceRefreshRecipeData = forceRefreshRecipeData;
+window.forceReloadRecipes = forceReloadRecipes; // BOC-108: New JSON-aware reload function
 window.forceUseGlobalRecipeData = forceUseGlobalRecipeData;
 window.checkForNewRecipes = checkForNewRecipes;
 

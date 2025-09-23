@@ -2870,4 +2870,42 @@ async function processAIRecipeWithValidation(recipeText) {
   }
 }
 
+// localStorage強制リフレッシュ機能（新レシピ反映用）
+function forceRefreshRecipeData() {
+  addBOC100Log('🔄 レシピデータ強制リフレッシュ開始', 'info');
+
+  // localStorage クリア
+  localStorage.removeItem('petit_recipe_data');
+  localStorage.removeItem('petit_recipe_version');
+
+  addBOC100Log('✅ localStorage クリア完了', 'success');
+  addBOC100Log('🔄 ページリロード実行中...', 'info');
+
+  // ページリロード
+  setTimeout(() => {
+    location.reload();
+  }, 1000);
+}
+
+// Gemini CLI処理後の自動リフレッシュチェック
+function checkForNewRecipes() {
+  const lastRecipeCount = localStorage.getItem('last_recipe_count');
+  const currentCount = window.PETIT_RECIPE_DATA ? window.PETIT_RECIPE_DATA.length : 0;
+
+  if (lastRecipeCount && parseInt(lastRecipeCount) < currentCount) {
+    addBOC100Log(`🆕 新しいレシピ検出: ${lastRecipeCount} → ${currentCount}件`, 'success');
+    showUserFeedback('🆕 新しいレシピが追加されました！データを更新します', 'success');
+
+    setTimeout(() => {
+      forceRefreshRecipeData();
+    }, 2000);
+  }
+
+  localStorage.setItem('last_recipe_count', currentCount.toString());
+}
+
+// グローバル関数として登録
+window.forceRefreshRecipeData = forceRefreshRecipeData;
+window.checkForNewRecipes = checkForNewRecipes;
+
 // ▲▲▲ BOC-106: AI Recipe Integration Functions ▲▲▲

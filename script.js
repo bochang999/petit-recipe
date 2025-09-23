@@ -2914,15 +2914,21 @@ function forceUseGlobalRecipeData() {
       servings: recipe.servings || "適量",
       // ingredients: petit-recipe文字列配列 → RecipeBox{name,amount,unit}配列変換
       ingredients: window.app ? window.app.parseIngredients(recipe.ingredients || []) : recipe.ingredients || [],
-      // instructions配列の正規化
-      instructions: recipe.instructions || []
+      // instructions配列の正規化 + steps変換（アプリが期待する形式）
+      instructions: recipe.instructions || [],
+      steps: recipe.instructions || []  // renderSteps()がstepsフィールドを期待
     }));
 
     // アプリインスタンスが存在する場合、直接更新
     if (window.app) {
-      // デバッグ: 変換前後のデータ構造を確認
-      addBOC100Log(`🔍 変換前サンプル: ${JSON.stringify(window.PETIT_RECIPE_DATA[0]?.ingredients?.slice(0,2) || [])}`, 'debug');
-      addBOC100Log(`🔍 変換後サンプル: ${JSON.stringify(convertedRecipes[0]?.ingredients?.slice(0,2) || [])}`, 'debug');
+      // APK用デバッグ: 変換データをUI表示で確認
+      const debugInfo = `データ変換詳細:
+変換前: ${window.PETIT_RECIPE_DATA[0]?.ingredients?.slice(0,1) || '未確認'}
+変換後: ${convertedRecipes[0]?.ingredients?.slice(0,1)?.map(i => `${i.name} ${i.amount}${i.unit}`) || '未確認'}
+手順: ${convertedRecipes[0]?.steps?.length || 0}件`;
+
+      addBOC100Log(`🔍 ${debugInfo}`, 'debug');
+      showUserFeedback(`🔍 ${debugInfo}`, 'info');
 
       window.app.recipes = convertedRecipes;
       window.app.filteredRecipes = convertedRecipes;

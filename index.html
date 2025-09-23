@@ -36,7 +36,7 @@
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
                     <button class="settings-button" onclick="window.app.showSettings()">⚙️</button>
-                    <button class="ai-add-button" onclick="window.app.showAIRecipeInput()">🤖 AI追加</button>
+                    <button class="ai-add-button" onclick="showAIRecipeInput()">🤖 AI追加</button>
                 </div>
             </header>
             
@@ -234,6 +234,50 @@
             </div>
         </div>
         <!-- ▲▲▲ BOC-98: Recipe Addition Screen ▲▲▲ -->
+
+        <!-- ▼▼▼ BOC-106: AI Recipe Input Screen ▼▼▼ -->
+        <div id="ai-recipe-screen" class="screen">
+            <header class="screen-header">
+                <button class="back-button" onclick="navigateBack()">←</button>
+                <h1 class="screen-title">🤖 AIレシピ追加</h1>
+            </header>
+
+            <div class="screen-content">
+                <form id="ai-recipe-form" onsubmit="processAIRecipe(event)">
+                    <div class="form-group">
+                        <label for="ai-recipe-input" class="form-label">レシピテキスト *</label>
+                        <textarea
+                            id="ai-recipe-input"
+                            name="recipeText"
+                            class="form-textarea"
+                            placeholder="レシピを自然な文章で入力してください&#10;例:&#10;チキンカレー&#10;&#10;材料:&#10;- 鶏肉 500g&#10;- 玉ねぎ 2個&#10;- カレールー 1箱&#10;&#10;作り方:&#10;1. 鶏肉を切る&#10;2. 野菜を炒める&#10;3. 煮込む"
+                            rows="15"
+                            required
+                        ></textarea>
+                        <div class="form-help">自然な文章でレシピを記述してください。AIが自動的に構造化します。</div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="navigateBack()">
+                            キャンセル
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-icon">🤖</span>
+                            AIで追加
+                        </button>
+                    </div>
+                </form>
+
+                <!-- AI処理状況表示 -->
+                <div id="ai-processing" class="ai-processing" style="display: none;">
+                    <div class="ai-status">
+                        <div class="ai-spinner"></div>
+                        <p id="ai-status-text">AIがレシピを解析中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ▲▲▲ BOC-106: AI Recipe Input Screen ▲▲▲ -->
 
         <!-- ▼▼▼ BOC-99: Delete Confirmation Modal ▼▼▼ -->
         <div id="delete-modal" class="modal-overlay">

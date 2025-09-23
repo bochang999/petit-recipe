@@ -1693,4 +1693,46 @@ html, body {
         font-size: 12px;
     }
 }
+
+/* APK Recipe Refresh Button */
+.search-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.refresh-data-button {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.refresh-data-button:hover {
+    transform: rotate(180deg) scale(1.1);
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+
+.refresh-data-button:active {
+    transform: rotate(180deg) scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .refresh-data-button {
+        width: 40px;
+        height: 40px;
+        font-size: 14px;
+    }
+}
+
 /* ▲▲▲ BOC-100: Mobile Debug Panel Styles ▲▲▲ */

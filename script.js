@@ -583,8 +583,9 @@ class LocalRecipeDatabase {
 
       console.log('📋 複製元レシピ:', originalRecipe.title);
 
-      // Step 2: 新ID生成（重複回避）
-      const newId = this.generateRecipeId();
+      // Step 2: 新ID生成（重複回避） - addRecipeパターンと同一
+      const existingRecipes = this.loadRecipes();
+      const newId = this.generateUniqueId(existingRecipes);
       console.log('🆔 新レシピID生成:', newId);
 
       // Step 3: 複製オブジェクト作成

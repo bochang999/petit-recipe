@@ -2906,10 +2906,18 @@ function forceUseGlobalRecipeData() {
   if (typeof window.PETIT_RECIPE_DATA !== 'undefined' && window.PETIT_RECIPE_DATA.length > 0) {
     addBOC100Log(`🔄 グローバルデータ強制適用: ${window.PETIT_RECIPE_DATA.length}件`, 'info');
 
+    // データ構造変換: title → name の変換
+    const convertedRecipes = window.PETIT_RECIPE_DATA.map(recipe => ({
+      ...recipe,
+      name: recipe.title,  // titleをnameに変換（アプリが期待する形式）
+      cookTime: recipe.cookTime || "未設定",
+      servings: recipe.servings || "適量"
+    }));
+
     // アプリインスタンスが存在する場合、直接更新
     if (window.app) {
-      window.app.recipes = window.PETIT_RECIPE_DATA;
-      window.app.filteredRecipes = window.PETIT_RECIPE_DATA;
+      window.app.recipes = convertedRecipes;
+      window.app.filteredRecipes = convertedRecipes;
       window.app.renderRecipes();
       addBOC100Log('✅ アプリデータ即座に更新完了', 'success');
       showUserFeedback('🆕 最新のレシピデータを適用しました！', 'success');

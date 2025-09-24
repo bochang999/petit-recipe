@@ -373,66 +373,34 @@
     <script src="local-recipe-ui-integration.js"></script>
     <script type="module" src="script.js"></script>
 
-    <!-- 4. Initialize system AFTER all scripts loaded -->
+    <!-- APK専用 シンプル化最終プラン: 初期化スクリプト -->
     <script>
-        // Initialize clean global data structure
-        window.PETIT_RECIPE_DATA = [];
-        console.log('🚀 BOC-107: Clean Simple Recipe System');
+        // APK専用: シンプル初期化
+        console.log('🚀 APK専用 シンプルレシピシステム起動');
 
-        // Auto-load recipes on DOM ready
+        // DOM読み込み完了時に起動時初期化を実行
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 DOM ready - starting recipe system');
+            console.log('📱 APK専用: DOM ready - 初期化開始');
 
-            // Longer wait to ensure all scripts are loaded
+            // シンプルな起動確認
             setTimeout(async () => {
-                console.log('🔍 Checking available functions...');
+                console.log('🔍 APK専用関数確認...');
+                console.log('- initializeAndLoadRecipes:', typeof window.initializeAndLoadRecipes);
                 console.log('- forceRefreshLocalRecipes:', typeof window.forceRefreshLocalRecipes);
-                console.log('- refreshRecipeData:', typeof window.refreshRecipeData);
-                console.log('- recipeDataManager:', typeof window.recipeDataManager);
 
-                // APK Environment Detection
-                const isAPK = window.Capacitor && window.Capacitor.isNativePlatform();
-                console.log(`📱 Environment: ${isAPK ? 'APK Native' : 'Web Fallback'}`);
-
-                // Debug: Test appropriate method based on environment
-                if (!isAPK) {
+                // APK専用起動時初期化を実行
+                if (window.initializeAndLoadRecipes) {
                     try {
-                        console.log('🧪 Testing direct fetch to recipes.json...');
-                        const testResponse = await fetch('./recipes.json');
-                        const testData = await testResponse.json();
-                        console.log(`📊 Direct fetch result: ${testData.recipes.length} recipes`);
-                    } catch (fetchError) {
-                        console.error('❌ Direct fetch failed:', fetchError);
-                    }
-                } else {
-                    console.log('📱 APK environment - skipping web fetch test');
-                }
-
-                // Debug: Test recipeDataManager functions
-                if (window.recipeDataManager) {
-                    try {
-                        console.log('🧪 Testing recipeDataManager.loadRecipes()...');
-                        const recipes = await window.recipeDataManager.loadRecipes();
-                        console.log(`📊 recipeDataManager result: ${recipes.length} recipes`);
-                    } catch (loadError) {
-                        console.error('❌ recipeDataManager.loadRecipes failed:', loadError);
-                    }
-                }
-
-                // Load initial recipes using the simple manager
-                if (window.forceRefreshLocalRecipes) {
-                    try {
-                        console.log('🔄 Loading initial recipes via forceRefreshLocalRecipes...');
-                        await window.forceRefreshLocalRecipes();
-                        console.log('✅ Initial recipes loaded successfully');
+                        console.log('🚀 APK専用起動時初期化実行中...');
+                        await window.initializeAndLoadRecipes();
+                        console.log('✅ APK専用初期化完了');
                     } catch (error) {
-                        console.error('❌ Initial recipe load failed:', error);
+                        console.error('❌ APK専用初期化失敗:', error);
                     }
                 } else {
-                    console.error('❌ forceRefreshLocalRecipes not available!');
-                    console.log('Available functions:', Object.keys(window).filter(k => typeof window[k] === 'function' && k.includes('recipe')));
+                    console.error('❌ initializeAndLoadRecipes関数が見つかりません');
                 }
-            }, 2000); // Extended timeout for script loading
+            }, 1000); // APK専用: シンプルなタイムアウト
         });
     </script>
 

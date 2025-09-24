@@ -2,75 +2,53 @@
 // Excel-like operations: Direct Capacitor FileSystem management
 
 /**
- * Simple Recipe Data Manager
+ * APK-Exclusive Simple Recipe Data Manager
  * Target: Documents/recipes.json as the ONLY data source
  * 4 Core Functions: loadRecipes, saveRecipes, addRecipe, deleteRecipe
+ * Assumption: Always runs in Capacitor native environment
  */
 class RecipeDataManager {
     constructor() {
         this.filePath = 'recipes.json';
-        this.isNative = false;
+        // APK-exclusive: No environment detection needed
         this.filesystem = null;
         this.directory = null;
         this.encoding = null;
     }
 
     /**
-     * Initialize FileSystem environment
+     * Initialize Capacitor FileSystem (APK-exclusive)
      */
     async initialize() {
-        try {
-            if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.isNativePlatform()) {
-                // Native environment - use Capacitor FileSystem
-                const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
-                this.filesystem = Filesystem;
-                this.directory = Directory.Documents;
-                this.encoding = Encoding.UTF8;
-                this.isNative = true;
-                console.log('✅ Native Capacitor FileSystem initialized');
-            } else {
-                // Web environment - fallback to localStorage
-                this.isNative = false;
-                console.log('🌐 Web environment - using localStorage fallback');
-            }
-        } catch (error) {
-            console.error('❌ FileSystem initialization failed:', error);
-            this.isNative = false;
-        }
+        // APK-exclusive: Direct Capacitor plugin access
+        const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
+        this.filesystem = Filesystem;
+        this.directory = Directory.Documents;
+        this.encoding = Encoding.UTF8;
+        console.log('✅ APK-exclusive Capacitor FileSystem initialized');
     }
 
     /**
      * Core Function 1: loadRecipes()
-     * Load recipes from Documents/recipes.json
+     * Load recipes from Documents/recipes.json (APK-exclusive)
      */
     async loadRecipes() {
         try {
             await this.initialize();
 
-            if (this.isNative) {
-                // Native: Read from Documents/recipes.json
-                try {
-                    const result = await this.filesystem.readFile({
-                        path: this.filePath,
-                        directory: this.directory,
-                        encoding: this.encoding
-                    });
-                    const data = JSON.parse(result.data);
-                    console.log(`✅ Loaded ${data.recipes.length} recipes from Documents/${this.filePath}`);
-                    return data.recipes || [];
-                } catch (fileError) {
-                    console.log('📝 No recipes.json found in Documents, initializing with sample data');
-                    return await this.createInitialRecipesFile();
-                }
-            } else {
-                // Web: Fallback to current recipes.json
-                const response = await fetch('./recipes.json');
-                if (!response.ok) {
-                    throw new Error('Failed to load recipes.json');
-                }
-                const data = await response.json();
-                console.log(`✅ Loaded ${data.recipes.length} recipes from ./recipes.json (web fallback)`);
+            // APK-exclusive: Always use Capacitor FileSystem
+            try {
+                const result = await this.filesystem.readFile({
+                    path: this.filePath,
+                    directory: this.directory,
+                    encoding: this.encoding
+                });
+                const data = JSON.parse(result.data);
+                console.log(`✅ Loaded ${data.recipes.length} recipes from Documents/${this.filePath}`);
                 return data.recipes || [];
+            } catch (fileError) {
+                console.log('📝 No recipes.json found in Documents, initializing from APK assets');
+                return await this.createInitialRecipesFile();
             }
         } catch (error) {
             console.error('❌ loadRecipes failed:', error);
@@ -80,7 +58,7 @@ class RecipeDataManager {
 
     /**
      * Core Function 2: saveRecipes(data)
-     * Save recipes to Documents/recipes.json
+     * Save recipes to Documents/recipes.json (APK-exclusive)
      */
     async saveRecipes(recipes) {
         try {
@@ -92,20 +70,14 @@ class RecipeDataManager {
                 recipes: recipes
             };
 
-            if (this.isNative) {
-                // Native: Write to Documents/recipes.json
-                await this.filesystem.writeFile({
-                    path: this.filePath,
-                    data: JSON.stringify(dataToSave, null, 2),
-                    directory: this.directory,
-                    encoding: this.encoding
-                });
-                console.log(`💾 Saved ${recipes.length} recipes to Documents/${this.filePath}`);
-            } else {
-                // Web: Save to localStorage as backup
-                localStorage.setItem('petit-recipe-data', JSON.stringify(dataToSave));
-                console.log(`💾 Saved ${recipes.length} recipes to localStorage (web fallback)`);
-            }
+            // APK-exclusive: Always use Capacitor FileSystem
+            await this.filesystem.writeFile({
+                path: this.filePath,
+                data: JSON.stringify(dataToSave, null, 2),
+                directory: this.directory,
+                encoding: this.encoding
+            });
+            console.log(`💾 Saved ${recipes.length} recipes to Documents/${this.filePath}`);
 
             return true;
         } catch (error) {
@@ -194,39 +166,32 @@ class RecipeDataManager {
     }
 
     /**
-     * Helper: Create initial recipes file from embedded data for APK
-     * Loads the full recipes.json data into Documents/recipes.json
+     * Helper: Initialize recipes from APK assets (APK-exclusive)
+     * Following user's APK専用シンプル化最終プラン
      */
     async createInitialRecipesFile() {
-        console.log('🔧 Creating initial recipes file with full recipe data for APK');
+        console.log('🔧 APK初回起動を検出。初期レシピをコピーします。');
 
         try {
-            // In APK environment, attempt to read from bundled assets first
-            if (this.isNative) {
-                console.log('📱 APK: Loading bundled recipes.json from assets');
+            // APK専用: 同梱された初期レシピ(./recipes.json)を取得
+            const response = await fetch('./recipes.json');
+            const bundledData = await response.text();
 
-                // Try to read bundled recipes.json from app assets
-                try {
-                    const bundledData = await fetch('./recipes.json');
-                    const parsedData = await bundledData.json();
-                    const recipes = parsedData.recipes || [];
+            // ユーザーの保存領域に書き込む
+            await this.initialize();
+            await this.filesystem.writeFile({
+                path: this.filePath,
+                data: bundledData,
+                directory: this.directory,
+                encoding: this.encoding
+            });
 
-                    console.log(`📦 Found ${recipes.length} bundled recipes, copying to Documents/recipes.json`);
-                    await this.saveRecipes(recipes);
-                    return recipes;
-                } catch (bundleError) {
-                    console.log('⚠️ Could not load bundled recipes.json, using minimal fallback');
-                    // Fallback to minimal initial data
-                    return await this.createEmptyRecipesFile();
-                }
-            } else {
-                // Web environment - should not reach this point, but safety fallback
-                console.log('🌐 Web environment - returning empty recipes');
-                return await this.createEmptyRecipesFile();
-            }
-        } catch (error) {
-            console.error('❌ createInitialRecipesFile failed:', error);
-            return await this.createEmptyRecipesFile();
+            console.log('✅ 初期レシピのコピーが完了しました。');
+            return JSON.parse(bundledData).recipes || [];
+        } catch (copyError) {
+            console.error('❌ 致命的エラー: 初期レシピのコピーに失敗しました！', copyError);
+            // エラーが発生した場合、空のレシピデータを返す
+            return [];
         }
     }
 
@@ -335,66 +300,62 @@ window.refreshRecipeData = async function() {
     return recipes;
 };
 
+// APK専用 シンプル化最終プラン: リフレッシュ機能
 window.forceRefreshLocalRecipes = async function() {
-    console.log('🔄 Force refreshing local recipes and UI...');
-    console.log('🖱️ Refresh button clicked - function called successfully');
+    console.log('🔄 レシピをリフレッシュします...');
+
     try {
-        // Step 1: Clear old localStorage data to prevent sample data issues
-        if (window.recipeDataManager && window.recipeDataManager.clearOldLocalStorageData) {
-            await window.recipeDataManager.clearOldLocalStorageData();
-        }
+        // APK専用: Capacitor FileSystemから直接読み込み
+        const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
 
-        // Step 2: Reload recipes from file (should be empty or real data)
-        const recipes = await window.refreshRecipeData();
+        const contents = await Filesystem.readFile({
+            path: 'recipes.json',
+            directory: Directory.Documents,
+            encoding: Encoding.UTF8
+        });
 
-        // Step 3: Update the app's recipe data if app exists
-        if (window.app && typeof window.app.renderRecipes === 'function') {
-            window.app.recipes = recipes;
-            window.app.filteredRecipes = [...recipes];
-            window.app.renderRecipes();
-            console.log('✅ App UI refreshed successfully');
-        } else if (typeof window.renderRecipesList === 'function') {
-            window.renderRecipesList();
-            console.log('✅ UI refreshed via renderRecipesList');
-        } else {
-            // Manual DOM update as final fallback
-            console.log('⚠️ No UI update function found - updating DOM manually');
-            const recipesList = document.getElementById('recipes-list');
-            if (recipesList) {
-                if (recipes.length === 0) {
-                    recipesList.innerHTML = '<div class="no-recipes">レシピがありません<br><small>新しいレシピを追加してください</small></div>';
-                    console.log('📝 Empty recipe list displayed');
-                } else {
-                    const recipesHtml = recipes.map(recipe => `
-                        <div class="recipe-card">
-                            <div class="recipe-header">
-                                <h3 class="recipe-title">${recipe.name || 'Unknown Recipe'}</h3>
-                                <div class="recipe-meta">
-                                    <span class="recipe-time">⏱️ ${recipe.cookTime || '不明'}</span>
-                                    <span class="recipe-servings">🍴 ${recipe.servings || 1}人前</span>
-                                </div>
-                            </div>
-                            <div class="recipe-preview">
-                                <p>材料: ${(recipe.ingredients || []).length}種類</p>
-                                <p>手順: ${(recipe.steps || []).length}ステップ</p>
-                            </div>
-                        </div>
-                    `).join('');
-                    recipesList.innerHTML = recipesHtml;
-                    console.log(`📋 Manual DOM update: ${recipes.length} recipes displayed`);
-                }
-            } else {
-                console.error('❌ recipes-list element not found - cannot update UI');
-            }
-        }
+        const data = JSON.parse(contents.data);
 
-        console.log(`🎯 Final result: ${recipes.length} recipes displayed`);
-        return recipes;
+        // UIを更新する - シンプルなDOM更新
+        renderRecipesToUI(data.recipes);
+        console.log('✅ リフレッシュ完了。');
+
+        return data.recipes;
     } catch (error) {
-        console.error('❌ Force refresh failed:', error);
-        alert('レシピの更新に失敗しました: ' + error.message);
+        console.error('❌ リフレッシュに失敗:', error);
+        return [];
     }
 };
+
+// APK専用: シンプルなUI更新関数
+function renderRecipesToUI(recipes) {
+    const recipesList = document.getElementById('recipes-list');
+    if (recipesList) {
+        if (recipes.length === 0) {
+            recipesList.innerHTML = '<div class="no-recipes">レシピがありません<br><small>新しいレシピを追加してください</small></div>';
+        } else {
+            const recipesHtml = recipes.map(recipe => `
+                <div class="recipe-card">
+                    <div class="recipe-header">
+                        <h3 class="recipe-title">${recipe.name || 'Unknown Recipe'}</h3>
+                        <div class="recipe-meta">
+                            <span class="recipe-time">⏱️ ${recipe.cookTime || '不明'}</span>
+                            <span class="recipe-servings">🍴 ${recipe.servings || 1}人前</span>
+                        </div>
+                    </div>
+                    <div class="recipe-preview">
+                        <p>材料: ${(recipe.ingredients || []).length}種類</p>
+                        <p>手順: ${(recipe.steps || []).length}ステップ</p>
+                    </div>
+                </div>
+            `).join('');
+            recipesList.innerHTML = recipesHtml;
+        }
+        console.log(`📋 UI更新完了: ${recipes.length} recipes displayed`);
+    } else {
+        console.error('❌ recipes-list element not found');
+    }
+}
 
 // Test function for development
 window.testRecipeDataManager = async function() {
@@ -438,12 +399,61 @@ window.cleanOldRecipeData = async function() {
     return false;
 };
 
-console.log('✅ Simple Recipe Data Manager loaded');
+// APK専用 起動時初期化関数 (ユーザー提案実装)
+window.initializeAndLoadRecipes = async function() {
+    console.log('🚀 APK専用 シンプル初期化開始');
+
+    // CapacitorのFileSystemプラグインを直接取得
+    const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
+    const RECIPE_FILE = 'recipes.json';
+
+    try {
+        // 【手順1】まず、ユーザーの保存領域にあるファイルの読み込みを試みる
+        const contents = await Filesystem.readFile({
+            path: RECIPE_FILE,
+            directory: Directory.Documents,
+            encoding: Encoding.UTF8
+        });
+
+        console.log('✅ ユーザーのレシピファイルを読み込みました。');
+        const data = JSON.parse(contents.data);
+        renderRecipesToUI(data.recipes || []);
+        return data;
+    } catch (e) {
+        // 【手順2】読み込みに失敗した場合（＝初回起動でファイルが存在しない）
+        console.log('ℹ️ 初回起動を検出。初期レシピをコピーします。');
+
+        try {
+            // APKに同梱された初期レシピ(./recipes.json)を取得
+            const response = await fetch('./recipes.json');
+            const bundledData = await response.text();
+
+            // ユーザーの保存領域に書き込む
+            await Filesystem.writeFile({
+                path: RECIPE_FILE,
+                data: bundledData,
+                directory: Directory.Documents,
+                encoding: Encoding.UTF8
+            });
+
+            console.log('✅ 初期レシピのコピーが完了しました。');
+            const data = JSON.parse(bundledData);
+            renderRecipesToUI(data.recipes || []);
+            return data;
+        } catch (copyError) {
+            console.error('❌ 致命的エラー: 初期レシピのコピーに失敗しました！', copyError);
+            // エラーが発生した場合、空のレシピデータを返す
+            const emptyData = { version: "1.0", recipes: [] };
+            renderRecipesToUI([]);
+            return emptyData;
+        }
+    }
+};
+
+console.log('✅ APK専用 Simple Recipe Data Manager loaded');
 console.log('🔧 Available functions:');
+console.log('  - initializeAndLoadRecipes() - APK専用起動時初期化');
+console.log('  - forceRefreshLocalRecipes() - APK専用リフレッシュ');
 console.log('  - loadAllRecipes() - Load all recipes');
 console.log('  - addNewRecipe(data) - Add new recipe');
 console.log('  - removeRecipe(id) - Delete recipe');
-console.log('  - refreshRecipeData() - Refresh and update PETIT_RECIPE_DATA');
-console.log('  - forceRefreshLocalRecipes() - Force refresh with UI update');
-console.log('  - cleanOldRecipeData() - Clear old localStorage data');
-console.log('  - testRecipeDataManager() - Run tests');

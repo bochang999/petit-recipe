@@ -211,6 +211,37 @@ class RecipeDataManager {
     }
 
     /**
+     * Helper: Clear old localStorage data
+     */
+    async clearOldLocalStorageData() {
+        try {
+            console.log('🧹 Clearing old localStorage recipe data...');
+
+            // Clear all old recipe-related localStorage keys
+            const keysToRemove = [
+                'petit-recipe-db',
+                'petitRecipeDB',
+                'recipe-database',
+                'recipeViewCounts',
+                'last_recipe_count'
+            ];
+
+            keysToRemove.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    console.log(`🗑️ Removed old localStorage key: ${key}`);
+                }
+            });
+
+            console.log('✅ Old localStorage data cleared');
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to clear localStorage:', error);
+            return false;
+        }
+    }
+
+    /**
      * Helper: Update existing recipe
      */
     async updateRecipe(recipeId, updatedData) {
@@ -267,6 +298,39 @@ window.refreshRecipeData = async function() {
     return recipes;
 };
 
+window.forceRefreshLocalRecipes = async function() {
+    console.log('🔄 Force refreshing local recipes and UI...');
+    try {
+        // Step 1: Clear old localStorage data to prevent sample data issues
+        if (window.recipeDataManager && window.recipeDataManager.clearOldLocalStorageData) {
+            await window.recipeDataManager.clearOldLocalStorageData();
+        }
+
+        // Step 2: Reload recipes from file (should be empty or real data)
+        const recipes = await window.refreshRecipeData();
+
+        // Step 3: Update the app's recipe data if app exists
+        if (window.app && typeof window.app.renderRecipes === 'function') {
+            window.app.recipes = recipes;
+            window.app.filteredRecipes = [...recipes];
+            window.app.renderRecipes();
+            console.log('✅ App UI refreshed successfully');
+        } else if (typeof window.renderRecipesList === 'function') {
+            window.renderRecipesList();
+            console.log('✅ UI refreshed via renderRecipesList');
+        } else {
+            console.log('⚠️ No UI update function found - reloading page');
+            location.reload();
+        }
+
+        console.log(`🎯 Final result: ${recipes.length} recipes displayed`);
+        return recipes;
+    } catch (error) {
+        console.error('❌ Force refresh failed:', error);
+        alert('レシピの更新に失敗しました: ' + error.message);
+    }
+};
+
 // Test function for development
 window.testRecipeDataManager = async function() {
     console.log('🧪 Testing Recipe Data Manager...');
@@ -300,10 +364,21 @@ window.testRecipeDataManager = async function() {
     }
 };
 
+// Clean localStorage function
+window.cleanOldRecipeData = async function() {
+    if (window.recipeDataManager && window.recipeDataManager.clearOldLocalStorageData) {
+        return await window.recipeDataManager.clearOldLocalStorageData();
+    }
+    console.log('⚠️ recipeDataManager not available for cleanup');
+    return false;
+};
+
 console.log('✅ Simple Recipe Data Manager loaded');
 console.log('🔧 Available functions:');
 console.log('  - loadAllRecipes() - Load all recipes');
 console.log('  - addNewRecipe(data) - Add new recipe');
 console.log('  - removeRecipe(id) - Delete recipe');
 console.log('  - refreshRecipeData() - Refresh and update PETIT_RECIPE_DATA');
+console.log('  - forceRefreshLocalRecipes() - Force refresh with UI update');
+console.log('  - cleanOldRecipeData() - Clear old localStorage data');
 console.log('  - testRecipeDataManager() - Run tests');

@@ -37,7 +37,11 @@ class BaseDataLoader {
             this.baseData = data.recipes;
             this.isLoaded = true;
 
-            console.log(`✅ Base data loaded: ${this.baseData.length} recipes`);
+            if (this.baseData.length === 0) {
+                console.log('📝 Base data loaded: Empty recipe list (ready for new recipes)');
+            } else {
+                console.log(`✅ Base data loaded: ${this.baseData.length} recipes`);
+            }
             return this.baseData;
         } catch (error) {
             console.error('❌ Base data loading failed:', error);

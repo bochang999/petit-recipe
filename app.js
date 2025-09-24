@@ -99,6 +99,46 @@ window.app = {
 
         if (recipeScreen) recipeScreen.classList.remove('active');
         if (detailScreen) detailScreen.classList.add('active');
+    },
+
+    // Simple recipe operations using recipeDataManager
+    async addRecipeFromForm(formData) {
+        console.log('➕ Adding recipe from form');
+        try {
+            if (window.addNewRecipe) {
+                const result = await window.addNewRecipe(formData);
+                console.log('✅ Recipe added successfully:', result.name);
+                // Refresh UI
+                if (window.refreshRecipeData) {
+                    await window.refreshRecipeData();
+                }
+                return result;
+            } else {
+                alert('レシピ管理システムが初期化されていません');
+            }
+        } catch (error) {
+            console.error('❌ Recipe addition failed:', error);
+            alert('レシピの追加に失敗しました: ' + error.message);
+        }
+    },
+
+    async deleteRecipeById(recipeId) {
+        console.log('🗑️ Deleting recipe ID:', recipeId);
+        try {
+            if (window.removeRecipe) {
+                await window.removeRecipe(recipeId);
+                console.log('✅ Recipe deleted successfully');
+                // Refresh UI
+                if (window.refreshRecipeData) {
+                    await window.refreshRecipeData();
+                }
+            } else {
+                alert('レシピ管理システムが初期化されていません');
+            }
+        } catch (error) {
+            console.error('❌ Recipe deletion failed:', error);
+            alert('レシピの削除に失敗しました: ' + error.message);
+        }
     }
 };
 

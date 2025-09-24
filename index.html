@@ -362,83 +362,94 @@
         <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->
     </div>
 
-    <!-- BOC-107: Layered Data Architecture - Excel-like Recipe System -->
+    <!-- BOC-107: Layered Data Architecture - Temporarily disabled for simplification -->
     <script type="module">
-        import { initializeRecipeArchitecture } from './recipe-architecture-init.js';
+        // import { initializeRecipeArchitecture } from './recipe-architecture-init.js';
 
         // Initialize global data structure for legacy compatibility
         window.PETIT_RECIPE_DATA = [];
 
-        // Excel-like architecture initialization
+        // Simple architecture initialization - temporarily disabled
         async function startRecipeSystem() {
-            try {
-                console.log('🚀 BOC-107: Starting Layered Data Architecture...');
-                console.log('🎯 Excel-like operations: Add→Save→Immediate Display');
-
-                const success = await initializeRecipeArchitecture();
-
-                if (success) {
-                    console.log('✅ Layered Architecture ready - Excel-like operations enabled');
-                    console.log('🎉 No APK rebuild needed for recipe changes!');
-                } else {
-                    console.log('⚠️ Architecture in fallback mode');
-                }
-            } catch (error) {
-                console.error('❌ Architecture startup failed:', error);
-            }
+            console.log('🚀 BOC-107: Simple Recipe System (Complex architecture disabled)');
+            console.log('🎯 Target: Excel-like operations via Capacitor FileSystem');
         }
 
-        // Legacy compatibility wrapper for forceRefreshLocalRecipes
+        // Simple refresh function using new recipeDataManager
         window.forceRefreshLocalRecipes = async function() {
-            console.log('🔄 Force refresh requested...');
+            console.log('🔄 Simple refresh requested (BOC-107 simplified)...');
             try {
-                if (window.forceRefreshRecipes) {
-                    console.log('✅ Using new architecture refresh');
-                    return await window.forceRefreshRecipes();
-                } else if (window.recipeArchitecture) {
-                    console.log('✅ Using direct architecture refresh');
-                    const recipes = await window.recipeArchitecture.forceRefresh();
-                    console.log(`🔄 Refreshed ${recipes.length} recipes`);
+                if (window.refreshRecipeData) {
+                    console.log('✅ Using simple recipeDataManager refresh');
+                    const recipes = await window.refreshRecipeData();
+
+                    // Update UI if renderRecipesToUI exists
+                    if (window.renderRecipesToUI) {
+                        window.renderRecipesToUI(recipes);
+                        console.log(`🔄 UI updated with ${recipes.length} recipes`);
+                    }
+
                     return recipes;
                 } else {
-                    console.log('⚠️ Architecture not ready, using fallback refresh');
+                    console.log('⚠️ recipeDataManager not ready, using page reload');
                     location.reload();
                 }
             } catch (error) {
-                console.error('❌ Force refresh failed:', error);
+                console.error('❌ Simple refresh failed:', error);
                 location.reload();
             }
         };
 
-        // Debug functions for testing
+        // Simple debug function
         window.debugRecipeSystem = async function() {
-            console.log('🔍 Recipe System Debug Info');
+            console.log('🔍 Simple Recipe System Debug Info');
             console.log('📊 PETIT_RECIPE_DATA length:', window.PETIT_RECIPE_DATA?.length || 0);
 
-            if (window.recipeArchitecture) {
-                const status = await window.recipeArchitecture.getStatus();
-                console.log('🏗️ Architecture Status:', status);
-
-                const recipes = await window.recipeArchitecture.getAllRecipes();
-                console.log('📝 All Recipes:', recipes.length);
-                console.log('📝 First Recipe:', recipes[0]);
+            if (window.recipeDataManager) {
+                const recipes = await window.recipeDataManager.loadRecipes();
+                console.log('📝 Loaded Recipes:', recipes.length);
+                if (recipes.length > 0) {
+                    console.log('📝 First Recipe:', recipes[0]);
+                }
             } else {
-                console.log('❌ recipeArchitecture not available');
+                console.log('❌ recipeDataManager not available');
             }
 
-            console.log('🔗 Available Functions:');
-            console.log('  - forceRefreshLocalRecipes:', typeof window.forceRefreshLocalRecipes);
-            console.log('  - forceRefreshRecipes:', typeof window.forceRefreshRecipes);
+            console.log('🔗 Available Simple Functions:');
+            console.log('  - loadAllRecipes:', typeof window.loadAllRecipes);
+            console.log('  - addNewRecipe:', typeof window.addNewRecipe);
+            console.log('  - removeRecipe:', typeof window.removeRecipe);
+            console.log('  - refreshRecipeData:', typeof window.refreshRecipeData);
         };
 
-        // Start the new architecture immediately
+        // Start the simple system and load initial data
         startRecipeSystem();
+
+        // Load recipes on DOM ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Loading initial recipes...');
+            try {
+                if (window.refreshRecipeData) {
+                    await window.refreshRecipeData();
+                    console.log('✅ Initial recipes loaded');
+                } else {
+                    console.log('⚠️ recipeDataManager not ready, retrying...');
+                    setTimeout(async () => {
+                        if (window.refreshRecipeData) {
+                            await window.refreshRecipeData();
+                        }
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('❌ Initial recipe loading failed:', error);
+            }
+        });
     </script>
     <!-- BOC-107: Essential UI functions first -->
     <script src="app.js"></script>
 
-    <!-- Recipe addition helper for real recipes -->
-    <script src="add-recipe-helper.js"></script>
+    <!-- Simple Recipe Data Manager - Single Source of Truth -->
+    <script src="recipeDataManager.js"></script>
 
     <!-- BOC-107: Essential UI scripts - maintaining backward compatibility -->
     <script src="local-recipe-ui-integration.js"></script>

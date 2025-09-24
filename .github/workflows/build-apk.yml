@@ -10,11 +10,11 @@ on:
 env:
   JAVA_VERSION: '21'
   NODE_VERSION: '20'
-  
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     # ========== 1. 環境セットアップフェーズ ==========
     - name: Checkout Repository
@@ -72,7 +72,7 @@ jobs:
           echo "❌ manifest.json が見つかりません"
           exit 1
         fi
-        
+
         if [ -f "sw.js" ]; then
           echo "✅ Service Worker存在確認"
         else
@@ -92,17 +92,17 @@ jobs:
         # package.jsonのバージョン更新
         jq --arg version "${{ env.VERSION_TAG }}" '.version = $version' package.json > package.json.tmp
         mv package.json.tmp package.json
-        
+
         # manifestのバージョン更新
         jq --arg version "${{ env.VERSION_TAG }}" '.version = $version' manifest.json > manifest.json.tmp
         mv manifest.json.tmp manifest.json
-        
+
         echo "✅ バージョン ${{ env.VERSION_TAG }} に更新完了"
 
     - name: Setup Keystore from GitHub Secrets
       run: |
         echo "🔑 キーストア設定開始"
-        
+
         if [ -z "${{ secrets.KEYSTORE_BASE64 }}" ]; then
           echo "⚠️ GitHub Secrets未設定 - PWAテンプレート固定キーストア生成"
           keytool -genkeypair -v \
@@ -114,36 +114,36 @@ jobs:
             -dname "CN=PWA Template,OU=PWA Template,O=PWA Template App,L=Tokyo,ST=Tokyo,C=JP" \
             -storepass template2024 \
             -keypass template2024
-          
+
           echo "KEYSTORE_PASSWORD=template2024" >> $GITHUB_ENV
           echo "KEY_ALIAS=pwa-template-key" >> $GITHUB_ENV
           echo "KEY_PASSWORD=template2024" >> $GITHUB_ENV
         else
           echo "✅ GitHub Secrets設定済み - 本番キーストア使用"
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > petit-recipe-release-keystore.jks
-          
+
           echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
           echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
           echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
         fi
-        
+
         echo "🔐 キーストア設定完了"
 
     # ========== 4. Capacitor初期化フェーズ ==========
     - name: Build Web Assets and Prepare Capacitor
       run: |
         echo "🏧️ ウェブアセットビルド開始"
-        
+
         # distディレクトリ作成とファイルコピー
         mkdir -p dist
-        cp index.html style.css script.js manifest.json sw.js recipes-data.js dist/
-        
+        cp index.html style.css script.js app.js recipeDataManager.js manifest.json sw.js dist/
+
         # iconsディレクトリも含める
         if [ -d "icons" ]; then
           cp -r icons dist/
         fi
-        
-        echo "✅ ウェブアセット準備完了（recipes-data.js含む）"
+
+        echo "✅ ウェブアセット準備完了（app.js, recipeDataManager.js含む）"
 
     - name: Initialize and Sync Capacitor Project
       run: |
@@ -155,14 +155,14 @@ jobs:
     - name: Generate App Icons and Splash Screens (Capacitor Assets)
       run: |
         echo "🎨 Androidアダプティブアイコン生成開始 (Capacitor公式ツール)"
-        
+
         # Capacitor公式アセットツールでアダプティブアイコン生成
         npx @capacitor/assets generate --android
-        
+
         # 生成結果確認
         echo "✅ アダプティブアイコン生成完了! 生成ファイル:"
         find android/app/src/main/res -name "*ic_launcher*" -o -name "*adaptive*" | sort
-        
+
         # アダプティブアイコン仕様確認
         if [ -d "android/app/src/main/res/mipmap-anydpi-v26" ]; then
           echo "✅ Android 8.0+ アダプティブアイコン対応完了"
@@ -176,13 +176,13 @@ jobs:
       run: |
         echo "🏧️ Android APK ビルド開始"
         cd android
-        
+
         # Gradleラッパーに実行権限付与
         chmod +x ./gradlew
-        
+
         # APKビルド
         ./gradlew assembleRelease --stacktrace
-        
+
         echo "✅ APK ビルド完了"
 
     - name: Sign APK with apksigner
@@ -194,15 +194,15 @@ jobs:
         VERSION_TAG: ${{ env.VERSION_TAG }}
       run: |
         echo "デバッグ情報：ワークフローが読み込んだエイリアス名は -> [${{ secrets.KEY_ALIAS }}] です"
-        
+
         echo "✍️ APK署名開始 (Modern apksigner)"
-        
+
         cd android/app/build/outputs/apk/release
-        
+
         # 最新のAndroid build-toolsのパスを取得
         BUILD_TOOLS_PATH=$(ls -d $ANDROID_HOME/build-tools/* | sort -r | head -n 1)
         echo "🔧 使用build-tools: $BUILD_TOOLS_PATH"
-        
+
         # APK署名 (signature scheme v2対応) - 実際に存在するkeystoreファイルを使用
         if [ -f "../../../../../../petit-recipe-release-keystore.jks" ]; then
           KEYSTORE_FILE="../../../../../../petit-recipe-release-keystore.jks"
@@ -213,9 +213,9 @@ jobs:
           ls -la ../../../../../../*.keystore ../../../../../../*.jks 2>/dev/null || echo "キーストアファイルが存在しません"
           exit 1
         fi
-        
+
         echo "🔑 使用キーストア: $KEYSTORE_FILE"
-        
+
         $BUILD_TOOLS_PATH/apksigner sign \
           --ks "$KEYSTORE_FILE" \
           --ks-key-alias "$KEY_ALIAS" \
@@ -223,10 +223,10 @@ jobs:
           --key-pass env:KEY_PASSWORD \
           --out petit-recipe_$VERSION_TAG.apk \
           app-release-unsigned.apk
-        
+
         # 署名検証
         $BUILD_TOOLS_PATH/apksigner verify petit-recipe_$VERSION_TAG.apk
-        
+
         echo "🎯 署名完了 (v2対応): petit-recipe_$VERSION_TAG.apk"
 
     - name: Verify APK
@@ -234,13 +234,13 @@ jobs:
         VERSION_TAG: ${{ env.VERSION_TAG }}
       run: |
         echo "🔍 APK検証開始"
-        
+
         APK_PATH="android/app/build/outputs/apk/release/petit-recipe_$VERSION_TAG.apk"
-        
+
         if [ -f "$APK_PATH" ]; then
           APK_SIZE=$(du -h "$APK_PATH" | cut -f1)
           echo "✅ APK生成成功: $APK_SIZE"
-          
+
           # APK情報表示
           $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/aapt dump badging "$APK_PATH" | head -5
         else
@@ -265,25 +265,25 @@ jobs:
         release_name: Petit Recipe v${{ env.VERSION_TAG }}
         body: |
           ## 📱 Petit Recipe APK v${{ env.VERSION_TAG }}
-          
+
           ### ✨ アプリ機能
           - 📱 PWA (Progressive Web App) 対応
           - 💾 オフライン動作
           - 🔄 自動更新機能
           - 📱 ネイティブアプリ風UI/UX
           - 🚀 高速起動
-          
+
           ### 🛠️ 開発環境
           - Node.js ${{ env.NODE_VERSION }}
           - Java JDK ${{ env.JAVA_VERSION }}
           - Capacitor 7.x
           - GitHub Actions自動ビルド
-          
+
           ### 📋 使用方法
           1. APKをダウンロード
           2. Android端末にインストール
           3. PWAアプリを利用開始
-          
+
           **APKファイル**: PETIT-RECIPE-APK-${{ env.VERSION_TAG }}
         draft: false
         prerelease: false

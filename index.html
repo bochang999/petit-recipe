@@ -362,47 +362,38 @@
         <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->
     </div>
 
-    <!-- BOC-107: Layered Data Architecture - Temporarily disabled for simplification -->
-    <script type="module">
-        // import { initializeRecipeArchitecture } from './recipe-architecture-init.js';
-
-        // Initialize global data structure for legacy compatibility
+    <!-- BOC-107: Clean Simple Recipe System -->
+    <script>
+        // Initialize clean global data structure
         window.PETIT_RECIPE_DATA = [];
 
-        // Simple architecture initialization - temporarily disabled
-        async function startRecipeSystem() {
-            console.log('🚀 BOC-107: Simple Recipe System (Complex architecture disabled)');
-            console.log('🎯 Target: Excel-like operations via Capacitor FileSystem');
+        // Simple system initialization
+        function startRecipeSystem() {
+            console.log('🚀 BOC-107: Clean Simple Recipe System');
+            console.log('🎯 Single data source: recipeDataManager.js only');
         }
 
-        // Simple refresh function using new recipeDataManager
+        // Clean refresh function using only recipeDataManager
         window.forceRefreshLocalRecipes = async function() {
-            console.log('🔄 Simple refresh requested (BOC-107 simplified)...');
+            console.log('🔄 Clean simple refresh...');
             try {
                 if (window.refreshRecipeData) {
-                    console.log('✅ Using simple recipeDataManager refresh');
                     const recipes = await window.refreshRecipeData();
-
-                    // Update UI if renderRecipesToUI exists
-                    if (window.renderRecipesToUI) {
-                        window.renderRecipesToUI(recipes);
-                        console.log(`🔄 UI updated with ${recipes.length} recipes`);
-                    }
-
+                    console.log(`🔄 Refreshed ${recipes.length} recipes`);
                     return recipes;
                 } else {
-                    console.log('⚠️ recipeDataManager not ready, using page reload');
+                    console.log('⚠️ recipeDataManager not ready, reloading page');
                     location.reload();
                 }
             } catch (error) {
-                console.error('❌ Simple refresh failed:', error);
+                console.error('❌ Refresh failed:', error);
                 location.reload();
             }
         };
 
-        // Simple debug function
+        // Clean debug function
         window.debugRecipeSystem = async function() {
-            console.log('🔍 Simple Recipe System Debug Info');
+            console.log('🔍 Clean Recipe System Debug');
             console.log('📊 PETIT_RECIPE_DATA length:', window.PETIT_RECIPE_DATA?.length || 0);
 
             if (window.recipeDataManager) {
@@ -415,34 +406,29 @@
                 console.log('❌ recipeDataManager not available');
             }
 
-            console.log('🔗 Available Simple Functions:');
+            console.log('🔗 Available Functions:');
             console.log('  - loadAllRecipes:', typeof window.loadAllRecipes);
             console.log('  - addNewRecipe:', typeof window.addNewRecipe);
             console.log('  - removeRecipe:', typeof window.removeRecipe);
             console.log('  - refreshRecipeData:', typeof window.refreshRecipeData);
         };
 
-        // Start the simple system and load initial data
+        // Start system
         startRecipeSystem();
 
-        // Load recipes on DOM ready
+        // Auto-load recipes on DOM ready
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Loading initial recipes...');
-            try {
+            setTimeout(async () => {
                 if (window.refreshRecipeData) {
-                    await window.refreshRecipeData();
-                    console.log('✅ Initial recipes loaded');
-                } else {
-                    console.log('⚠️ recipeDataManager not ready, retrying...');
-                    setTimeout(async () => {
-                        if (window.refreshRecipeData) {
-                            await window.refreshRecipeData();
-                        }
-                    }, 1000);
+                    try {
+                        await window.refreshRecipeData();
+                        console.log('✅ Initial recipes loaded');
+                    } catch (error) {
+                        console.error('❌ Initial loading failed:', error);
+                    }
                 }
-            } catch (error) {
-                console.error('❌ Initial recipe loading failed:', error);
-            }
+            }, 500);
         });
     </script>
     <!-- BOC-107: Essential UI functions first -->

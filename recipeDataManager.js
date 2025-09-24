@@ -300,6 +300,7 @@ window.refreshRecipeData = async function() {
 
 window.forceRefreshLocalRecipes = async function() {
     console.log('🔄 Force refreshing local recipes and UI...');
+    console.log('🖱️ Refresh button clicked - function called successfully');
     try {
         // Step 1: Clear old localStorage data to prevent sample data issues
         if (window.recipeDataManager && window.recipeDataManager.clearOldLocalStorageData) {
@@ -319,8 +320,35 @@ window.forceRefreshLocalRecipes = async function() {
             window.renderRecipesList();
             console.log('✅ UI refreshed via renderRecipesList');
         } else {
-            console.log('⚠️ No UI update function found - reloading page');
-            location.reload();
+            // Manual DOM update as final fallback
+            console.log('⚠️ No UI update function found - updating DOM manually');
+            const recipesList = document.getElementById('recipes-list');
+            if (recipesList) {
+                if (recipes.length === 0) {
+                    recipesList.innerHTML = '<div class="no-recipes">レシピがありません<br><small>新しいレシピを追加してください</small></div>';
+                    console.log('📝 Empty recipe list displayed');
+                } else {
+                    const recipesHtml = recipes.map(recipe => `
+                        <div class="recipe-card">
+                            <div class="recipe-header">
+                                <h3 class="recipe-title">${recipe.name || 'Unknown Recipe'}</h3>
+                                <div class="recipe-meta">
+                                    <span class="recipe-time">⏱️ ${recipe.cookTime || '不明'}</span>
+                                    <span class="recipe-servings">🍴 ${recipe.servings || 1}人前</span>
+                                </div>
+                            </div>
+                            <div class="recipe-preview">
+                                <p>材料: ${(recipe.ingredients || []).length}種類</p>
+                                <p>手順: ${(recipe.steps || []).length}ステップ</p>
+                            </div>
+                        </div>
+                    `).join('');
+                    recipesList.innerHTML = recipesHtml;
+                    console.log(`📋 Manual DOM update: ${recipes.length} recipes displayed`);
+                }
+            } else {
+                console.error('❌ recipes-list element not found - cannot update UI');
+            }
         }
 
         console.log(`🎯 Final result: ${recipes.length} recipes displayed`);

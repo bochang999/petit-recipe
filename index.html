@@ -418,24 +418,38 @@
 
         // Auto-load recipes on DOM ready
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Loading initial recipes...');
+            console.log('🚀 BOC-107: Clean Simple Recipe System Startup');
+
+            // Wait for all scripts to load
             setTimeout(async () => {
-                if (window.refreshRecipeData) {
+                console.log('🔍 Checking available functions...');
+                console.log('- forceRefreshLocalRecipes:', typeof window.forceRefreshLocalRecipes);
+                console.log('- refreshRecipeData:', typeof window.refreshRecipeData);
+                console.log('- recipeDataManager:', typeof window.recipeDataManager);
+
+                // Use the simple refresh function if available
+                if (window.forceRefreshLocalRecipes) {
                     try {
-                        await window.refreshRecipeData();
-                        console.log('✅ Initial recipes loaded');
+                        console.log('🔄 Using forceRefreshLocalRecipes for startup');
+                        await window.forceRefreshLocalRecipes();
+                        console.log('✅ Initial recipes loaded via forceRefreshLocalRecipes');
                     } catch (error) {
-                        console.error('❌ Initial loading failed:', error);
+                        console.error('❌ forceRefreshLocalRecipes failed:', error);
+                        console.log('🔄 Fallback: Page reload');
+                        location.reload();
                     }
+                } else {
+                    console.error('❌ forceRefreshLocalRecipes not available');
+                    console.log('Available window functions:', Object.keys(window).filter(k => k.includes('recipe')));
                 }
-            }, 500);
+            }, 1000); // Increased timeout to ensure all scripts loaded
         });
     </script>
-    <!-- BOC-107: Essential UI functions first -->
-    <script src="app.js"></script>
-
-    <!-- Simple Recipe Data Manager - Single Source of Truth -->
+    <!-- Simple Recipe Data Manager - Single Source of Truth (FIRST) -->
     <script src="recipeDataManager.js"></script>
+
+    <!-- BOC-107: Essential UI functions -->
+    <script src="app.js"></script>
 
     <!-- BOC-107: Essential UI scripts - maintaining backward compatibility -->
     <script src="local-recipe-ui-integration.js"></script>

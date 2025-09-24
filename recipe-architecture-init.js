@@ -174,16 +174,66 @@ async function displayRecipes() {
         } else if (typeof window.renderRecipes === 'function') {
             window.renderRecipes();
         } else {
-            // Fallback: trigger custom event
-            document.dispatchEvent(new CustomEvent('recipesUpdated', {
-                detail: { recipes, legacyData: window.PETIT_RECIPE_DATA }
-            }));
+            // Fallback: Direct UI rendering
+            await renderRecipesToUI(recipes);
         }
 
         console.log(`📊 Displayed ${recipes.length} recipes`);
         console.log(`🔄 Legacy format updated: ${window.PETIT_RECIPE_DATA.length} items`);
     } catch (error) {
         console.error('❌ Failed to display recipes:', error);
+    }
+}
+
+/**
+ * Direct UI rendering when no existing system is found
+ */
+async function renderRecipesToUI(recipes) {
+    try {
+        const recipesListElement = document.getElementById('recipes-list');
+
+        if (!recipesListElement) {
+            console.log('⚠️ No recipes-list element found, triggering custom event instead');
+            document.dispatchEvent(new CustomEvent('recipesUpdated', {
+                detail: { recipes, legacyData: window.PETIT_RECIPE_DATA }
+            }));
+            return;
+        }
+
+        // Simple recipe card rendering
+        const recipesHTML = recipes.map(recipe => `
+            <div class="recipe-card" data-id="${recipe.id}">
+                <h3 class="recipe-title">${recipe.name}</h3>
+                <div class="recipe-meta">
+                    <span class="servings">🍽️ ${recipe.servings}人前</span>
+                    <span class="cook-time">⏰ ${recipe.cookTime}</span>
+                </div>
+                <div class="recipe-ingredients">
+                    <h4>材料:</h4>
+                    <ul>
+                        ${recipe.ingredients.map(ing => `
+                            <li>${ing.name} ${ing.amount}${ing.unit}</li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <div class="recipe-steps">
+                    <h4>手順:</h4>
+                    <ol>
+                        ${recipe.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                </div>
+            </div>
+        `).join('');
+
+        recipesListElement.innerHTML = recipesHTML;
+        console.log(`🎨 Direct UI rendering completed: ${recipes.length} recipes`);
+
+    } catch (error) {
+        console.error('❌ Direct UI rendering failed:', error);
+        // Final fallback: custom event
+        document.dispatchEvent(new CustomEvent('recipesUpdated', {
+            detail: { recipes, legacyData: window.PETIT_RECIPE_DATA }
+        }));
     }
 }
 

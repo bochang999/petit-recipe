@@ -386,11 +386,18 @@ class RecipeDataArchitecture {
         try {
             console.log('🏗️ Initializing Recipe Data Architecture...');
 
-            // Initialize all layers
-            await Promise.all([
-                this.baseLoader.loadBaseData(),
-                this.userManager.initialize()
-            ]);
+            // Initialize all layers with detailed logging
+            console.log('🔄 Step 1: Loading base data...');
+            const baseData = await this.baseLoader.loadBaseData();
+            console.log(`✅ Base data loaded: ${baseData.length} recipes`);
+
+            console.log('🔄 Step 2: Initializing user manager...');
+            await this.userManager.initialize();
+            console.log('✅ User manager initialized');
+
+            // Get status for debugging
+            const status = await this.getStatus();
+            console.log('📊 Architecture Status:', status);
 
             console.log('✅ Recipe Data Architecture ready');
             return true;

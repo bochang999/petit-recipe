@@ -390,19 +390,53 @@
 
         // Legacy compatibility wrapper for forceRefreshLocalRecipes
         window.forceRefreshLocalRecipes = async function() {
-            if (window.forceRefreshRecipes) {
-                return await window.forceRefreshRecipes();
-            } else {
-                console.log('⚠️ Architecture not ready, using fallback refresh');
+            console.log('🔄 Force refresh requested...');
+            try {
+                if (window.forceRefreshRecipes) {
+                    console.log('✅ Using new architecture refresh');
+                    return await window.forceRefreshRecipes();
+                } else if (window.recipeArchitecture) {
+                    console.log('✅ Using direct architecture refresh');
+                    const recipes = await window.recipeArchitecture.forceRefresh();
+                    console.log(`🔄 Refreshed ${recipes.length} recipes`);
+                    return recipes;
+                } else {
+                    console.log('⚠️ Architecture not ready, using fallback refresh');
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('❌ Force refresh failed:', error);
                 location.reload();
             }
+        };
+
+        // Debug functions for testing
+        window.debugRecipeSystem = async function() {
+            console.log('🔍 Recipe System Debug Info');
+            console.log('📊 PETIT_RECIPE_DATA length:', window.PETIT_RECIPE_DATA?.length || 0);
+
+            if (window.recipeArchitecture) {
+                const status = await window.recipeArchitecture.getStatus();
+                console.log('🏗️ Architecture Status:', status);
+
+                const recipes = await window.recipeArchitecture.getAllRecipes();
+                console.log('📝 All Recipes:', recipes.length);
+                console.log('📝 First Recipe:', recipes[0]);
+            } else {
+                console.log('❌ recipeArchitecture not available');
+            }
+
+            console.log('🔗 Available Functions:');
+            console.log('  - forceRefreshLocalRecipes:', typeof window.forceRefreshLocalRecipes);
+            console.log('  - forceRefreshRecipes:', typeof window.forceRefreshRecipes);
         };
 
         // Start the new architecture immediately
         startRecipeSystem();
     </script>
-    <script src="local-recipe-ui-integration.js"></script>
-    <script type="module" src="script.js"></script>
+    <!-- BOC-107: Legacy scripts disabled - using new layered architecture -->
+    <!-- <script src="local-recipe-ui-integration.js"></script> -->
+    <!-- <script type="module" src="script.js"></script> -->
 
     <!-- APK Status Bar初期化 -->
     <script>

@@ -59,8 +59,8 @@ class RecipeDataManager {
                     console.log(`✅ Loaded ${data.recipes.length} recipes from Documents/${this.filePath}`);
                     return data.recipes || [];
                 } catch (fileError) {
-                    console.log('📝 No recipes.json found in Documents, creating empty one');
-                    return await this.createEmptyRecipesFile();
+                    console.log('📝 No recipes.json found in Documents, initializing with sample data');
+                    return await this.createInitialRecipesFile();
                 }
             } else {
                 // Web: Fallback to current recipes.json
@@ -194,7 +194,58 @@ class RecipeDataManager {
     }
 
     /**
-     * Helper: Create empty recipes file
+     * Helper: Create initial recipes file with sample data
+     */
+    async createInitialRecipesFile() {
+        console.log('🔧 Creating initial recipes file with sample data for APK');
+
+        // Sample recipes for APK initialization
+        const initialRecipes = [
+            {
+                id: "1",
+                name: "豚の角煮",
+                servings: 4,
+                cookTime: "30分",
+                ingredients: [
+                    { name: "豚バラブロック肉", amount: 500, unit: "g" },
+                    { name: "酒", amount: 50, unit: "ml" },
+                    { name: "みりん", amount: 50, unit: "ml" },
+                    { name: "醤油", amount: 50, unit: "ml" }
+                ],
+                steps: [
+                    "豚バラ肉を一口大に切る",
+                    "フライパンで表面を焼く",
+                    "調味料を加えて煮込む",
+                    "30分煮込んで完成"
+                ]
+            },
+            {
+                id: "2",
+                name: "チキンカレー",
+                servings: 4,
+                cookTime: "45分",
+                ingredients: [
+                    { name: "鶏もも肉", amount: 400, unit: "g" },
+                    { name: "玉ねぎ", amount: 2, unit: "個" },
+                    { name: "カレールウ", amount: 1, unit: "箱" },
+                    { name: "水", amount: 600, unit: "ml" }
+                ],
+                steps: [
+                    "玉ねぎを薄切りにする",
+                    "鶏肉を一口大に切る",
+                    "炒めて水を加える",
+                    "ルウを入れて煮込む"
+                ]
+            }
+        ];
+
+        await this.saveRecipes(initialRecipes);
+        console.log(`✅ Created initial recipes file with ${initialRecipes.length} sample recipes`);
+        return initialRecipes;
+    }
+
+    /**
+     * Helper: Create empty recipes file (backup method)
      */
     async createEmptyRecipesFile() {
         const emptyData = [];

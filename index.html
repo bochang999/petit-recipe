@@ -43,7 +43,7 @@
             <div class="screen-content">
                 <div class="search-container">
                     <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
-                    <button class="refresh-data-button" onclick="window.forceRefreshLocalRecipes()" title="ローカルレシピを即座リフレッシュ">🔄</button>
+                    <button class="refresh-data-button" onclick="console.log('🖱️ Refresh button clicked!'); if(window.forceRefreshLocalRecipes) { window.forceRefreshLocalRecipes(); } else { console.error('❌ forceRefreshLocalRecipes not found!'); }" title="ローカルレシピを即座リフレッシュ">🔄</button>
                 </div>
 
                 <div class="sort-tabs">
@@ -362,98 +362,79 @@
         <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->
     </div>
 
-    <!-- BOC-107: Clean Simple Recipe System -->
+    <!-- BOC-107: Clean Simple Recipe System - FIXED ORDER -->
+    <!-- 1. Single Source of Truth Data Manager (FIRST - must load before other scripts) -->
+    <script src="recipeDataManager.js"></script>
+
+    <!-- 2. Essential UI functions (depends on recipeDataManager) -->
+    <script src="app.js"></script>
+
+    <!-- 3. UI integration (depends on both above) -->
+    <script src="local-recipe-ui-integration.js"></script>
+    <script type="module" src="script.js"></script>
+
+    <!-- 4. Initialize system AFTER all scripts loaded -->
     <script>
         // Initialize clean global data structure
         window.PETIT_RECIPE_DATA = [];
-
-        // Simple system initialization
-        function startRecipeSystem() {
-            console.log('🚀 BOC-107: Clean Simple Recipe System');
-            console.log('🎯 Single data source: recipeDataManager.js only');
-        }
-
-        // Clean refresh function using only recipeDataManager
-        window.forceRefreshLocalRecipes = async function() {
-            console.log('🔄 Clean simple refresh...');
-            try {
-                if (window.refreshRecipeData) {
-                    const recipes = await window.refreshRecipeData();
-                    console.log(`🔄 Refreshed ${recipes.length} recipes`);
-                    return recipes;
-                } else {
-                    console.log('⚠️ recipeDataManager not ready, reloading page');
-                    location.reload();
-                }
-            } catch (error) {
-                console.error('❌ Refresh failed:', error);
-                location.reload();
-            }
-        };
-
-        // Clean debug function
-        window.debugRecipeSystem = async function() {
-            console.log('🔍 Clean Recipe System Debug');
-            console.log('📊 PETIT_RECIPE_DATA length:', window.PETIT_RECIPE_DATA?.length || 0);
-
-            if (window.recipeDataManager) {
-                const recipes = await window.recipeDataManager.loadRecipes();
-                console.log('📝 Loaded Recipes:', recipes.length);
-                if (recipes.length > 0) {
-                    console.log('📝 First Recipe:', recipes[0]);
-                }
-            } else {
-                console.log('❌ recipeDataManager not available');
-            }
-
-            console.log('🔗 Available Functions:');
-            console.log('  - loadAllRecipes:', typeof window.loadAllRecipes);
-            console.log('  - addNewRecipe:', typeof window.addNewRecipe);
-            console.log('  - removeRecipe:', typeof window.removeRecipe);
-            console.log('  - refreshRecipeData:', typeof window.refreshRecipeData);
-        };
-
-        // Start system
-        startRecipeSystem();
+        console.log('🚀 BOC-107: Clean Simple Recipe System');
 
         // Auto-load recipes on DOM ready
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 BOC-107: Clean Simple Recipe System Startup');
+            console.log('🚀 DOM ready - starting recipe system');
 
-            // Wait for all scripts to load
+            // Longer wait to ensure all scripts are loaded
             setTimeout(async () => {
                 console.log('🔍 Checking available functions...');
                 console.log('- forceRefreshLocalRecipes:', typeof window.forceRefreshLocalRecipes);
                 console.log('- refreshRecipeData:', typeof window.refreshRecipeData);
                 console.log('- recipeDataManager:', typeof window.recipeDataManager);
 
-                // Use the simple refresh function if available
-                if (window.forceRefreshLocalRecipes) {
+                // APK Environment Detection
+                const isAPK = window.Capacitor && window.Capacitor.isNativePlatform();
+                console.log(`📱 Environment: ${isAPK ? 'APK Native' : 'Web Fallback'}`);
+
+                // Debug: Test appropriate method based on environment
+                if (!isAPK) {
                     try {
-                        console.log('🔄 Using forceRefreshLocalRecipes for startup');
-                        await window.forceRefreshLocalRecipes();
-                        console.log('✅ Initial recipes loaded via forceRefreshLocalRecipes');
-                    } catch (error) {
-                        console.error('❌ forceRefreshLocalRecipes failed:', error);
-                        console.log('🔄 Fallback: Page reload');
-                        location.reload();
+                        console.log('🧪 Testing direct fetch to recipes.json...');
+                        const testResponse = await fetch('./recipes.json');
+                        const testData = await testResponse.json();
+                        console.log(`📊 Direct fetch result: ${testData.recipes.length} recipes`);
+                    } catch (fetchError) {
+                        console.error('❌ Direct fetch failed:', fetchError);
                     }
                 } else {
-                    console.error('❌ forceRefreshLocalRecipes not available');
-                    console.log('Available window functions:', Object.keys(window).filter(k => k.includes('recipe')));
+                    console.log('📱 APK environment - skipping web fetch test');
                 }
-            }, 1000); // Increased timeout to ensure all scripts loaded
+
+                // Debug: Test recipeDataManager functions
+                if (window.recipeDataManager) {
+                    try {
+                        console.log('🧪 Testing recipeDataManager.loadRecipes()...');
+                        const recipes = await window.recipeDataManager.loadRecipes();
+                        console.log(`📊 recipeDataManager result: ${recipes.length} recipes`);
+                    } catch (loadError) {
+                        console.error('❌ recipeDataManager.loadRecipes failed:', loadError);
+                    }
+                }
+
+                // Load initial recipes using the simple manager
+                if (window.forceRefreshLocalRecipes) {
+                    try {
+                        console.log('🔄 Loading initial recipes via forceRefreshLocalRecipes...');
+                        await window.forceRefreshLocalRecipes();
+                        console.log('✅ Initial recipes loaded successfully');
+                    } catch (error) {
+                        console.error('❌ Initial recipe load failed:', error);
+                    }
+                } else {
+                    console.error('❌ forceRefreshLocalRecipes not available!');
+                    console.log('Available functions:', Object.keys(window).filter(k => typeof window[k] === 'function' && k.includes('recipe')));
+                }
+            }, 2000); // Extended timeout for script loading
         });
     </script>
-    <!-- Simple Recipe Data Manager - Single Source of Truth (FIRST) -->
-    <script src="recipeDataManager.js"></script>
-
-    <!-- BOC-107: Essential UI functions -->
-    <script src="app.js"></script>
-
-    <!-- BOC-107: Essential UI scripts - maintaining backward compatibility -->
-    <script src="local-recipe-ui-integration.js"></script>
-    <script type="module" src="script.js"></script>
 
     <!-- APK Status Bar初期化 -->
     <script>

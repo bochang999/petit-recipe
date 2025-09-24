@@ -171,8 +171,8 @@ class LocalRecipeDatabase {
     try {
       console.log('🔄 静的データ移行処理開始');
 
-      // window.PETIT_RECIPE_DATAからデータを取得
-      const staticData = window.PETIT_RECIPE_DATA || [];
+      // Use recipeDataManager as single source of truth
+      const staticData = [];
       console.log('📋 移行対象データ件数:', staticData.length);
 
       if (staticData.length === 0) {
@@ -1031,15 +1031,15 @@ class PetitRecipeApp {
         // フォールバック: 従来の方法でデータ取得
         let fallbackData = null;
 
-        // 1. まずglobalのPETIT_RECIPE_DATAを確認（強制優先）
-        if (
-          typeof window.PETIT_RECIPE_DATA !== "undefined" &&
-          Array.isArray(window.PETIT_RECIPE_DATA) &&
-          window.PETIT_RECIPE_DATA.length > 0
-        ) {
-          console.log("✅ グローバルレシピデータを強制使用:", window.PETIT_RECIPE_DATA.length + "件");
-          console.log("🔄 最新のrecipes-data.jsから読み込み - Capacitor環境でも適用");
-          fallbackData = window.PETIT_RECIPE_DATA;
+        // 1. Use recipeDataManager as single source of truth
+        if (window.loadAllRecipes) {
+          try {
+            fallbackData = await window.loadAllRecipes();
+            console.log("✅ recipeDataManagerからデータ取得:", fallbackData.length + "件");
+          } catch (error) {
+            console.error("❌ recipeDataManagerからのデータ取得失敗:", error);
+            fallbackData = null;
+          }
         } else {
           console.log("⚠️ グローバルデータなしまたは空配列、fetchを試行");
 
@@ -2539,7 +2539,7 @@ function logLocalRecipeDatabaseState() {
     }
 
     // データソース確認
-    addBOC100Log(`📂 静的データ有無: ${window.PETIT_RECIPE_DATA ? 'あり（' + window.PETIT_RECIPE_DATA.length + '件）' : 'なし'}`, 'info');
+    addBOC100Log('📂 recipeDataManager利用（静的データは廃止）', 'info');
 
     // localStorage状態
     const storageData = localStorage.getItem(db.STORAGE_KEY || 'petit-recipes');
@@ -2649,12 +2649,8 @@ function diagnoseRecipeIdProblem() {
   const filteredRecipes = window.app.filteredRecipes;
   addBOC100Log(`📊 FilteredRecipes配列長: ${filteredRecipes ? filteredRecipes.length : '未定義'}`, 'info');
 
-  // 3. Static dataの確認
-  if (window.PETIT_RECIPE_DATA) {
-    addBOC100Log(`📂 静的データ: ${window.PETIT_RECIPE_DATA.length}件`, 'info');
-    const staticSample = window.PETIT_RECIPE_DATA.slice(0, 3).map(r => `ID:"${r.id}"`);
-    addBOC100Log(`📋 静的データサンプル: ${staticSample.join(', ')}`, 'info');
-  }
+  // 3. recipeDataManager status check
+  addBOC100Log('📂 recipeDataManager使用中（静的データは廃止済み）', 'info');
 
   addBOC100Log('🔬 Recipe ID問題診断完了', 'success');
 }
@@ -2862,30 +2858,28 @@ function validateRecipeJSON(jsonData) {
   return true;
 }
 
-// AI処理結果をpetit-recipeに追加
-function addAIProcessedRecipe(jsonData) {
+// AI処理結果をrecipeDataManagerに追加
+async function addAIProcessedRecipe(jsonData) {
   try {
     validateRecipeJSON(jsonData);
 
-    // 既存レシピID生成パターンに従ってID付与
-    const existingRecipes = window.PETIT_RECIPE_DATA || [];
-    const newId = generateUniqueId(existingRecipes);
-
+    // Convert to recipeDataManager format
     const newRecipe = {
-      id: newId,
-      title: jsonData.title,
-      servings: jsonData.servings || "適量",
-      ingredients: jsonData.ingredients.map(ing => `${ing.name} ${ing.amount}${ing.unit}`),
-      instructions: jsonData.instructions,
-      cookTime: jsonData.cookTime || "未設定"
+      name: jsonData.title,
+      servings: jsonData.servings || 1,
+      cookTime: jsonData.cookTime || "未設定",
+      ingredients: jsonData.ingredients || [],
+      steps: jsonData.instructions || []
     };
 
-    // データに追加
-    window.PETIT_RECIPE_DATA.push(newRecipe);
-
-    addBOC100Log(`✅ AIレシピ追加完了: ${newRecipe.title} (ID: ${newRecipe.id})`, 'success');
-
-    return newRecipe;
+    // Add using recipeDataManager
+    if (window.addNewRecipe) {
+      const addedRecipe = await window.addNewRecipe(newRecipe);
+      addBOC100Log(`✅ AIレシピ追加完了: ${addedRecipe.name} (ID: ${addedRecipe.id})`, 'success');
+      return addedRecipe;
+    } else {
+      throw new Error('recipeDataManager not available');
+    }
 
   } catch (error) {
     addBOC100Log(`❌ レシピ追加エラー: ${error.message}`, 'error');
@@ -2981,11 +2975,11 @@ async function forceReloadRecipes() {
       }
     }
 
-    // Fallback to global data if JSON fails
-    addBOC100Log('⚠️ JSON loading failed, trying legacy data...', 'info');
-    const fallbackSuccess = forceUseGlobalRecipeData();
+    // Fallback to recipeDataManager if JSON fails
+    addBOC100Log('⚠️ JSON loading failed, trying recipeDataManager...', 'info');
+    const fallbackSuccess = await useRecipeDataManager();
     if (!fallbackSuccess) {
-      throw new Error('Both JSON and legacy data sources failed');
+      throw new Error('Both JSON and recipeDataManager data sources failed');
     }
   } catch (error) {
     addBOC100Log(`❌ BOC-108: Reload failed - ${error.message}`, 'error');
@@ -2993,68 +2987,69 @@ async function forceReloadRecipes() {
   }
 }
 
-// Capacitor環境での強制グローバルデータ使用 (Legacy fallback for BOC-108)
-function forceUseGlobalRecipeData() {
-  if (typeof window.PETIT_RECIPE_DATA !== 'undefined' && window.PETIT_RECIPE_DATA.length > 0) {
-    addBOC100Log(`🔄 グローバルデータ強制適用: ${window.PETIT_RECIPE_DATA.length}件`, 'info');
-
-    // データ構造変換: title → name の変換
-    const convertedRecipes = window.PETIT_RECIPE_DATA.map(recipe => ({
-      ...recipe,
-      name: recipe.title,  // titleをnameに変換（アプリが期待する形式）
-      cookTime: recipe.cookTime || "未設定",
-      servings: recipe.servings || "適量",
-      // ingredients: petit-recipe文字列配列 → RecipeBox{name,amount,unit}配列変換
-      ingredients: window.app ? window.app.parseIngredients(recipe.ingredients || []) : recipe.ingredients || [],
-      // instructions配列の正規化 + steps変換（アプリが期待する形式）
-      instructions: recipe.instructions || [],
-      steps: recipe.instructions || []  // renderSteps()がstepsフィールドを期待
-    }));
-
-    // アプリインスタンスが存在する場合、直接更新
-    if (window.app) {
-      // APK用デバッグ: 変換データをUI表示で確認
-      const debugInfo = `データ変換詳細:
-変換前: ${window.PETIT_RECIPE_DATA[0]?.ingredients?.slice(0,1) || '未確認'}
-変換後: ${convertedRecipes[0]?.ingredients?.slice(0,1)?.map(i => `${i.name} ${i.amount}${i.unit}`) || '未確認'}
-手順: ${convertedRecipes[0]?.steps?.length || 0}件`;
-
-      addBOC100Log(`🔍 ${debugInfo}`, 'debug');
-      showUserFeedback(`🔍 ${debugInfo}`, 'info');
-
-      window.app.recipes = convertedRecipes;
-      window.app.filteredRecipes = convertedRecipes;
-      window.app.renderRecipes();
-      addBOC100Log('✅ アプリデータ即座に更新完了', 'success');
-      showUserFeedback('🆕 最新のレシピデータを適用しました！', 'success');
+// Use recipeDataManager instead of legacy global data (BOC-107)
+async function useRecipeDataManager() {
+  try {
+    if (!window.loadAllRecipes) {
+      addBOC100Log('❌ recipeDataManager not available', 'error');
+      return false;
     }
 
-    return true;
+    const recipes = await window.loadAllRecipes();
+    if (!recipes || recipes.length === 0) {
+      addBOC100Log('⚠️ No recipes found in recipeDataManager', 'info');
+      return false;
+    }
+
+    addBOC100Log(`🔄 recipeDataManagerからデータ取得: ${recipes.length}件`, 'info');
+
+    // Update UI using the renderRecipesToUI function from recipeDataManager
+    if (window.renderRecipesToUI) {
+      window.renderRecipesToUI(recipes);
+      addBOC100Log('✅ UI更新完了', 'success');
+      return true;
+    } else {
+      addBOC100Log('❌ renderRecipesToUI function not found', 'error');
+      return false;
+    }
+  } catch (error) {
+    addBOC100Log(`❌ recipeDataManager error: ${error.message}`, 'error');
+    return false;
   }
-  return false;
 }
 
-// Gemini CLI処理後の自動リフレッシュチェック
-function checkForNewRecipes() {
-  const lastRecipeCount = localStorage.getItem('last_recipe_count');
-  const currentCount = window.PETIT_RECIPE_DATA ? window.PETIT_RECIPE_DATA.length : 0;
+// Recipe data change check using recipeDataManager
+async function checkForNewRecipes() {
+  try {
+    const lastRecipeCount = localStorage.getItem('last_recipe_count');
+    let currentCount = 0;
 
-  if (lastRecipeCount && parseInt(lastRecipeCount) < currentCount) {
-    addBOC100Log(`🆕 新しいレシピ検出: ${lastRecipeCount} → ${currentCount}件`, 'success');
-    showUserFeedback('🆕 新しいレシピが追加されました！データを更新します', 'success');
+    if (window.loadAllRecipes) {
+      const recipes = await window.loadAllRecipes();
+      currentCount = recipes ? recipes.length : 0;
+    }
 
-    setTimeout(() => {
-      forceRefreshRecipeData();
-    }, 2000);
+    if (lastRecipeCount && parseInt(lastRecipeCount) < currentCount) {
+      addBOC100Log(`🆕 新しいレシピ検出: ${lastRecipeCount} → ${currentCount}件`, 'success');
+      showUserFeedback('🆕 新しいレシピが追加されました！データを更新します', 'success');
+
+      setTimeout(async () => {
+        if (window.forceRefreshLocalRecipes) {
+          await window.forceRefreshLocalRecipes();
+        }
+      }, 2000);
+    }
+
+    localStorage.setItem('last_recipe_count', currentCount.toString());
+  } catch (error) {
+    addBOC100Log(`❌ checkForNewRecipes error: ${error.message}`, 'error');
   }
-
-  localStorage.setItem('last_recipe_count', currentCount.toString());
 }
 
 // グローバル関数として登録
 window.forceRefreshRecipeData = forceRefreshRecipeData;
 window.forceReloadRecipes = forceReloadRecipes; // BOC-108: New JSON-aware reload function
-window.forceUseGlobalRecipeData = forceUseGlobalRecipeData;
+window.useRecipeDataManager = useRecipeDataManager;
 window.checkForNewRecipes = checkForNewRecipes;
 
 // ▲▲▲ BOC-106: AI Recipe Integration Functions ▲▲▲

@@ -434,9 +434,12 @@
         // Start the new architecture immediately
         startRecipeSystem();
     </script>
-    <!-- BOC-107: Legacy scripts disabled - using new layered architecture -->
-    <!-- <script src="local-recipe-ui-integration.js"></script> -->
-    <!-- <script type="module" src="script.js"></script> -->
+    <!-- BOC-107: Essential UI functions first -->
+    <script src="app.js"></script>
+
+    <!-- BOC-107: Essential UI scripts - maintaining backward compatibility -->
+    <script src="local-recipe-ui-integration.js"></script>
+    <script type="module" src="script.js"></script>
 
     <!-- APK Status Bar初期化 -->
     <script>

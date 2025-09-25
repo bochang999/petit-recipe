@@ -563,36 +563,6 @@ window.initializeAndLoadRecipes = async function() {
     }
 };
 
-// Manual UI rendering fallback for when window.app is not available
-function renderRecipesToUI(recipes) {
-    console.log('[DIAG] 🎨 手動UI更新開始 -', recipes.length, 'レシピ');
-
-    const recipeList = document.getElementById('recipe-list');
-    if (recipeList) {
-        recipeList.innerHTML = '';
-
-        if (recipes.length === 0) {
-            recipeList.innerHTML = '<p class="no-recipes">レシピがありません</p>';
-        } else {
-            recipes.forEach(recipe => {
-                const recipeCard = document.createElement('div');
-                recipeCard.className = 'recipe-card';
-                recipeCard.innerHTML = `
-                    <h3>${recipe.name || 'Untitled Recipe'}</h3>
-                    <p class="recipe-description">${recipe.description || ''}</p>
-                    <div class="recipe-meta">
-                        <span>材料: ${(recipe.ingredients || []).length}個</span>
-                        <span>手順: ${(recipe.steps || []).length}個</span>
-                    </div>
-                `;
-                recipeList.appendChild(recipeCard);
-            });
-        }
-        console.log('[DIAG] ✅ 手動UI更新完了');
-    } else {
-        console.error('[DIAG] ❌ recipe-list要素が見つかりません');
-    }
-}
 
 console.log('✅ APK専用 Simple Recipe Data Manager loaded');
 console.log('🔧 Available functions:');

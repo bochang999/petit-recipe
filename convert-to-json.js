@@ -86,7 +86,8 @@ function validateRecipeData(data) {
   return { valid: true, totalRecipes: data.recipes.length };
 }
 
-if (typeof module !== 'undefined' && module.exports) {
+// Export for Node.js environment if available
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = { convertLegacyToJSON, validateRecipeData, parseIngredients };
 }
 

@@ -54,12 +54,49 @@ window.app = {
         }
     },
 
-    handleFileSelection(event) {
+    async handleFileSelection(event) {
         console.log('📁 File selection:', event.target.files);
         const file = event.target.files[0];
-        if (file) {
-            alert(`ファイル選択: ${file.name} - インポート機能は現在準備中です`);
+        if (!file) {
+            alert('ファイルが選択されていません');
+            return;
         }
+
+        try {
+            console.log('📥 インポート開始:', file.name);
+            const fileContent = await this.readFileAsText(file);
+            console.log('📄 ファイル内容読み込み完了');
+
+            const importData = JSON.parse(fileContent);
+            console.log('✅ JSON解析完了:', importData);
+
+            // Use the database import function
+            if (window.petitRecipeDB && window.petitRecipeDB.importData) {
+                const result = await window.petitRecipeDB.importData(importData);
+                console.log('✅ インポート完了:', result);
+                alert(`インポートが完了しました！${result.importedRecipes}件のレシピを追加しました。`);
+
+                // Refresh UI
+                if (window.forceRefreshLocalRecipes) {
+                    await window.forceRefreshLocalRecipes();
+                }
+            } else {
+                throw new Error('petitRecipeDB not available');
+            }
+        } catch (error) {
+            console.error('❌ インポートエラー:', error);
+            alert(`インポートに失敗しました: ${error.message}`);
+        }
+    },
+
+    // Helper function to read file as text
+    readFileAsText(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(new Error('File reading failed'));
+            reader.readAsText(file);
+        });
     },
 
     // Recipe screen navigation
@@ -169,3 +206,5 @@ window.processAIRecipe = function(event) {
 };
 
 console.log('✅ Emergency app object and global functions created');
+console.log('🔍 window.app object:', window.app);
+console.log('🔍 window.app.showSettings:', typeof window.app.showSettings);

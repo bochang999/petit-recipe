@@ -710,11 +710,16 @@ class LocalRecipeDatabase {
         currentViewCounts: Object.keys(currentViewCounts).length
       });
 
-      // Step 3: レシピデータ上書き
-      this.saveRecipes(importData.data.recipes);
+      // Step 3: レシピデータ上書き（安全性チェック追加）
+      const recipesToImport = importData?.data?.recipes || [];
+      if (!Array.isArray(recipesToImport)) {
+        throw new Error('Invalid recipes data structure');
+      }
+      this.saveRecipes(recipesToImport);
 
-      // Step 4: 閲覧数データ上書き
-      localStorage.setItem('petit_recipe_view_counts', JSON.stringify(importData.data.viewCounts));
+      // Step 4: 閲覧数データ上書き（安全性チェック追加）
+      const viewCountsToImport = importData?.data?.viewCounts || {};
+      localStorage.setItem('petit_recipe_view_counts', JSON.stringify(viewCountsToImport));
 
       // Step 5: バージョン情報更新
       localStorage.setItem(this.VERSION_KEY, importData.version);
@@ -742,6 +747,8 @@ class LocalRecipeDatabase {
 
     } catch (error) {
       console.error('❌ データインポートエラー:', error);
+      console.error('❌ インポートデータ構造:', importData);
+      console.error('❌ エラースタック:', error.stack);
       throw new Error(`Import failed: ${error.message}`);
     }
   }

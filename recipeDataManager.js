@@ -450,8 +450,46 @@ window.initializeAndLoadRecipes = async function() {
     }
 };
 
+// 究極のデバッグ関数 - BOC-107 Export Error Diagnosis
+window.testFileRead = async function() {
+    const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
+    const FILENAME = 'recipes.json';
+
+    console.log(`[DEBUG] 📝これから ${FILENAME} の読み込みテストを開始します...`);
+
+    try {
+        const result = await Filesystem.readFile({
+            path: FILENAME,
+            directory: Directory.Documents,
+            encoding: Encoding.UTF8
+        });
+
+        console.log('[DEBUG] ✅ 読み込み成功！ファイルの中身（生テキスト）:', result.data);
+        console.log('[DEBUG] 📊 ファイルサイズ:', result.data.length, 'characters');
+
+        // Try to parse as JSON to check structure
+        try {
+            const parsed = JSON.parse(result.data);
+            console.log('[DEBUG] 🔍 JSON解析成功！構造:', {
+                hasVersion: !!parsed.version,
+                hasRecipes: !!parsed.recipes,
+                recipeCount: parsed.recipes ? parsed.recipes.length : 'N/A',
+                dataKeys: Object.keys(parsed)
+            });
+        } catch (parseError) {
+            console.error('[DEBUG] ❌ JSON解析失敗！', parseError);
+        }
+
+        return result.data;
+    } catch (error) {
+        console.error(`[DEBUG] ❌ 読み込み失敗！エラー詳細:`, JSON.stringify(error, null, 2));
+        return null;
+    }
+};
+
 console.log('✅ APK専用 Simple Recipe Data Manager loaded');
 console.log('🔧 Available functions:');
+console.log('  - testFileRead() - 究極のデバッグ関数（BOC-107対応）');
 console.log('  - initializeAndLoadRecipes() - APK専用起動時初期化');
 console.log('  - forceRefreshLocalRecipes() - APK専用リフレッシュ');
 console.log('  - loadAllRecipes() - Load all recipes');

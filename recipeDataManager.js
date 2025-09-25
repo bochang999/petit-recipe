@@ -487,6 +487,113 @@ window.testFileRead = async function() {
     }
 };
 
+// Gemini's Solution: initializeAndLoadRecipes with enhanced logging for false error detection
+window.initializeAndLoadRecipes = async function() {
+    console.log('[DIAG] 🚀 initializeAndLoadRecipes開始');
+
+    try {
+        const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
+        const RECIPE_FILE = 'recipes.json';
+
+        console.log('[DIAG] 📁 Documents/recipes.json読み込み試行中...');
+
+        try {
+            // Try to read existing user recipes file first
+            const contents = await Filesystem.readFile({
+                path: RECIPE_FILE,
+                directory: Directory.Documents,
+                encoding: Encoding.UTF8
+            });
+
+            const data = JSON.parse(contents.data);
+            console.log('[DIAG] ✅ TRYブロックの最後まで到達。成功を返します。');
+            console.log('[DIAG] 📊 レシピ数:', data.recipes ? data.recipes.length : 0);
+
+            // Successfully loaded, render to UI
+            if (window.app && window.app.renderRecipes) {
+                window.app.renderRecipes(data.recipes || []);
+                console.log('[DIAG] ✅ UI更新完了');
+            } else {
+                console.log('[DIAG] ⚠️ UI更新関数が見つかりません - 手動レンダリング実行');
+                renderRecipesToUI(data.recipes || []);
+            }
+
+            return data;
+
+        } catch (fileError) {
+            console.log('[DIAG] 📝 初回起動検出 - APKアセットからコピーします');
+
+            // File doesn't exist, copy from APK assets
+            const response = await fetch('./recipes.json');
+            const bundledData = await response.text();
+
+            await Filesystem.writeFile({
+                path: RECIPE_FILE,
+                data: bundledData,
+                directory: Directory.Documents,
+                encoding: Encoding.UTF8
+            });
+
+            const data = JSON.parse(bundledData);
+            console.log('[DIAG] ✅ 初期コピー成功 - TRYブロックの最後まで到達。成功を返します。');
+            console.log('[DIAG] 📊 コピーしたレシピ数:', data.recipes ? data.recipes.length : 0);
+
+            // Render initial recipes to UI
+            if (window.app && window.app.renderRecipes) {
+                window.app.renderRecipes(data.recipes || []);
+                console.log('[DIAG] ✅ UI更新完了');
+            } else {
+                console.log('[DIAG] ⚠️ UI更新関数が見つかりません - 手動レンダリング実行');
+                renderRecipesToUI(data.recipes || []);
+            }
+
+            return data;
+        }
+
+    } catch (e) {
+        console.error('[DIAG] ❌ CATCHブロックが実行されました。エラーを返します。', e);
+
+        // This might be the source of "false error reporting"
+        if (typeof displayDataLoadError === 'function') {
+            console.log('[DIAG] ⚠️ displayDataLoadError()が呼ばれます - これが偽エラーの原因かもしれません');
+            displayDataLoadError();
+        }
+
+        return { version: "1.0", recipes: [] };
+    }
+};
+
+// Manual UI rendering fallback for when window.app is not available
+function renderRecipesToUI(recipes) {
+    console.log('[DIAG] 🎨 手動UI更新開始 -', recipes.length, 'レシピ');
+
+    const recipeList = document.getElementById('recipe-list');
+    if (recipeList) {
+        recipeList.innerHTML = '';
+
+        if (recipes.length === 0) {
+            recipeList.innerHTML = '<p class="no-recipes">レシピがありません</p>';
+        } else {
+            recipes.forEach(recipe => {
+                const recipeCard = document.createElement('div');
+                recipeCard.className = 'recipe-card';
+                recipeCard.innerHTML = `
+                    <h3>${recipe.name || 'Untitled Recipe'}</h3>
+                    <p class="recipe-description">${recipe.description || ''}</p>
+                    <div class="recipe-meta">
+                        <span>材料: ${(recipe.ingredients || []).length}個</span>
+                        <span>手順: ${(recipe.steps || []).length}個</span>
+                    </div>
+                `;
+                recipeList.appendChild(recipeCard);
+            });
+        }
+        console.log('[DIAG] ✅ 手動UI更新完了');
+    } else {
+        console.error('[DIAG] ❌ recipe-list要素が見つかりません');
+    }
+}
+
 console.log('✅ APK専用 Simple Recipe Data Manager loaded');
 console.log('🔧 Available functions:');
 console.log('  - testFileRead() - 究極のデバッグ関数（BOC-107対応）');

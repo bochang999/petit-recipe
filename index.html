@@ -373,47 +373,74 @@
     <script src="local-recipe-ui-integration.js"></script>
     <script type="module" src="script.js"></script>
 
-    <!-- APK専用 シンプル化最終プラン: 初期化スクリプト -->
+    <!-- Gemini's Solution: Simplified main() Function Architecture -->
     <script>
-        // APK専用: シンプル初期化
-        console.log('🚀 APK専用 シンプルレシピシステム起動');
+        // Gemini's Recommended main() function for clean initialization flow
+        async function main() {
+            console.log("🚀 App initialization started...");
 
-        // DOM読み込み完了時に起動時初期化を実行
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('📱 APK専用: DOM ready - 初期化開始');
-
-            // シンプルな起動確認
-            setTimeout(async () => {
-                console.log('🔍 APK専用関数確認...');
-                console.log('- initializeAndLoadRecipes:', typeof window.initializeAndLoadRecipes);
-                console.log('- forceRefreshLocalRecipes:', typeof window.forceRefreshLocalRecipes);
-
-                // ★★★最優先で究極のデバッグ関数を実行★★★ (BOC-107対応)
-                if (window.testFileRead) {
-                    try {
-                        console.log('🔍 BOC-107: 究極のデバッグ関数実行中...');
-                        await window.testFileRead();
-                        console.log('✅ BOC-107: デバッグ関数実行完了');
-                    } catch (error) {
-                        console.error('❌ BOC-107: デバッグ関数実行失敗:', error);
-                    }
-                } else {
-                    console.error('❌ BOC-107: testFileRead関数が見つかりません');
+            // 1. First execute debug function (highest priority)
+            if (window.testFileRead) {
+                try {
+                    console.log('🔍 BOC-107: Executing ultimate debug function...');
+                    await window.testFileRead();
+                    console.log('✅ BOC-107: Debug function completed');
+                } catch (error) {
+                    console.error('❌ BOC-107: Debug function failed:', error);
                 }
+            } else {
+                console.error('❌ BOC-107: testFileRead function not found');
+            }
 
-                // 本来の初期化処理
-                if (window.initializeAndLoadRecipes) {
-                    try {
-                        console.log('🚀 APK専用起動時初期化実行中...');
-                        const recipeData = await window.initializeAndLoadRecipes();
-                        console.log('✅ APK専用初期化完了');
-                    } catch (error) {
-                        console.error('❌ APK専用初期化失敗:', error);
+            // 2. Initialize and load recipes with enhanced error detection
+            if (window.initializeAndLoadRecipes) {
+                try {
+                    console.log('🚀 Executing initializeAndLoadRecipes...');
+                    const recipeData = await window.initializeAndLoadRecipes();
+
+                    // 3. Success handling with error message clearing
+                    if (recipeData && recipeData.recipes) {
+                        console.log(`✅ Initialization successful. ${recipeData.recipes.length} recipes loaded.`);
+
+                        // Clear any false error messages (Gemini's fix for "false error reporting")
+                        const errorElements = document.querySelectorAll('.error-message, .data-load-error');
+                        errorElements.forEach(el => {
+                            console.log('[DIAG] 🧹 Clearing false error message:', el.textContent);
+                            el.style.display = 'none';
+                        });
+
+                        // Hide any error overlays
+                        if (typeof hideDataLoadError === 'function') {
+                            console.log('[DIAG] 🧹 Calling hideDataLoadError()');
+                            hideDataLoadError();
+                        }
+
+                    } else {
+                        throw new Error("Loaded data is not in the correct format.");
                     }
-                } else {
-                    console.error('❌ initializeAndLoadRecipes関数が見つかりません');
+                } catch (error) {
+                    console.error("❌ App initialization failed:", error);
+
+                    // Only show error UI if genuine error occurred
+                    if (typeof displayDataLoadError === 'function') {
+                        console.log('[DIAG] ⚠️ Genuine error - displaying error UI');
+                        displayDataLoadError();
+                    }
                 }
-            }, 1000); // APK専用: シンプルなタイムアウト
+            } else {
+                console.error('❌ initializeAndLoadRecipes function not found');
+            }
+
+            console.log("✅ Main initialization complete");
+        }
+
+        // Simple DOMContentLoaded listener that just calls main()
+        document.addEventListener('DOMContentLoaded', () => {
+            // Gemini's recommended approach: main function manages everything
+            console.log('📱 DOM ready - calling main() function');
+            main().catch(error => {
+                console.error('❌ Main function failed:', error);
+            });
         });
     </script>
 

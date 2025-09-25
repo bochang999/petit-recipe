@@ -15,13 +15,13 @@ const config: CapacitorConfig = {
     },
   },
   server: {
-    androidScheme: 'https'
+    androidScheme: "https",
   },
   android: {
     allowMixedContent: true,
     webContentsDebuggingEnabled: true,
     // ▼▼▼ Add contentInset setting for status bar handling ▼▼▼
-    contentInset: 'never'
+    contentInset: "never",
   },
 };
 

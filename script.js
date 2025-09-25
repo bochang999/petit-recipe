@@ -21,13 +21,13 @@ function addDebugLog(message) {
 }
 
 // ▼▼▼ BOC-100: Mobile Debug Logger ▼▼▼
-function addBOC100Log(message, type = 'info') {
+function addBOC100Log(message, type = "info") {
   const timestamp = new Date().toLocaleTimeString();
   const logEntry = {
     time: timestamp,
     message: message,
     type: type, // 'info', 'success', 'error', 'event'
-    id: Date.now()
+    id: Date.now(),
   };
 
   boc100Logs.push(logEntry);
@@ -44,14 +44,16 @@ function addBOC100Log(message, type = 'info') {
 
 // モバイルデバッグパネル更新
 function updateMobileDebugPanel() {
-  const panel = document.getElementById('mobile-debug-panel');
-  const content = document.getElementById('mobile-debug-content');
+  const panel = document.getElementById("mobile-debug-panel");
+  const content = document.getElementById("mobile-debug-content");
 
   if (panel && content) {
-    content.innerHTML = boc100Logs.map(log => {
-      const typeClass = `debug-${log.type}`;
-      return `<div class="${typeClass}">[${log.time}] ${log.message}</div>`;
-    }).join('');
+    content.innerHTML = boc100Logs
+      .map((log) => {
+        const typeClass = `debug-${log.type}`;
+        return `<div class="${typeClass}">[${log.time}] ${log.message}</div>`;
+      })
+      .join("");
 
     // 自動スクロール
     content.scrollTop = content.scrollHeight;
@@ -59,77 +61,76 @@ function updateMobileDebugPanel() {
 }
 
 // 🔧 テスト関数 (グローバルスコープ)
-window.testSort = function(sortType) {
+window.testSort = function (sortType) {
   addDebugLog(`🔘 物理テストボタン: ${sortType}`);
-  if (window.app && typeof window.app.sortRecipes === 'function') {
+  if (window.app && typeof window.app.sortRecipes === "function") {
     addDebugLog(`✅ app.sortRecipes関数が存在`);
     window.app.sortRecipes(sortType);
   } else {
     addDebugLog(`❌ app.sortRecipes関数が見つからない`);
     addDebugLog(`🔍 window.app = ${typeof window.app}`);
   }
-}
+};
 
 // 📱 ログ表示 (グローバルスコープ)
-window.showLogs = function() {
-  const logDiv = document.getElementById('debug-logs');
-  const logContent = document.getElementById('log-content');
+window.showLogs = function () {
+  const logDiv = document.getElementById("debug-logs");
+  const logContent = document.getElementById("log-content");
 
   if (logDiv && logContent) {
-    logContent.innerHTML = debugLogs.join('<br>');
-    logDiv.style.display = logDiv.style.display === 'none' ? 'block' : 'none';
+    logContent.innerHTML = debugLogs.join("<br>");
+    logDiv.style.display = logDiv.style.display === "none" ? "block" : "none";
   }
-}
+};
 
 // ▼▼▼ BOC-100: Mobile Debug Panel Controls ▼▼▼
-window.toggleMobileDebug = function() {
-  const panel = document.getElementById('mobile-debug-panel');
+window.toggleMobileDebug = function () {
+  const panel = document.getElementById("mobile-debug-panel");
   if (panel) {
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    addBOC100Log('モバイルデバッグパネル切り替え', 'info');
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+    addBOC100Log("モバイルデバッグパネル切り替え", "info");
   }
-}
+};
 
-window.clearBOC100Logs = function() {
+window.clearBOC100Logs = function () {
   boc100Logs.length = 0;
   updateMobileDebugPanel();
-  addBOC100Log('ログクリア完了', 'info');
-}
+  addBOC100Log("ログクリア完了", "info");
+};
 
-window.testBOC100Functions = function() {
-  addBOC100Log('🧪 BOC-100機能テスト開始', 'event');
+window.testBOC100Functions = function () {
+  addBOC100Log("🧪 BOC-100機能テスト開始", "event");
 
   // window.appの存在確認
   if (window.app) {
-    addBOC100Log('✅ window.app 存在確認OK', 'success');
+    addBOC100Log("✅ window.app 存在確認OK", "success");
 
     // showSettingsメソッド確認
-    if (typeof window.app.showSettings === 'function') {
-      addBOC100Log('✅ showSettings メソッド存在', 'success');
+    if (typeof window.app.showSettings === "function") {
+      addBOC100Log("✅ showSettings メソッド存在", "success");
     } else {
-      addBOC100Log('❌ showSettings メソッド未存在', 'error');
+      addBOC100Log("❌ showSettings メソッド未存在", "error");
     }
 
     // exportDataメソッド確認
-    if (typeof window.app.exportData === 'function') {
-      addBOC100Log('✅ exportData メソッド存在', 'success');
+    if (typeof window.app.exportData === "function") {
+      addBOC100Log("✅ exportData メソッド存在", "success");
     } else {
-      addBOC100Log('❌ exportData メソッド未存在', 'error');
+      addBOC100Log("❌ exportData メソッド未存在", "error");
     }
 
     // importDataメソッド確認
-    if (typeof window.app.importData === 'function') {
-      addBOC100Log('✅ importData メソッド存在', 'success');
+    if (typeof window.app.importData === "function") {
+      addBOC100Log("✅ importData メソッド存在", "success");
     } else {
-      addBOC100Log('❌ importData メソッド未存在', 'error');
+      addBOC100Log("❌ importData メソッド未存在", "error");
     }
-
   } else {
-    addBOC100Log('❌ window.app が未定義', 'error');
+    addBOC100Log("❌ window.app が未定義", "error");
   }
 
-  addBOC100Log('🧪 BOC-100機能テスト完了', 'event');
-}
+  addBOC100Log("🧪 BOC-100機能テスト完了", "event");
+};
 
 // ▼▼▼ BOC-108: File-Based Recipe Data System Integration ▼▼▼
 
@@ -138,32 +139,34 @@ window.testBOC100Functions = function() {
  * Integrates with BOC-108 file-based system
  */
 async function loadRecipesFromJSON() {
-    console.log('📁 BOC-108: Loading recipes from JSON file...');
+  console.log("📁 BOC-108: Loading recipes from JSON file...");
 
-    try {
-        // Use BOC-108 RecipeDataManager
-        if (window.recipeDataManager) {
-            const recipes = await window.recipeDataManager.loadRecipes();
-            console.log(`✅ Loaded ${recipes.length} recipes from JSON file`);
-            return recipes;
-        } else {
-            console.warn('⚠️ RecipeDataManager not available, trying direct fetch...');
+  try {
+    // Use BOC-108 RecipeDataManager
+    if (window.recipeDataManager) {
+      const recipes = await window.recipeDataManager.loadRecipes();
+      console.log(`✅ Loaded ${recipes.length} recipes from JSON file`);
+      return recipes;
+    } else {
+      console.warn(
+        "⚠️ RecipeDataManager not available, trying direct fetch...",
+      );
 
-            // Fallback: Direct fetch
-            const response = await fetch('./recipes.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+      // Fallback: Direct fetch
+      const response = await fetch("./recipes.json");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-            const data = await response.json();
-            const recipes = data.recipes || [];
-            console.log(`✅ Direct fetch: Loaded ${recipes.length} recipes`);
-            return recipes;
-        }
-    } catch (error) {
-        console.error('❌ Failed to load recipes from JSON:', error);
-        return [];
+      const data = await response.json();
+      const recipes = data.recipes || [];
+      console.log(`✅ Direct fetch: Loaded ${recipes.length} recipes`);
+      return recipes;
     }
+  } catch (error) {
+    console.error("❌ Failed to load recipes from JSON:", error);
+    return [];
+  }
 }
 
 /**
@@ -171,30 +174,30 @@ async function loadRecipesFromJSON() {
  * Replaces complex localStorage management
  */
 async function forceReloadRecipes() {
-    console.log('🔄 BOC-108: Force reloading recipes from JSON...');
+  console.log("🔄 BOC-108: Force reloading recipes from JSON...");
 
-    try {
-        // Clear any cached data
-        if (window.localStorage) {
-            localStorage.removeItem('petit_recipe_data');
-            localStorage.removeItem('petit_recipe_cache');
-        }
-
-        // Load fresh data from file
-        const recipes = await loadRecipesFromJSON();
-
-        // Update UI if app is available
-        if (window.app && typeof window.app.refreshRecipeList === 'function') {
-            window.app.updateRecipeData(recipes);
-            await window.app.refreshRecipeList();
-            console.log('✅ UI refreshed with new recipe data');
-        }
-
-        return recipes;
-    } catch (error) {
-        console.error('❌ Force reload failed:', error);
-        return [];
+  try {
+    // Clear any cached data
+    if (window.localStorage) {
+      localStorage.removeItem("petit_recipe_data");
+      localStorage.removeItem("petit_recipe_cache");
     }
+
+    // Load fresh data from file
+    const recipes = await loadRecipesFromJSON();
+
+    // Update UI if app is available
+    if (window.app && typeof window.app.refreshRecipeList === "function") {
+      window.app.updateRecipeData(recipes);
+      await window.app.refreshRecipeList();
+      console.log("✅ UI refreshed with new recipe data");
+    }
+
+    return recipes;
+  } catch (error) {
+    console.error("❌ Force reload failed:", error);
+    return [];
+  }
 }
 
 // Global registration for UI integration
@@ -206,21 +209,21 @@ window.forceReloadRecipes = forceReloadRecipes;
 // ▼▼▼ BOC-97: Data Persistence Layer - localStorage Migration System ▼▼▼
 class LocalRecipeDatabase {
   constructor() {
-    this.STORAGE_KEY = 'petit_recipe_data';
-    this.VERSION_KEY = 'petit_recipe_version';
-    this.CURRENT_VERSION = '1.0.0';
-    this.MIGRATION_LOG_KEY = 'petit_recipe_migration_log';
+    this.STORAGE_KEY = "petit_recipe_data";
+    this.VERSION_KEY = "petit_recipe_version";
+    this.CURRENT_VERSION = "1.0.0";
+    this.MIGRATION_LOG_KEY = "petit_recipe_migration_log";
   }
 
   // 初回移行ロジック - マイルストーン3の核心機能
   async initialize() {
-    console.log('🗄️ LocalRecipeDatabase初期化開始');
+    console.log("🗄️ LocalRecipeDatabase初期化開始");
 
     if (!this.hasLocalData()) {
-      console.log('📥 初回起動：静的データからlocalStorageへ移行開始');
+      console.log("📥 初回起動：静的データからlocalStorageへ移行開始");
       await this.migrateFromStaticData();
     } else {
-      console.log('✅ localStorageデータ存在確認済み');
+      console.log("✅ localStorageデータ存在確認済み");
 
       // ▼▼▼ BOC-100: 既存データのID統一化チェック ▼▼▼
       await this.checkAndFixExistingDataIds();
@@ -234,35 +237,37 @@ class LocalRecipeDatabase {
   hasLocalData() {
     const data = localStorage.getItem(this.STORAGE_KEY);
     const hasData = data !== null && data !== undefined;
-    console.log('🔍 localStorageデータチェック:', hasData ? '存在' : '未存在');
+    console.log("🔍 localStorageデータチェック:", hasData ? "存在" : "未存在");
     return hasData;
   }
 
   // recipes-data.jsからlocalStorageへの初回移行
   async migrateFromStaticData() {
     try {
-      console.log('🔄 静的データ移行処理開始');
+      console.log("🔄 静的データ移行処理開始");
 
       // Use recipeDataManager as single source of truth
       const staticData = [];
-      console.log('📋 移行対象データ件数:', staticData.length);
+      console.log("📋 移行対象データ件数:", staticData.length);
 
       if (staticData.length === 0) {
-        console.warn('⚠️ 移行対象の静的データが見つかりません');
+        console.warn("⚠️ 移行対象の静的データが見つかりません");
         return;
       }
 
       // ▼▼▼ BOC-100: Recipe ID統一化システム ▼▼▼
       // 静的データのIDを統一フォーマット (recipe_X) に変換
-      const unifiedRecipes = staticData.map(recipe => {
+      const unifiedRecipes = staticData.map((recipe) => {
         const originalId = recipe.id;
-        const unifiedId = originalId.startsWith('recipe_') ? originalId : `recipe_${originalId}`;
+        const unifiedId = originalId.startsWith("recipe_")
+          ? originalId
+          : `recipe_${originalId}`;
 
         console.log(`🔄 ID変換: "${originalId}" → "${unifiedId}"`);
 
         return {
           ...recipe,
-          id: unifiedId
+          id: unifiedId,
         };
       });
 
@@ -279,15 +284,17 @@ class LocalRecipeDatabase {
       const migrationLog = {
         timestamp: new Date().toISOString(),
         sourceDataCount: staticData.length,
-        version: this.CURRENT_VERSION
+        version: this.CURRENT_VERSION,
       };
-      localStorage.setItem(this.MIGRATION_LOG_KEY, JSON.stringify(migrationLog));
+      localStorage.setItem(
+        this.MIGRATION_LOG_KEY,
+        JSON.stringify(migrationLog),
+      );
 
-      console.log('✅ 静的データからlocalStorageへの移行完了');
-      console.log('📊 移行データ:', staticData.length + '件のレシピ');
-
+      console.log("✅ 静的データからlocalStorageへの移行完了");
+      console.log("📊 移行データ:", staticData.length + "件のレシピ");
     } catch (error) {
-      console.error('❌ データ移行エラー:', error);
+      console.error("❌ データ移行エラー:", error);
       throw new Error(`Migration failed: ${error.message}`);
     }
   }
@@ -295,30 +302,32 @@ class LocalRecipeDatabase {
   // ▼▼▼ BOC-100: 既存データID統一化チェック・修正 ▼▼▼
   async checkAndFixExistingDataIds() {
     try {
-      console.log('🔍 既存データのID形式チェック開始');
+      console.log("🔍 既存データのID形式チェック開始");
 
       const existingRecipes = this.loadRecipes();
       let needsFixing = false;
 
       // 古いID形式 ("1", "2", "4") のレシピがあるかチェック
-      const oldFormatRecipes = existingRecipes.filter(recipe =>
-        !recipe.id.startsWith('recipe_') && /^\d+$/.test(recipe.id)
+      const oldFormatRecipes = existingRecipes.filter(
+        (recipe) => !recipe.id.startsWith("recipe_") && /^\d+$/.test(recipe.id),
       );
 
       if (oldFormatRecipes.length > 0) {
-        console.log(`🔧 古いID形式のレシピを発見: ${oldFormatRecipes.length}件`);
+        console.log(
+          `🔧 古いID形式のレシピを発見: ${oldFormatRecipes.length}件`,
+        );
         needsFixing = true;
 
         // ID統一化実行
-        const fixedRecipes = existingRecipes.map(recipe => {
-          if (!recipe.id.startsWith('recipe_') && /^\d+$/.test(recipe.id)) {
+        const fixedRecipes = existingRecipes.map((recipe) => {
+          if (!recipe.id.startsWith("recipe_") && /^\d+$/.test(recipe.id)) {
             const oldId = recipe.id;
             const newId = `recipe_${oldId}`;
             console.log(`🔄 ID修正: "${oldId}" → "${newId}"`);
 
             return {
               ...recipe,
-              id: newId
+              id: newId,
             };
           }
           return recipe;
@@ -326,30 +335,31 @@ class LocalRecipeDatabase {
 
         // 修正されたデータを保存
         this.saveRecipes(fixedRecipes);
-        console.log(`✅ 既存データID統一化完了: ${oldFormatRecipes.length}件修正`);
+        console.log(
+          `✅ 既存データID統一化完了: ${oldFormatRecipes.length}件修正`,
+        );
 
         // 閲覧数データも修正が必要かチェック
         this.fixViewCountIds(oldFormatRecipes);
       } else {
-        console.log('✅ 既存データのID形式は正常です');
+        console.log("✅ 既存データのID形式は正常です");
       }
-
     } catch (error) {
-      console.error('❌ 既存データID統一化エラー:', error);
+      console.error("❌ 既存データID統一化エラー:", error);
     }
   }
 
   // 閲覧数データのID修正
   fixViewCountIds(oldFormatRecipes) {
     try {
-      const viewCountsJson = localStorage.getItem('petit_recipe_view_counts');
+      const viewCountsJson = localStorage.getItem("petit_recipe_view_counts");
       if (!viewCountsJson) return;
 
       const viewCounts = JSON.parse(viewCountsJson);
       let updated = false;
 
-      oldFormatRecipes.forEach(recipe => {
-        const oldId = recipe.id.replace('recipe_', ''); // recipe_1 → 1
+      oldFormatRecipes.forEach((recipe) => {
+        const oldId = recipe.id.replace("recipe_", ""); // recipe_1 → 1
         const newId = `recipe_${oldId}`;
 
         if (viewCounts[oldId] !== undefined) {
@@ -361,12 +371,14 @@ class LocalRecipeDatabase {
       });
 
       if (updated) {
-        localStorage.setItem('petit_recipe_view_counts', JSON.stringify(viewCounts));
-        console.log('✅ 閲覧数データID統一化完了');
+        localStorage.setItem(
+          "petit_recipe_view_counts",
+          JSON.stringify(viewCounts),
+        );
+        console.log("✅ 閲覧数データID統一化完了");
       }
-
     } catch (error) {
-      console.error('❌ 閲覧数データID修正エラー:', error);
+      console.error("❌ 閲覧数データID修正エラー:", error);
     }
   }
   // ▲▲▲ BOC-100: 既存データID統一化チェック・修正 ▲▲▲
@@ -376,16 +388,18 @@ class LocalRecipeDatabase {
     try {
       const data = localStorage.getItem(this.STORAGE_KEY);
       if (!data) {
-        console.log('📭 localStorageにデータが見つかりません');
+        console.log("📭 localStorageにデータが見つかりません");
         return [];
       }
 
       const recipes = JSON.parse(data);
-      console.log('📖 localStorageからレシピデータ読み込み完了:', recipes.length + '件');
+      console.log(
+        "📖 localStorageからレシピデータ読み込み完了:",
+        recipes.length + "件",
+      );
       return recipes;
-
     } catch (error) {
-      console.error('❌ localStorageデータ読み込みエラー:', error);
+      console.error("❌ localStorageデータ読み込みエラー:", error);
       return [];
     }
   }
@@ -395,10 +409,12 @@ class LocalRecipeDatabase {
     try {
       const dataString = JSON.stringify(recipes);
       localStorage.setItem(this.STORAGE_KEY, dataString);
-      console.log('💾 localStorageにレシピデータ保存完了:', recipes.length + '件');
-
+      console.log(
+        "💾 localStorageにレシピデータ保存完了:",
+        recipes.length + "件",
+      );
     } catch (error) {
-      console.error('❌ localStorageデータ保存エラー:', error);
+      console.error("❌ localStorageデータ保存エラー:", error);
       throw new Error(`Save failed: ${error.message}`);
     }
   }
@@ -412,7 +428,7 @@ class LocalRecipeDatabase {
     return {
       hasLocalData: hasLocal,
       version: version,
-      migrationLog: migrationLog ? JSON.parse(migrationLog) : null
+      migrationLog: migrationLog ? JSON.parse(migrationLog) : null,
     };
   }
 
@@ -421,12 +437,14 @@ class LocalRecipeDatabase {
   // レシピ追加メソッド - マイルストーン3 CRUD機能の基盤
   addRecipe(newRecipe) {
     try {
-      console.log('📝 新規レシピ追加開始:', newRecipe);
+      console.log("📝 新規レシピ追加開始:", newRecipe);
 
       // Step 1: バリデーション
       const validationResult = this.validateRecipe(newRecipe);
       if (!validationResult.isValid) {
-        throw new Error(`Recipe validation failed: ${validationResult.errors.join(', ')}`);
+        throw new Error(
+          `Recipe validation failed: ${validationResult.errors.join(", ")}`,
+        );
       }
 
       // Step 2: 既存レシピデータ読み込み
@@ -437,7 +455,7 @@ class LocalRecipeDatabase {
         ...newRecipe,
         id: this.generateUniqueId(existingRecipes),
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Step 4: レシピリストに追加
@@ -446,18 +464,17 @@ class LocalRecipeDatabase {
       // Step 5: localStorage保存
       this.saveRecipes(updatedRecipes);
 
-      console.log('✅ レシピ追加完了:', recipeWithId.id, recipeWithId.title);
+      console.log("✅ レシピ追加完了:", recipeWithId.id, recipeWithId.title);
       return recipeWithId;
-
     } catch (error) {
-      console.error('❌ レシピ追加エラー:', error);
+      console.error("❌ レシピ追加エラー:", error);
       throw new Error(`Failed to add recipe: ${error.message}`);
     }
   }
 
   // ユニークID生成 - 既存IDとの重複回避
   generateUniqueId(existingRecipes = []) {
-    const existingIds = new Set(existingRecipes.map(recipe => recipe.id));
+    const existingIds = new Set(existingRecipes.map((recipe) => recipe.id));
     let newId;
 
     do {
@@ -465,7 +482,7 @@ class LocalRecipeDatabase {
       newId = `recipe_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
     } while (existingIds.has(newId));
 
-    console.log('🆔 生成されたユニークID:', newId);
+    console.log("🆔 生成されたユニークID:", newId);
     return newId;
   }
 
@@ -474,32 +491,46 @@ class LocalRecipeDatabase {
     const errors = [];
 
     // 必須フィールドチェック
-    if (!recipe.title || typeof recipe.title !== 'string' || recipe.title.trim() === '') {
-      errors.push('Recipe title is required');
+    if (
+      !recipe.title ||
+      typeof recipe.title !== "string" ||
+      recipe.title.trim() === ""
+    ) {
+      errors.push("Recipe title is required");
     }
 
-    if (!recipe.ingredients || !Array.isArray(recipe.ingredients) || recipe.ingredients.length === 0) {
-      errors.push('Recipe ingredients are required');
+    if (
+      !recipe.ingredients ||
+      !Array.isArray(recipe.ingredients) ||
+      recipe.ingredients.length === 0
+    ) {
+      errors.push("Recipe ingredients are required");
     }
 
-    if (!recipe.instructions || !Array.isArray(recipe.instructions) || recipe.instructions.length === 0) {
-      errors.push('Recipe instructions are required');
+    if (
+      !recipe.instructions ||
+      !Array.isArray(recipe.instructions) ||
+      recipe.instructions.length === 0
+    ) {
+      errors.push("Recipe instructions are required");
     }
 
     // オプショナルフィールドのデフォルト値設定
     const validatedRecipe = {
-      title: recipe.title?.trim() || '',
-      ingredients: window.app ? window.app.parseIngredients(recipe.ingredients || []) : recipe.ingredients || [],
+      title: recipe.title?.trim() || "",
+      ingredients: window.app
+        ? window.app.parseIngredients(recipe.ingredients || [])
+        : recipe.ingredients || [],
       instructions: recipe.instructions || [],
-      servings: recipe.servings || '1人前',
-      cookTime: recipe.cookTime || '未設定',
-      difficulty: recipe.difficulty || '初級'
+      servings: recipe.servings || "1人前",
+      cookTime: recipe.cookTime || "未設定",
+      difficulty: recipe.difficulty || "初級",
     };
 
     return {
       isValid: errors.length === 0,
       errors: errors,
-      validatedRecipe: validatedRecipe
+      validatedRecipe: validatedRecipe,
     };
   }
 
@@ -512,7 +543,7 @@ class LocalRecipeDatabase {
   // 特定IDのレシピ存在確認 (簡易版)
   recipeExistsSimple(recipeId) {
     const recipes = this.loadRecipes();
-    return recipes.some(recipe => recipe.id === recipeId);
+    return recipes.some((recipe) => recipe.id === recipeId);
   }
 
   // ▲▲▲ BOC-98: Recipe Addition Implementation ▲▲▲
@@ -522,29 +553,34 @@ class LocalRecipeDatabase {
   // 特定IDのレシピ取得メソッド
   getRecipeById(recipeId) {
     try {
-      console.log('🔍 レシピ取得開始 ID:', recipeId);
-      addBOC100Log(`🔍 getRecipeById呼び出し: ID="${recipeId}" (型: ${typeof recipeId})`, 'info');
+      console.log("🔍 レシピ取得開始 ID:", recipeId);
+      addBOC100Log(
+        `🔍 getRecipeById呼び出し: ID="${recipeId}" (型: ${typeof recipeId})`,
+        "info",
+      );
 
       const recipes = this.loadRecipes();
-      addBOC100Log(`📊 取得したレシピ総数: ${recipes.length}件`, 'info');
+      addBOC100Log(`📊 取得したレシピ総数: ${recipes.length}件`, "info");
 
       if (recipes.length > 0) {
-        const allIds = recipes.map(r => `"${r.id}"`);
-        addBOC100Log(`🆔 データベース内全ID: ${allIds.join(', ')}`, 'info');
+        const allIds = recipes.map((r) => `"${r.id}"`);
+        addBOC100Log(`🆔 データベース内全ID: ${allIds.join(", ")}`, "info");
       }
 
-      const recipe = recipes.find(r => r.id === recipeId);
+      const recipe = recipes.find((r) => r.id === recipeId);
 
       if (!recipe) {
-        addBOC100Log(`❌ レシピ検索失敗: "${recipeId}" が見つかりません`, 'error');
+        addBOC100Log(
+          `❌ レシピ検索失敗: "${recipeId}" が見つかりません`,
+          "error",
+        );
         throw new Error(`Recipe not found with ID: ${recipeId}`);
       }
 
-      console.log('✅ レシピ取得成功:', recipe.title);
+      console.log("✅ レシピ取得成功:", recipe.title);
       return recipe;
-
     } catch (error) {
-      console.error('❌ レシピ取得エラー:', error);
+      console.error("❌ レシピ取得エラー:", error);
       throw new Error(`Failed to get recipe: ${error.message}`);
     }
   }
@@ -552,19 +588,23 @@ class LocalRecipeDatabase {
   // レシピ更新メソッド - 既存レシピのデータを更新
   updateRecipe(updatedRecipe) {
     try {
-      console.log('📝 レシピ更新開始:', updatedRecipe.id);
+      console.log("📝 レシピ更新開始:", updatedRecipe.id);
 
       // Step 1: バリデーション
       const validationResult = this.validateRecipe(updatedRecipe);
       if (!validationResult.isValid) {
-        throw new Error(`Recipe validation failed: ${validationResult.errors.join(', ')}`);
+        throw new Error(
+          `Recipe validation failed: ${validationResult.errors.join(", ")}`,
+        );
       }
 
       // Step 2: 既存レシピデータ読み込み
       const existingRecipes = this.loadRecipes();
 
       // Step 3: 対象レシピのインデックス検索
-      const recipeIndex = existingRecipes.findIndex(r => r.id === updatedRecipe.id);
+      const recipeIndex = existingRecipes.findIndex(
+        (r) => r.id === updatedRecipe.id,
+      );
       if (recipeIndex === -1) {
         throw new Error(`Recipe not found for update: ${updatedRecipe.id}`);
       }
@@ -575,7 +615,7 @@ class LocalRecipeDatabase {
         ...updatedRecipe,
         id: updatedRecipe.id, // ID保持
         createdAt: originalRecipe.createdAt, // 作成日時保持
-        updatedAt: new Date().toISOString() // 更新日時を現在時刻に
+        updatedAt: new Date().toISOString(), // 更新日時を現在時刻に
       };
 
       // Step 5: 配列内の該当レシピを更新
@@ -584,11 +624,14 @@ class LocalRecipeDatabase {
       // Step 6: localStorage保存
       this.saveRecipes(existingRecipes);
 
-      console.log('✅ レシピ更新完了:', updatedRecipeWithTimestamp.id, updatedRecipeWithTimestamp.title);
+      console.log(
+        "✅ レシピ更新完了:",
+        updatedRecipeWithTimestamp.id,
+        updatedRecipeWithTimestamp.title,
+      );
       return updatedRecipeWithTimestamp;
-
     } catch (error) {
-      console.error('❌ レシピ更新エラー:', error);
+      console.error("❌ レシピ更新エラー:", error);
       throw new Error(`Failed to update recipe: ${error.message}`);
     }
   }
@@ -596,36 +639,40 @@ class LocalRecipeDatabase {
   // レシピ削除メソッド - 指定IDのレシピを完全削除
   deleteRecipe(recipeId) {
     try {
-      console.log('🗑️ レシピ削除開始 ID:', recipeId);
+      console.log("🗑️ レシピ削除開始 ID:", recipeId);
 
       // Step 1: 既存レシピデータ読み込み
       const existingRecipes = this.loadRecipes();
 
       // Step 2: 削除対象レシピの存在確認
-      const targetRecipe = existingRecipes.find(r => r.id === recipeId);
+      const targetRecipe = existingRecipes.find((r) => r.id === recipeId);
       if (!targetRecipe) {
         throw new Error(`Recipe not found for deletion: ${recipeId}`);
       }
 
       // Step 3: 削除前ログ記録 (バックアップ・監査用)
-      console.log('📋 削除対象レシピ:', targetRecipe.title, 'created:', targetRecipe.createdAt);
+      console.log(
+        "📋 削除対象レシピ:",
+        targetRecipe.title,
+        "created:",
+        targetRecipe.createdAt,
+      );
 
       // Step 4: 対象レシピ以外でフィルタリング
-      const updatedRecipes = existingRecipes.filter(r => r.id !== recipeId);
+      const updatedRecipes = existingRecipes.filter((r) => r.id !== recipeId);
 
       // Step 5: localStorage保存
       this.saveRecipes(updatedRecipes);
 
-      console.log('✅ レシピ削除完了:', recipeId);
-      console.log('📊 残レシピ件数:', updatedRecipes.length);
+      console.log("✅ レシピ削除完了:", recipeId);
+      console.log("📊 残レシピ件数:", updatedRecipes.length);
 
       return {
         deletedRecipe: targetRecipe,
-        remainingCount: updatedRecipes.length
+        remainingCount: updatedRecipes.length,
       };
-
     } catch (error) {
-      console.error('❌ レシピ削除エラー:', error);
+      console.error("❌ レシピ削除エラー:", error);
       throw new Error(`Failed to delete recipe: ${error.message}`);
     }
   }
@@ -634,9 +681,9 @@ class LocalRecipeDatabase {
   recipeExists(recipeId) {
     try {
       const recipes = this.loadRecipes();
-      return recipes.some(recipe => recipe.id === recipeId);
+      return recipes.some((recipe) => recipe.id === recipeId);
     } catch (error) {
-      console.error('❌ レシピ存在チェックエラー:', error);
+      console.error("❌ レシピ存在チェックエラー:", error);
       return false;
     }
   }
@@ -645,7 +692,7 @@ class LocalRecipeDatabase {
   // レシピ複製メソッド - 指定IDのレシピを複製して新規レシピとして保存
   duplicateRecipe(originalRecipeId) {
     try {
-      console.log('📋 レシピ複製開始 ID:', originalRecipeId);
+      console.log("📋 レシピ複製開始 ID:", originalRecipeId);
 
       // Step 1: 元レシピ取得・検証
       const originalRecipe = this.getRecipeById(originalRecipeId);
@@ -653,12 +700,12 @@ class LocalRecipeDatabase {
         throw new Error(`Original recipe not found: ${originalRecipeId}`);
       }
 
-      console.log('📋 複製元レシピ:', originalRecipe.title);
+      console.log("📋 複製元レシピ:", originalRecipe.title);
 
       // Step 2: 新ID生成（重複回避） - addRecipeパターンと同一
       const existingRecipes = this.loadRecipes();
       const newId = this.generateUniqueId(existingRecipes);
-      console.log('🆔 新レシピID生成:', newId);
+      console.log("🆔 新レシピID生成:", newId);
 
       // Step 3: 複製オブジェクト作成
       const duplicatedRecipe = {
@@ -666,23 +713,22 @@ class LocalRecipeDatabase {
         id: newId,
         title: `${originalRecipe.title} のコピー`,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
 
       // Step 4: 複製レシピを新規追加として保存
       const savedRecipe = this.addRecipe(duplicatedRecipe);
 
-      console.log('✅ レシピ複製完了:', {
+      console.log("✅ レシピ複製完了:", {
         originalId: originalRecipeId,
         originalTitle: originalRecipe.title,
         newId: savedRecipe.id,
-        newTitle: savedRecipe.title
+        newTitle: savedRecipe.title,
       });
 
       return savedRecipe;
-
     } catch (error) {
-      console.error('❌ レシピ複製エラー:', error);
+      console.error("❌ レシピ複製エラー:", error);
       throw new Error(`Failed to duplicate recipe: ${error.message}`);
     }
   }
@@ -697,16 +743,21 @@ class LocalRecipeDatabase {
 
       const stats = {
         totalRecipes: recipes.length,
-        recentlyCreated: recipes.filter(r => new Date(r.createdAt) > oneWeekAgo).length,
-        recentlyUpdated: recipes.filter(r => r.updatedAt && new Date(r.updatedAt) > oneWeekAgo).length,
-        originalRecipes: recipes.filter(r => !r.updatedAt || r.createdAt === r.updatedAt).length
+        recentlyCreated: recipes.filter(
+          (r) => new Date(r.createdAt) > oneWeekAgo,
+        ).length,
+        recentlyUpdated: recipes.filter(
+          (r) => r.updatedAt && new Date(r.updatedAt) > oneWeekAgo,
+        ).length,
+        originalRecipes: recipes.filter(
+          (r) => !r.updatedAt || r.createdAt === r.updatedAt,
+        ).length,
       };
 
-      console.log('📊 CRUD統計:', stats);
+      console.log("📊 CRUD統計:", stats);
       return stats;
-
     } catch (error) {
-      console.error('❌ CRUD統計取得エラー:', error);
+      console.error("❌ CRUD統計取得エラー:", error);
       return null;
     }
   }
@@ -718,13 +769,15 @@ class LocalRecipeDatabase {
   // データエクスポート機能 - 全レシピと閲覧データを統合JSON出力
   exportAllData() {
     try {
-      console.log('📦 データエクスポート開始');
+      console.log("📦 データエクスポート開始");
 
       // Step 1: レシピデータ取得
       const recipes = this.loadRecipes();
 
       // Step 2: 閲覧数データ取得 (ViewCountManagerから)
-      const viewCounts = JSON.parse(localStorage.getItem('petit_recipe_view_counts') || '{}');
+      const viewCounts = JSON.parse(
+        localStorage.getItem("petit_recipe_view_counts") || "{}",
+      );
 
       // Step 3: システム情報取得
       const migrationStatus = this.getMigrationStatus();
@@ -733,31 +786,31 @@ class LocalRecipeDatabase {
       const exportData = {
         version: this.CURRENT_VERSION,
         exportDate: new Date().toISOString(),
-        appVersion: 'petit-recipe-v3.0',
+        appVersion: "petit-recipe-v3.0",
         totalRecipes: recipes.length,
         totalViewCounts: Object.keys(viewCounts).length,
         data: {
           recipes: recipes,
           viewCounts: viewCounts,
-          migrationLog: migrationStatus.migrationLog
+          migrationLog: migrationStatus.migrationLog,
         },
         metadata: {
           dataVersion: migrationStatus.version,
-          exportedBy: 'LocalRecipeDatabase',
-          originalMigrationTime: migrationStatus.migrationLog?.timestamp || null
-        }
+          exportedBy: "LocalRecipeDatabase",
+          originalMigrationTime:
+            migrationStatus.migrationLog?.timestamp || null,
+        },
       };
 
-      console.log('✅ エクスポートデータ作成完了:', {
+      console.log("✅ エクスポートデータ作成完了:", {
         recipes: exportData.totalRecipes,
         viewCounts: exportData.totalViewCounts,
-        size: JSON.stringify(exportData).length + ' bytes'
+        size: JSON.stringify(exportData).length + " bytes",
       });
 
       return exportData;
-
     } catch (error) {
-      console.error('❌ データエクスポートエラー:', error);
+      console.error("❌ データエクスポートエラー:", error);
       throw new Error(`Export failed: ${error.message}`);
     }
   }
@@ -765,33 +818,40 @@ class LocalRecipeDatabase {
   // データインポート機能 - バックアップからの完全復元
   importAllData(importData) {
     try {
-      console.log('📥 データインポート開始');
+      console.log("📥 データインポート開始");
 
       // Step 1: データ形式検証
       const validationResult = this.validateImportData(importData);
       if (!validationResult.isValid) {
-        throw new Error(`Import validation failed: ${validationResult.errors.join(', ')}`);
+        throw new Error(
+          `Import validation failed: ${validationResult.errors.join(", ")}`,
+        );
       }
 
       // Step 2: 現在のデータ取得（ログ用）
       const currentRecipes = this.loadRecipes();
-      const currentViewCounts = JSON.parse(localStorage.getItem('petit_recipe_view_counts') || '{}');
+      const currentViewCounts = JSON.parse(
+        localStorage.getItem("petit_recipe_view_counts") || "{}",
+      );
 
-      console.log('📊 インポート前状態:', {
+      console.log("📊 インポート前状態:", {
         currentRecipes: currentRecipes.length,
-        currentViewCounts: Object.keys(currentViewCounts).length
+        currentViewCounts: Object.keys(currentViewCounts).length,
       });
 
       // Step 3: レシピデータ上書き（安全性チェック追加）
       const recipesToImport = importData?.data?.recipes || [];
       if (!Array.isArray(recipesToImport)) {
-        throw new Error('Invalid recipes data structure');
+        throw new Error("Invalid recipes data structure");
       }
       this.saveRecipes(recipesToImport);
 
       // Step 4: 閲覧数データ上書き（安全性チェック追加）
       const viewCountsToImport = importData?.data?.viewCounts || {};
-      localStorage.setItem('petit_recipe_view_counts', JSON.stringify(viewCountsToImport));
+      localStorage.setItem(
+        "petit_recipe_view_counts",
+        JSON.stringify(viewCountsToImport),
+      );
 
       // Step 5: バージョン情報更新
       localStorage.setItem(this.VERSION_KEY, importData.version);
@@ -804,23 +864,25 @@ class LocalRecipeDatabase {
         sourceVersion: importData.version,
         sourceExportDate: importData.exportDate,
         replacedRecipes: currentRecipes.length,
-        replacedViewCounts: Object.keys(currentViewCounts).length
+        replacedViewCounts: Object.keys(currentViewCounts).length,
       };
 
-      localStorage.setItem('petit_recipe_import_log', JSON.stringify(importLog));
+      localStorage.setItem(
+        "petit_recipe_import_log",
+        JSON.stringify(importLog),
+      );
 
-      console.log('✅ データインポート完了:', {
+      console.log("✅ データインポート完了:", {
         importedRecipes: importLog.importedRecipes,
         importedViewCounts: importLog.importedViewCounts,
-        sourceDate: importData.exportDate
+        sourceDate: importData.exportDate,
       });
 
       return importLog;
-
     } catch (error) {
-      console.error('❌ データインポートエラー:', error);
-      console.error('❌ インポートデータ構造:', importData);
-      console.error('❌ エラースタック:', error.stack);
+      console.error("❌ データインポートエラー:", error);
+      console.error("❌ インポートデータ構造:", importData);
+      console.error("❌ エラースタック:", error.stack);
       throw new Error(`Import failed: ${error.message}`);
     }
   }
@@ -830,44 +892,51 @@ class LocalRecipeDatabase {
     const errors = [];
 
     // 必須フィールドチェック
-    if (!data || typeof data !== 'object') {
-      errors.push('Invalid data format');
+    if (!data || typeof data !== "object") {
+      errors.push("Invalid data format");
       return { isValid: false, errors };
     }
 
-    if (!data.version) errors.push('Missing version information');
-    if (!data.exportDate) errors.push('Missing export date');
-    if (!data.data) errors.push('Missing data section');
+    if (!data.version) errors.push("Missing version information");
+    if (!data.exportDate) errors.push("Missing export date");
+    if (!data.data) errors.push("Missing data section");
 
     if (data.data) {
       if (!Array.isArray(data.data.recipes)) {
-        errors.push('Invalid recipes format - must be array');
+        errors.push("Invalid recipes format - must be array");
       } else {
         // レシピ構造の基本チェック
-        const invalidRecipes = data.data.recipes.filter(recipe =>
-          !recipe.id || !recipe.title || !Array.isArray(recipe.ingredients)
+        const invalidRecipes = data.data.recipes.filter(
+          (recipe) =>
+            !recipe.id || !recipe.title || !Array.isArray(recipe.ingredients),
         );
         if (invalidRecipes.length > 0) {
-          errors.push(`${invalidRecipes.length} recipes missing required fields`);
+          errors.push(
+            `${invalidRecipes.length} recipes missing required fields`,
+          );
         }
       }
 
-      if (data.data.viewCounts && typeof data.data.viewCounts !== 'object') {
-        errors.push('Invalid viewCounts format - must be object');
+      if (data.data.viewCounts && typeof data.data.viewCounts !== "object") {
+        errors.push("Invalid viewCounts format - must be object");
       }
     }
 
     // バージョン互換性チェック
     if (data.version && !this.isVersionCompatible(data.version)) {
-      errors.push(`Incompatible version: ${data.version} (current: ${this.CURRENT_VERSION})`);
+      errors.push(
+        `Incompatible version: ${data.version} (current: ${this.CURRENT_VERSION})`,
+      );
     }
 
     const isValid = errors.length === 0;
     if (isValid) {
-      console.log('✅ インポートデータ検証成功:', {
+      console.log("✅ インポートデータ検証成功:", {
         version: data.version,
         recipes: data.data.recipes?.length || 0,
-        viewCounts: data.data.viewCounts ? Object.keys(data.data.viewCounts).length : 0
+        viewCounts: data.data.viewCounts
+          ? Object.keys(data.data.viewCounts).length
+          : 0,
       });
     }
 
@@ -877,30 +946,31 @@ class LocalRecipeDatabase {
   // バージョン互換性チェック
   isVersionCompatible(importVersion) {
     // 現在は1.0.0のみサポート
-    const supportedVersions = ['1.0.0'];
+    const supportedVersions = ["1.0.0"];
     return supportedVersions.includes(importVersion);
   }
 
   // バックアップ・リストア統計情報取得
   getBackupStats() {
     try {
-      const importLog = localStorage.getItem('petit_recipe_import_log');
+      const importLog = localStorage.getItem("petit_recipe_import_log");
       const migrationStatus = this.getMigrationStatus();
       const currentRecipes = this.loadRecipes();
-      const currentViewCounts = JSON.parse(localStorage.getItem('petit_recipe_view_counts') || '{}');
+      const currentViewCounts = JSON.parse(
+        localStorage.getItem("petit_recipe_view_counts") || "{}",
+      );
 
       return {
         currentData: {
           recipes: currentRecipes.length,
           viewCounts: Object.keys(currentViewCounts).length,
-          version: migrationStatus.version
+          version: migrationStatus.version,
         },
         lastImport: importLog ? JSON.parse(importLog) : null,
-        lastMigration: migrationStatus.migrationLog
+        lastMigration: migrationStatus.migrationLog,
       };
-
     } catch (error) {
-      console.error('❌ バックアップ統計取得エラー:', error);
+      console.error("❌ バックアップ統計取得エラー:", error);
       return null;
     }
   }
@@ -910,16 +980,18 @@ class LocalRecipeDatabase {
   // 閲覧数取得メソッド
   getViewCount(recipeId) {
     try {
-      addBOC100Log(`📊 閲覧数取得: ID="${recipeId}"`, 'info');
+      addBOC100Log(`📊 閲覧数取得: ID="${recipeId}"`, "info");
 
-      const viewCounts = JSON.parse(localStorage.getItem('petit_recipe_view_counts') || '{}');
+      const viewCounts = JSON.parse(
+        localStorage.getItem("petit_recipe_view_counts") || "{}",
+      );
       const count = viewCounts[recipeId] || 0;
 
-      addBOC100Log(`📈 閲覧数: ID="${recipeId}" → ${count}回`, 'info');
+      addBOC100Log(`📈 閲覧数: ID="${recipeId}" → ${count}回`, "info");
       return count;
     } catch (error) {
-      console.error('❌ 閲覧数取得エラー:', error);
-      addBOC100Log(`❌ 閲覧数取得エラー: ${error.message}`, 'error');
+      console.error("❌ 閲覧数取得エラー:", error);
+      addBOC100Log(`❌ 閲覧数取得エラー: ${error.message}`, "error");
       return 0;
     }
   }
@@ -927,20 +999,28 @@ class LocalRecipeDatabase {
   // 閲覧数インクリメントメソッド
   incrementViewCount(recipeId) {
     try {
-      addBOC100Log(`📈 閲覧数インクリメント: ID="${recipeId}"`, 'info');
+      addBOC100Log(`📈 閲覧数インクリメント: ID="${recipeId}"`, "info");
 
-      const viewCounts = JSON.parse(localStorage.getItem('petit_recipe_view_counts') || '{}');
+      const viewCounts = JSON.parse(
+        localStorage.getItem("petit_recipe_view_counts") || "{}",
+      );
       const oldCount = viewCounts[recipeId] || 0;
       const newCount = oldCount + 1;
 
       viewCounts[recipeId] = newCount;
-      localStorage.setItem('petit_recipe_view_counts', JSON.stringify(viewCounts));
+      localStorage.setItem(
+        "petit_recipe_view_counts",
+        JSON.stringify(viewCounts),
+      );
 
-      addBOC100Log(`📈 閲覧数更新: ID="${recipeId}" ${oldCount}回 → ${newCount}回`, 'success');
+      addBOC100Log(
+        `📈 閲覧数更新: ID="${recipeId}" ${oldCount}回 → ${newCount}回`,
+        "success",
+      );
       return newCount;
     } catch (error) {
-      console.error('❌ 閲覧数インクリメントエラー:', error);
-      addBOC100Log(`❌ 閲覧数インクリメントエラー: ${error.message}`, 'error');
+      console.error("❌ 閲覧数インクリメントエラー:", error);
+      addBOC100Log(`❌ 閲覧数インクリメントエラー: ${error.message}`, "error");
       return 0;
     }
   }
@@ -967,8 +1047,8 @@ class PetitRecipeApp {
     // ▼▼▼ Phase 1: App Memory (State Management) ▼▼▼
     this.history = [];
     this.state = {
-      currentScreen: 'recipes-screen',
-      selectedRecipeId: null
+      currentScreen: "recipes-screen",
+      selectedRecipeId: null,
     };
 
     // ▼▼▼ BOC-99: Edit/Delete State Management ▼▼▼
@@ -995,8 +1075,8 @@ class PetitRecipeApp {
         const { StatusBar } = window.Capacitor.Plugins;
         if (StatusBar) {
           await StatusBar.setOverlaysWebView({ overlay: false });
-          await StatusBar.setStyle({ style: 'LIGHT' });
-          await StatusBar.setBackgroundColor({ color: '#3498db' });
+          await StatusBar.setStyle({ style: "LIGHT" });
+          await StatusBar.setBackgroundColor({ color: "#3498db" });
           console.log("✅ StatusBar JavaScript configuration applied");
         } else {
           console.warn("⚠️ StatusBar plugin not available");
@@ -1016,16 +1096,19 @@ class PetitRecipeApp {
     // アプリ状態の復元
     const stateRestored = this.loadState();
     if (stateRestored) {
-      console.log('🔄 前回の状態を復元:', this.state);
+      console.log("🔄 前回の状態を復元:", this.state);
       // 復元された状態に基づいて画面を表示
       this.showScreen(this.state.currentScreen);
 
       // レシピ詳細画面の場合、レシピも復元
-      if (this.state.currentScreen === 'recipe-detail-screen' && this.state.selectedRecipeId) {
+      if (
+        this.state.currentScreen === "recipe-detail-screen" &&
+        this.state.selectedRecipeId
+      ) {
         this.showRecipeDetail(this.state.selectedRecipeId);
       }
     } else {
-      console.log('🆕 初回起動またはクリーン初期化');
+      console.log("🆕 初回起動またはクリーン初期化");
       // 初期画面表示
       this.renderRecipes();
     }
@@ -1040,9 +1123,9 @@ class PetitRecipeApp {
   // ▼▼▼ BOC-108: File-Based Recipe Loading System ▼▼▼
   async loadRecipesFromJSON() {
     try {
-      addDebugLog('📋 BOC-108: Trying to load recipes.json...');
+      addDebugLog("📋 BOC-108: Trying to load recipes.json...");
 
-      const response = await fetch('./recipes.json');
+      const response = await fetch("./recipes.json");
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -1050,14 +1133,18 @@ class PetitRecipeApp {
       const data = await response.json();
 
       if (!data.recipes || !Array.isArray(data.recipes)) {
-        throw new Error('Invalid JSON structure: missing recipes array');
+        throw new Error("Invalid JSON structure: missing recipes array");
       }
 
-      addDebugLog(`✅ BOC-108: recipes.json loaded - ${data.recipes.length} recipes`);
-      addDebugLog(`📊 JSON version: ${data.version}, updated: ${data.lastUpdated}`);
+      addDebugLog(
+        `✅ BOC-108: recipes.json loaded - ${data.recipes.length} recipes`,
+      );
+      addDebugLog(
+        `📊 JSON version: ${data.version}, updated: ${data.lastUpdated}`,
+      );
 
       // JSON format is already in the correct structure for UI
-      return data.recipes.map(recipe => ({
+      return data.recipes.map((recipe) => ({
         id: recipe.id,
         name: recipe.name,
         category: "main", // Default category
@@ -1065,9 +1152,8 @@ class PetitRecipeApp {
         ingredients: recipe.ingredients, // Already in {name, amount, unit} format
         steps: recipe.steps,
         cookTime: recipe.cookTime,
-        difficulty: "中級" // Default difficulty
+        difficulty: "中級", // Default difficulty
       }));
-
     } catch (error) {
       addDebugLog(`❌ BOC-108: recipes.json load failed - ${error.message}`);
       return null;
@@ -1082,18 +1168,32 @@ class PetitRecipeApp {
       // STEP 1: Try recipes.json first (BOC-108 implementation)
       const jsonRecipes = await this.loadRecipesFromJSON();
       if (jsonRecipes && jsonRecipes.length > 0) {
-        console.log("✅ recipes.json loaded successfully:", jsonRecipes.length + " recipes");
-        addDebugLog(`📋 BOC-108: JSON file loaded - ${jsonRecipes.length} recipes`);
+        console.log(
+          "✅ recipes.json loaded successfully:",
+          jsonRecipes.length + " recipes",
+        );
+        addDebugLog(
+          `📋 BOC-108: JSON file loaded - ${jsonRecipes.length} recipes`,
+        );
 
         this.recipes = jsonRecipes;
         this.filteredRecipes = [...this.recipes];
 
         // ▼▼▼ BOC-100: Recipe Loading Debug ▼▼▼
-        addBOC100Log(`📖 BOC-108: JSON recipes loaded: ${this.recipes.length}件`, 'success');
-        addBOC100Log(`🔢 JSON recipe IDs: ${this.recipes.map(r => r.id).join(', ')}`, 'info');
+        addBOC100Log(
+          `📖 BOC-108: JSON recipes loaded: ${this.recipes.length}件`,
+          "success",
+        );
+        addBOC100Log(
+          `🔢 JSON recipe IDs: ${this.recipes.map((r) => r.id).join(", ")}`,
+          "info",
+        );
         // ▲▲▲ BOC-100: Recipe Loading Debug ▲▲▲
 
-        console.log("📖 BOC-108: JSON recipe loading completed:", this.recipes.length + " recipes");
+        console.log(
+          "📖 BOC-108: JSON recipe loading completed:",
+          this.recipes.length + " recipes",
+        );
         return; // Skip legacy loading
       }
 
@@ -1103,7 +1203,10 @@ class PetitRecipeApp {
 
       // STEP 2: データが取得できた場合の処理
       if (petitRecipes && petitRecipes.length > 0) {
-        console.log("📋 LocalStorageからデータ取得成功:", petitRecipes.length + "件");
+        console.log(
+          "📋 LocalStorageからデータ取得成功:",
+          petitRecipes.length + "件",
+        );
       } else {
         console.log("⚠️ LocalStorageデータなし - フォールバック処理開始");
 
@@ -1114,7 +1217,10 @@ class PetitRecipeApp {
         if (window.loadAllRecipes) {
           try {
             fallbackData = await window.loadAllRecipes();
-            console.log("✅ recipeDataManagerからデータ取得:", fallbackData.length + "件");
+            console.log(
+              "✅ recipeDataManagerからデータ取得:",
+              fallbackData.length + "件",
+            );
           } catch (error) {
             console.error("❌ recipeDataManagerからのデータ取得失敗:", error);
             fallbackData = null;
@@ -1140,14 +1246,21 @@ class PetitRecipeApp {
               fallbackData = JSON.parse(atob(result.data));
               console.log("✅ Capacitor経由でデータ読み込み成功");
             } catch (capacitorError) {
-              console.log("⚠️ Capacitorアクセス失敗、通常fetch試行:", capacitorError.message);
+              console.log(
+                "⚠️ Capacitorアクセス失敗、通常fetch試行:",
+                capacitorError.message,
+              );
               throw capacitorError;
             }
           } else {
             // 3. Web環境での通常fetch
             console.log("🌐 Web環境での通常fetch");
             const response = await fetch("src/data/recipes.json");
-            console.log("📡 Fetch response:", response.status, response.statusText);
+            console.log(
+              "📡 Fetch response:",
+              response.status,
+              response.statusText,
+            );
 
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
@@ -1173,12 +1286,24 @@ class PetitRecipeApp {
       this.filteredRecipes = [...this.recipes];
 
       // ▼▼▼ BOC-100: Recipe Loading Debug ▼▼▼
-      addBOC100Log(`📖 レシピ読み込み完了: ${this.recipes.length}件`, 'success');
-      addBOC100Log(`🔢 読み込まれたレシピID: ${this.recipes.map(r => r.id).join(', ')}`, 'info');
-      addBOC100Log(`🧪 ID "recipe_4" 存在確認: ${this.recipes.some(r => r.id === 'recipe_4') ? 'あり' : 'なし'}`, this.recipes.some(r => r.id === 'recipe_4') ? 'success' : 'error');
+      addBOC100Log(
+        `📖 レシピ読み込み完了: ${this.recipes.length}件`,
+        "success",
+      );
+      addBOC100Log(
+        `🔢 読み込まれたレシピID: ${this.recipes.map((r) => r.id).join(", ")}`,
+        "info",
+      );
+      addBOC100Log(
+        `🧪 ID "recipe_4" 存在確認: ${this.recipes.some((r) => r.id === "recipe_4") ? "あり" : "なし"}`,
+        this.recipes.some((r) => r.id === "recipe_4") ? "success" : "error",
+      );
       // ▲▲▲ BOC-100: Recipe Loading Debug ▲▲▲
 
-      console.log("📖 BOC-97: レシピデータ読み込み完了:", this.recipes.length + "件");
+      console.log(
+        "📖 BOC-97: レシピデータ読み込み完了:",
+        this.recipes.length + "件",
+      );
       console.log("✅ 変換後データ:", this.recipes);
     } catch (error) {
       console.error("❌ レシピデータ読み込み失敗:", error);
@@ -1206,17 +1331,26 @@ class PetitRecipeApp {
   // petit-recipe形式をRecipeBox形式に変換
   convertPetitToRecipeBox(petitRecipe) {
     // ▼▼▼ BOC-100: ID変換詳細ログ + 重複プレフィックス修正 ▼▼▼
-    addBOC100Log(`🔄 レシピ変換開始: "${petitRecipe.title}"`, 'info');
-    addBOC100Log(`🆔 変換前ID: "${petitRecipe.id}" (型: ${typeof petitRecipe.id})`, 'info');
+    addBOC100Log(`🔄 レシピ変換開始: "${petitRecipe.title}"`, "info");
+    addBOC100Log(
+      `🆔 変換前ID: "${petitRecipe.id}" (型: ${typeof petitRecipe.id})`,
+      "info",
+    );
 
     // 🔧 重複プレフィックス問題修正: 既にrecipe_プレフィックスがある場合は追加しない
     let convertedId;
-    if (String(petitRecipe.id).startsWith('recipe_')) {
+    if (String(petitRecipe.id).startsWith("recipe_")) {
       convertedId = String(petitRecipe.id); // 既にプレフィックス付きの場合はそのまま使用
-      addBOC100Log(`✅ 既存プレフィックス検出: "${convertedId}" (変換不要)`, 'success');
+      addBOC100Log(
+        `✅ 既存プレフィックス検出: "${convertedId}" (変換不要)`,
+        "success",
+      );
     } else {
       convertedId = `recipe_${petitRecipe.id}`;
-      addBOC100Log(`🔄 プレフィックス追加: "${petitRecipe.id}" → "${convertedId}"`, 'info');
+      addBOC100Log(
+        `🔄 プレフィックス追加: "${petitRecipe.id}" → "${convertedId}"`,
+        "info",
+      );
     }
     // ▲▲▲ BOC-100: ID変換ログ + 重複プレフィックス修正 ▲▲▲
 
@@ -1299,7 +1433,7 @@ class PetitRecipeApp {
 
   // イベントリスナー設定
   setupEventListeners() {
-    addDebugLog('🎧 setupEventListeners開始');
+    addDebugLog("🎧 setupEventListeners開始");
     // 検索機能
     const searchInput = document.getElementById("recipe-search");
     if (searchInput) {
@@ -1311,7 +1445,7 @@ class PetitRecipeApp {
     // ソートタブ
     document.querySelectorAll(".sort-tab").forEach((tab) => {
       tab.addEventListener("click", (e) => {
-        addDebugLog('🔘 ソートボタンクリック検出: ' + e.target.textContent);
+        addDebugLog("🔘 ソートボタンクリック検出: " + e.target.textContent);
 
         // アクティブタブの切り替え
         document
@@ -1320,7 +1454,7 @@ class PetitRecipeApp {
         e.target.classList.add("active");
 
         const sortType = e.target.dataset.sort;
-        addDebugLog('📊 ソートタイプ: ' + sortType);
+        addDebugLog("📊 ソートタイプ: " + sortType);
         this.sortRecipes(sortType);
       });
     });
@@ -1341,30 +1475,36 @@ class PetitRecipeApp {
   async setupNativeListeners() {
     // 重複登録防止
     if (this.nativeListenersRegistered) {
-      console.log('⚠️ ネイティブリスナー既に登録済み');
+      console.log("⚠️ ネイティブリスナー既に登録済み");
       return;
     }
 
     // Capacitor環境チェック
-    if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform()) {
+    if (
+      typeof window.Capacitor !== "undefined" &&
+      window.Capacitor.isNativePlatform()
+    ) {
       try {
         // 動的インポート: ブラウザ環境では失敗しても続行
-        const { App } = await import('@capacitor/app');
+        const { App } = await import("@capacitor/app");
 
         // backButtonハンドラー
         this.backButtonHandler = () => {
-          console.log('🔙 ネイティブ戻るボタン押下検出');
+          console.log("🔙 ネイティブ戻るボタン押下検出");
           this.handleNativeBackButton();
         };
 
-        await App.addListener('backButton', this.backButtonHandler);
+        await App.addListener("backButton", this.backButtonHandler);
         this.nativeListenersRegistered = true;
-        console.log('✅ ネイティブリスナー設定完了');
+        console.log("✅ ネイティブリスナー設定完了");
       } catch (error) {
-        console.log('ℹ️ Capacitorプラグインインポート失敗 (ブラウザ環境):', error.message);
+        console.log(
+          "ℹ️ Capacitorプラグインインポート失敗 (ブラウザ環境):",
+          error.message,
+        );
       }
     } else {
-      console.log('ℹ️ Capacitor環境ではありません - ネイティブリスナー不要');
+      console.log("ℹ️ Capacitor環境ではありません - ネイティブリスナー不要");
     }
 
     // ▼▼▼ BOC-98: Recipe Addition Form Event Listeners ▼▼▼
@@ -1375,16 +1515,19 @@ class PetitRecipeApp {
   // ネイティブ戻るボタン処理
   async handleNativeBackButton() {
     if (this.history.length > 1) {
-      console.log('📱 アプリ内ナビゲーション実行');
+      console.log("📱 アプリ内ナビゲーション実行");
       this.navigateBack();
     } else {
-      console.log('🚪 アプリ終了');
-      if (typeof window.Capacitor !== "undefined" && window.Capacitor.isNativePlatform()) {
+      console.log("🚪 アプリ終了");
+      if (
+        typeof window.Capacitor !== "undefined" &&
+        window.Capacitor.isNativePlatform()
+      ) {
         try {
-          const { App } = await import('@capacitor/app');
+          const { App } = await import("@capacitor/app");
           await App.exitApp();
         } catch (error) {
-          console.log('ℹ️ アプリ終了処理失敗 (ブラウザ環境):', error.message);
+          console.log("ℹ️ アプリ終了処理失敗 (ブラウザ環境):", error.message);
         }
       }
     }
@@ -1411,7 +1554,10 @@ class PetitRecipeApp {
     const recipesHtml = this.filteredRecipes
       .map((recipe) => {
         // ▼▼▼ BOC-100: Recipe Card ID Logging ▼▼▼
-        addBOC100Log(`🃏 カード生成: ID="${recipe.id}" (型: ${typeof recipe.id}) → ${recipe.name}`, 'info');
+        addBOC100Log(
+          `🃏 カード生成: ID="${recipe.id}" (型: ${typeof recipe.id}) → ${recipe.name}`,
+          "info",
+        );
         // ▲▲▲ BOC-100: Recipe Card ID Logging ▲▲▲
 
         return `
@@ -1441,22 +1587,31 @@ class PetitRecipeApp {
   // レシピ詳細の表示
   showRecipeDetail(recipeId) {
     // ▼▼▼ BOC-100: Comprehensive Recipe ID Logging ▼▼▼
-    addBOC100Log(`🔍 showRecipeDetail呼び出し: ID="${recipeId}" (型: ${typeof recipeId})`, 'info');
-    addBOC100Log(`📊 利用可能レシピ総数: ${this.recipes ? this.recipes.length : '未定義'}`, 'info');
+    addBOC100Log(
+      `🔍 showRecipeDetail呼び出し: ID="${recipeId}" (型: ${typeof recipeId})`,
+      "info",
+    );
+    addBOC100Log(
+      `📊 利用可能レシピ総数: ${this.recipes ? this.recipes.length : "未定義"}`,
+      "info",
+    );
 
     if (this.recipes && this.recipes.length > 0) {
-      const allIds = this.recipes.map(r => `"${r.id}"`);
-      addBOC100Log(`🆔 全レシピID一覧: ${allIds.join(', ')}`, 'info');
+      const allIds = this.recipes.map((r) => `"${r.id}"`);
+      addBOC100Log(`🆔 全レシピID一覧: ${allIds.join(", ")}`, "info");
     }
     // ▲▲▲ BOC-100: Recipe ID Logging ▲▲▲
 
     // ▼▼▼ BOC-100: Recipe Search Debug ▼▼▼
-    addBOC100Log(`🔍 レシピ検索実行: 検索ID="${recipeId}" 対象配列長=${this.recipes.length}`, 'info');
+    addBOC100Log(
+      `🔍 レシピ検索実行: 検索ID="${recipeId}" 対象配列長=${this.recipes.length}`,
+      "info",
+    );
 
     // デバッグ用: 最初の3件のIDを表示
     if (this.recipes.length > 0) {
-      const sampleIds = this.recipes.slice(0, 3).map(r => `"${r.id}"`);
-      addBOC100Log(`🔍 検索対象の先頭3件ID: ${sampleIds.join(', ')}`, 'info');
+      const sampleIds = this.recipes.slice(0, 3).map((r) => `"${r.id}"`);
+      addBOC100Log(`🔍 検索対象の先頭3件ID: ${sampleIds.join(", ")}`, "info");
     }
     // ▲▲▲ BOC-100: Recipe Search Debug ▲▲▲
 
@@ -1464,32 +1619,45 @@ class PetitRecipeApp {
     if (!recipe) {
       const errorMsg = `レシピが見つかりません: ID="${recipeId}" (型: ${typeof recipeId})`;
       console.error(errorMsg);
-      addBOC100Log(`❌ ${errorMsg}`, 'error');
+      addBOC100Log(`❌ ${errorMsg}`, "error");
 
       // ▼▼▼ BOC-100: ID検索詳細診断 ▼▼▼
-      addBOC100Log(`🧪 ID検索詳細診断開始`, 'info');
+      addBOC100Log(`🧪 ID検索詳細診断開始`, "info");
 
       // 文字列比較テスト
       const stringId = String(recipeId);
-      const stringMatches = this.recipes.filter(r => String(r.id) === stringId);
-      addBOC100Log(`🔤 文字列変換比較: "${stringId}" → ${stringMatches.length}件一致`, stringMatches.length > 0 ? 'success' : 'error');
+      const stringMatches = this.recipes.filter(
+        (r) => String(r.id) === stringId,
+      );
+      addBOC100Log(
+        `🔤 文字列変換比較: "${stringId}" → ${stringMatches.length}件一致`,
+        stringMatches.length > 0 ? "success" : "error",
+      );
 
       // 部分一致テスト
-      const partialMatches = this.recipes.filter(r => r.id.includes(recipeId) || recipeId.includes(r.id));
-      addBOC100Log(`🔍 部分一致テスト: ${partialMatches.length}件一致`, partialMatches.length > 0 ? 'warning' : 'info');
+      const partialMatches = this.recipes.filter(
+        (r) => r.id.includes(recipeId) || recipeId.includes(r.id),
+      );
+      addBOC100Log(
+        `🔍 部分一致テスト: ${partialMatches.length}件一致`,
+        partialMatches.length > 0 ? "warning" : "info",
+      );
 
       if (partialMatches.length > 0) {
-        partialMatches.forEach(match => {
-          addBOC100Log(`🎯 部分一致候補: ID="${match.id}" → ${match.name}`, 'warning');
+        partialMatches.forEach((match) => {
+          addBOC100Log(
+            `🎯 部分一致候補: ID="${match.id}" → ${match.name}`,
+            "warning",
+          );
         });
       }
 
-      addBOC100Log(`🧪 ID検索詳細診断完了`, 'info');
+      addBOC100Log(`🧪 ID検索詳細診断完了`, "info");
       // ▲▲▲ BOC-100: ID Search Diagnostics ▲▲▲
       return;
     }
 
-    addBOC100Log(`✅ レシピ発見: ID="${recipeId}" → ${recipe.name}`, 'success');
+    addBOC100Log(`✅ レシピ発見: ID="${recipeId}" → ${recipe.name}`, "success");
 
     this.currentRecipe = recipe;
     this.currentPortion = 1;
@@ -1560,7 +1728,6 @@ class PetitRecipeApp {
     stepsList.innerHTML = stepsHtml;
   }
 
-
   // 分量調整
   updatePortion(portion) {
     this.currentPortion = parseInt(portion);
@@ -1592,13 +1759,15 @@ class PetitRecipeApp {
     this.renderRecipes();
   }
 
-
   // ▼▼▼ Phase 2: Enhanced Screen Navigation ▼▼▼
   // 画面切り替え（履歴管理機能付き）
   showScreen(screenId) {
     // レシピ詳細画面の場合は同じ画面でも再表示を許可
-    if (this.state.currentScreen === screenId && screenId !== 'recipe-detail-screen') {
-      console.log('📱 同じ画面のため切り替えスキップ:', screenId);
+    if (
+      this.state.currentScreen === screenId &&
+      screenId !== "recipe-detail-screen"
+    ) {
+      console.log("📱 同じ画面のため切り替えスキップ:", screenId);
       return;
     }
 
@@ -1614,11 +1783,10 @@ class PetitRecipeApp {
     if (targetScreen) {
       targetScreen.classList.add("active");
 
-
       // レシピ一覧画面の場合はレシピリストを描画
-      if (screenId === 'recipes-screen') {
+      if (screenId === "recipes-screen") {
         this.renderRecipes();
-        console.log('🎨 レシピ一覧画面でレシピリスト描画実行');
+        console.log("🎨 レシピ一覧画面でレシピリスト描画実行");
       }
 
       // ▼▼▼ Phase 2: State & History Management ▼▼▼
@@ -1626,9 +1794,12 @@ class PetitRecipeApp {
       this.state.currentScreen = screenId;
 
       // 履歴に追加（同じ画面の連続は避ける）
-      if (this.history.length === 0 || this.history[this.history.length - 1] !== screenId) {
+      if (
+        this.history.length === 0 ||
+        this.history[this.history.length - 1] !== screenId
+      ) {
         this.history.push(screenId);
-        console.log('📚 履歴追加:', this.history);
+        console.log("📚 履歴追加:", this.history);
       }
 
       // 状態を永続化
@@ -1638,17 +1809,17 @@ class PetitRecipeApp {
       // 古い currentScreen プロパティとの互換性のため
       this.currentScreen = screenId;
     } else {
-      console.error('❌ 画面要素が見つかりません:', screenId);
+      console.error("❌ 画面要素が見つかりません:", screenId);
     }
   }
 
   // 戻るナビゲーション
   navigateBack() {
-    console.log('⬅️ 戻る操作開始');
+    console.log("⬅️ 戻る操作開始");
 
     if (this.history.length <= 1) {
-      console.log('📚 履歴が少ないため、デフォルト画面に戻ります');
-      this.showScreen('recipes-screen');
+      console.log("📚 履歴が少ないため、デフォルト画面に戻ります");
+      this.showScreen("recipes-screen");
       return;
     }
 
@@ -1657,7 +1828,7 @@ class PetitRecipeApp {
 
     // 前の画面を取得
     const previousScreen = this.history[this.history.length - 1];
-    console.log('📚 前の画面:', previousScreen);
+    console.log("📚 前の画面:", previousScreen);
 
     // 前の画面を表示（showScreenは履歴に追加するが、すでに存在するのでスキップされる）
     this.state.currentScreen = previousScreen;
@@ -1674,7 +1845,7 @@ class PetitRecipeApp {
       console.log(`✅ 戻り完了: ${previousScreen}`);
 
       // レシピ一覧画面に戻る場合は、レシピを再描画
-      if (previousScreen === 'recipes-screen') {
+      if (previousScreen === "recipes-screen") {
         this.renderRecipes();
       }
 
@@ -1722,16 +1893,16 @@ class PetitRecipeApp {
   // 閲覧数データの読み込み
   loadViewCounts() {
     try {
-      const saved = localStorage.getItem('petit-recipe-viewcounts');
+      const saved = localStorage.getItem("petit-recipe-viewcounts");
       if (saved) {
         this.viewCounts = JSON.parse(saved);
-        console.log('📊 閲覧数データ読み込み:', this.viewCounts);
+        console.log("📊 閲覧数データ読み込み:", this.viewCounts);
       } else {
         this.viewCounts = {};
-        console.log('📊 閲覧数データ初期化');
+        console.log("📊 閲覧数データ初期化");
       }
     } catch (error) {
-      console.error('❌ 閲覧数データ読み込み失敗:', error);
+      console.error("❌ 閲覧数データ読み込み失敗:", error);
       this.viewCounts = {};
     }
   }
@@ -1739,10 +1910,13 @@ class PetitRecipeApp {
   // 閲覧数データの保存
   saveViewCounts() {
     try {
-      localStorage.setItem('petit-recipe-viewcounts', JSON.stringify(this.viewCounts));
-      console.log('💾 閲覧数データ保存完了:', this.viewCounts);
+      localStorage.setItem(
+        "petit-recipe-viewcounts",
+        JSON.stringify(this.viewCounts),
+      );
+      console.log("💾 閲覧数データ保存完了:", this.viewCounts);
     } catch (error) {
-      console.error('❌ 閲覧数データ保存失敗:', error);
+      console.error("❌ 閲覧数データ保存失敗:", error);
     }
   }
 
@@ -1753,36 +1927,36 @@ class PetitRecipeApp {
       const stateData = {
         currentScreen: this.state.currentScreen,
         selectedRecipeId: this.state.selectedRecipeId,
-        history: this.history
+        history: this.history,
       };
-      localStorage.setItem('petit-recipe-state', JSON.stringify(stateData));
-      console.log('💾 アプリ状態保存完了:', stateData);
+      localStorage.setItem("petit-recipe-state", JSON.stringify(stateData));
+      console.log("💾 アプリ状態保存完了:", stateData);
     } catch (error) {
-      console.error('❌ アプリ状態保存失敗:', error);
+      console.error("❌ アプリ状態保存失敗:", error);
     }
   }
 
   // アプリ状態の読み込み
   loadState() {
     try {
-      const saved = localStorage.getItem('petit-recipe-state');
+      const saved = localStorage.getItem("petit-recipe-state");
       if (saved) {
         const stateData = JSON.parse(saved);
-        this.state.currentScreen = stateData.currentScreen || 'recipes-screen';
+        this.state.currentScreen = stateData.currentScreen || "recipes-screen";
         this.state.selectedRecipeId = stateData.selectedRecipeId || null;
         this.history = stateData.history || [];
-        console.log('📂 アプリ状態読み込み完了:', stateData);
+        console.log("📂 アプリ状態読み込み完了:", stateData);
         return true;
       } else {
-        console.log('📂 アプリ状態初期化');
+        console.log("📂 アプリ状態初期化");
         return false;
       }
     } catch (error) {
-      console.error('❌ アプリ状態読み込み失敗:', error);
+      console.error("❌ アプリ状態読み込み失敗:", error);
       // フォールバック：デフォルト状態
       this.state = {
-        currentScreen: 'recipes-screen',
-        selectedRecipeId: null
+        currentScreen: "recipes-screen",
+        selectedRecipeId: null,
       };
       this.history = [];
       return false;
@@ -1794,39 +1968,42 @@ class PetitRecipeApp {
 
   // レシピ追加画面表示
   showAddRecipeScreen() {
-    console.log('📝 レシピ追加画面表示開始');
+    console.log("📝 レシピ追加画面表示開始");
 
     // 追加モード設定
-    this.editMode = 'add';
+    this.editMode = "add";
     this.editingRecipeId = null;
 
-    this.showScreen('add-recipe-screen');
+    this.showScreen("add-recipe-screen");
     this.clearAddRecipeForm();
     this.showEditModeIndicator(false); // 追加モードでは非表示
   }
 
   // レシピ追加フォームのイベントリスナー設定
   setupAddRecipeFormListeners() {
-    const form = document.getElementById('add-recipe-form');
+    const form = document.getElementById("add-recipe-form");
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener("submit", (e) => {
         e.preventDefault();
         this.handleAddRecipeSubmit();
       });
-      console.log('📋 レシピ追加フォームリスナー設定完了');
+      console.log("📋 レシピ追加フォームリスナー設定完了");
     }
   }
-
 
   // フォームデータ収集
   collectFormData() {
     return {
-      title: document.getElementById('recipe-title')?.value?.trim() || '',
-      servings: document.getElementById('recipe-servings')?.value?.trim() || '1人前',
-      cookTime: document.getElementById('recipe-cooktime')?.value?.trim() || '未設定',
-      difficulty: document.getElementById('recipe-difficulty')?.value || '初級',
-      ingredients: document.getElementById('recipe-ingredients')?.value?.trim() || '',
-      instructions: document.getElementById('recipe-instructions')?.value?.trim() || ''
+      title: document.getElementById("recipe-title")?.value?.trim() || "",
+      servings:
+        document.getElementById("recipe-servings")?.value?.trim() || "1人前",
+      cookTime:
+        document.getElementById("recipe-cooktime")?.value?.trim() || "未設定",
+      difficulty: document.getElementById("recipe-difficulty")?.value || "初級",
+      ingredients:
+        document.getElementById("recipe-ingredients")?.value?.trim() || "",
+      instructions:
+        document.getElementById("recipe-instructions")?.value?.trim() || "",
     };
   }
 
@@ -1836,22 +2013,22 @@ class PetitRecipeApp {
 
     // レシピ名チェック
     if (!formData.title) {
-      errors.push('レシピ名は必須です');
+      errors.push("レシピ名は必須です");
     }
 
     // 材料チェック
     if (!formData.ingredients) {
-      errors.push('材料は必須です');
+      errors.push("材料は必須です");
     }
 
     // 手順チェック
     if (!formData.instructions) {
-      errors.push('作り方は必須です');
+      errors.push("作り方は必須です");
     }
 
     return {
       isValid: errors.length === 0,
-      errors: errors
+      errors: errors,
     };
   }
 
@@ -1862,26 +2039,30 @@ class PetitRecipeApp {
       servings: formData.servings,
       cookTime: formData.cookTime,
       difficulty: formData.difficulty,
-      ingredients: formData.ingredients.split('\n').filter(line => line.trim() !== ''),
-      instructions: formData.instructions.split('\n').filter(line => line.trim() !== '')
+      ingredients: formData.ingredients
+        .split("\n")
+        .filter((line) => line.trim() !== ""),
+      instructions: formData.instructions
+        .split("\n")
+        .filter((line) => line.trim() !== ""),
     };
   }
 
   // フォームクリア
   clearAddRecipeForm() {
-    const form = document.getElementById('add-recipe-form');
+    const form = document.getElementById("add-recipe-form");
     if (form) {
       form.reset();
       // デフォルト値復元
-      document.getElementById('recipe-servings').value = '1人前';
-      document.getElementById('recipe-cooktime').value = '未設定';
-      document.getElementById('recipe-difficulty').value = '初級';
+      document.getElementById("recipe-servings").value = "1人前";
+      document.getElementById("recipe-cooktime").value = "未設定";
+      document.getElementById("recipe-difficulty").value = "初級";
     }
   }
 
   // エラーメッセージ表示
   showFormErrors(errors) {
-    const errorMessage = errors.join('\n');
+    const errorMessage = errors.join("\n");
     alert(`入力エラー:\n${errorMessage}`);
   }
 
@@ -1897,10 +2078,10 @@ class PetitRecipeApp {
 
   // レシピ一覧再読み込み
   async refreshRecipeList() {
-    console.log('🔄 レシピ一覧再読み込み開始');
+    console.log("🔄 レシピ一覧再読み込み開始");
     await this.loadRecipes();
     this.renderRecipes();
-    console.log('✅ レシピ一覧更新完了');
+    console.log("✅ レシピ一覧更新完了");
   }
 
   // ▲▲▲ BOC-98: Recipe Addition Implementation ▲▲▲
@@ -1909,22 +2090,25 @@ class PetitRecipeApp {
 
   // レシピ編集開始 - 詳細画面から呼び出される
   startEditRecipe() {
-    console.log('🔘 startEditRecipe()メソッドが呼び出されました'); // ← 診断ログ追加
-    addBOC100Log('🔘 startEditRecipe()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
+    console.log("🔘 startEditRecipe()メソッドが呼び出されました"); // ← 診断ログ追加
+    addBOC100Log("🔘 startEditRecipe()メソッドが呼び出されました", "event"); // ← モバイル診断ログ追加
     try {
       const currentRecipeId = this.state.selectedRecipeId;
-      addBOC100Log(`🎯 編集対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`, 'info');
+      addBOC100Log(
+        `🎯 編集対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`,
+        "info",
+      );
 
       if (!currentRecipeId) {
-        addBOC100Log('❌ 編集対象レシピIDが未設定', 'error');
-        throw new Error('No recipe selected for editing');
+        addBOC100Log("❌ 編集対象レシピIDが未設定", "error");
+        throw new Error("No recipe selected for editing");
       }
 
-      console.log('📝 レシピ編集開始:', currentRecipeId);
-      addBOC100Log(`📝 レシピ編集開始: ${currentRecipeId}`, 'info');
+      console.log("📝 レシピ編集開始:", currentRecipeId);
+      addBOC100Log(`📝 レシピ編集開始: ${currentRecipeId}`, "info");
 
       // 編集モード設定
-      this.editMode = 'edit';
+      this.editMode = "edit";
       this.editingRecipeId = currentRecipeId;
 
       // レシピデータ取得・フォームプリフィル
@@ -1932,64 +2116,70 @@ class PetitRecipeApp {
       this.prefillEditForm(recipe);
 
       // 編集画面表示
-      this.showScreen('add-recipe-screen');
+      this.showScreen("add-recipe-screen");
       this.showEditModeIndicator(true);
 
-      console.log('✅ 編集モード開始完了:', recipe.title);
-
+      console.log("✅ 編集モード開始完了:", recipe.title);
     } catch (error) {
-      console.error('❌ 編集開始エラー:', error);
+      console.error("❌ 編集開始エラー:", error);
       this.showErrorMessage(`編集を開始できませんでした: ${error.message}`);
     }
   }
 
   // フォームにレシピデータをプリフィル
   prefillEditForm(recipe) {
-    console.log('📋 フォームデータプリフィル開始:', recipe.title);
+    console.log("📋 フォームデータプリフィル開始:", recipe.title);
 
     // 基本情報フィールド
-    document.getElementById('recipe-title').value = recipe.title || '';
-    document.getElementById('recipe-servings').value = recipe.servings || '1人前';
-    document.getElementById('recipe-cooktime').value = recipe.cookTime || '未設定';
-    document.getElementById('recipe-difficulty').value = recipe.difficulty || '初級';
+    document.getElementById("recipe-title").value = recipe.title || "";
+    document.getElementById("recipe-servings").value =
+      recipe.servings || "1人前";
+    document.getElementById("recipe-cooktime").value =
+      recipe.cookTime || "未設定";
+    document.getElementById("recipe-difficulty").value =
+      recipe.difficulty || "初級";
 
     // 材料・手順配列 → テキストエリア変換
     const ingredientsText = Array.isArray(recipe.ingredients)
-      ? recipe.ingredients.join('\n')
-      : recipe.ingredients || '';
+      ? recipe.ingredients.join("\n")
+      : recipe.ingredients || "";
 
     const instructionsText = Array.isArray(recipe.instructions)
-      ? recipe.instructions.join('\n')
-      : recipe.instructions || '';
+      ? recipe.instructions.join("\n")
+      : recipe.instructions || "";
 
-    document.getElementById('recipe-ingredients').value = ingredientsText;
-    document.getElementById('recipe-instructions').value = instructionsText;
+    document.getElementById("recipe-ingredients").value = ingredientsText;
+    document.getElementById("recipe-instructions").value = instructionsText;
 
-    console.log('✅ フォームプリフィル完了');
+    console.log("✅ フォームプリフィル完了");
   }
 
   // 編集モードインジケータ表示制御
   showEditModeIndicator(show) {
-    const indicator = document.getElementById('edit-mode-indicator');
-    const screenTitle = document.querySelector('#add-recipe-screen .screen-title');
+    const indicator = document.getElementById("edit-mode-indicator");
+    const screenTitle = document.querySelector(
+      "#add-recipe-screen .screen-title",
+    );
 
     if (show) {
-      indicator.style.display = 'block';
-      if (screenTitle) screenTitle.textContent = 'レシピを編集';
+      indicator.style.display = "block";
+      if (screenTitle) screenTitle.textContent = "レシピを編集";
     } else {
-      indicator.style.display = 'none';
-      if (screenTitle) screenTitle.textContent = '新しいレシピを追加';
+      indicator.style.display = "none";
+      if (screenTitle) screenTitle.textContent = "新しいレシピを追加";
     }
   }
 
   // フォーム送信処理を拡張 (追加・編集両対応)
   async handleAddRecipeSubmit() {
     try {
-      console.log(`📤 ${this.editMode === 'edit' ? 'レシピ更新' : 'レシピ追加'}フォーム送信開始`);
+      console.log(
+        `📤 ${this.editMode === "edit" ? "レシピ更新" : "レシピ追加"}フォーム送信開始`,
+      );
 
       // フォームデータ収集
       const formData = this.collectFormData();
-      console.log('📋 収集したフォームデータ:', formData);
+      console.log("📋 収集したフォームデータ:", formData);
 
       // バリデーション
       const validationResult = this.validateAddRecipeForm(formData);
@@ -2003,17 +2193,17 @@ class PetitRecipeApp {
 
       let savedRecipe;
 
-      if (this.editMode === 'edit') {
+      if (this.editMode === "edit") {
         // 編集モード: 更新処理
         recipeData.id = this.editingRecipeId;
         savedRecipe = this.recipeDB.updateRecipe(recipeData);
-        console.log('✅ レシピ更新完了:', savedRecipe.id);
-        this.showSuccessMessage('レシピが正常に更新されました！');
+        console.log("✅ レシピ更新完了:", savedRecipe.id);
+        this.showSuccessMessage("レシピが正常に更新されました！");
       } else {
         // 追加モード: 新規作成処理 (既存処理)
         savedRecipe = this.recipeDB.addRecipe(recipeData);
-        console.log('✅ レシピ追加完了:', savedRecipe.id);
-        this.showSuccessMessage('レシピが正常に追加されました！');
+        console.log("✅ レシピ追加完了:", savedRecipe.id);
+        this.showSuccessMessage("レシピが正常に追加されました！");
       }
 
       // 編集モード終了・画面遷移
@@ -2024,15 +2214,19 @@ class PetitRecipeApp {
       await this.refreshRecipeList();
 
       // 編集の場合は詳細画面に戻る
-      if (this.editMode === 'edit') {
+      if (this.editMode === "edit") {
         setTimeout(() => {
           this.showRecipeDetail(savedRecipe.id);
         }, 100); // 画面遷移後に詳細表示
       }
-
     } catch (error) {
-      console.error(`❌ ${this.editMode === 'edit' ? 'レシピ更新' : 'レシピ追加'}エラー:`, error);
-      this.showErrorMessage(`${this.editMode === 'edit' ? 'レシピの更新' : 'レシピの追加'}に失敗しました: ${error.message}`);
+      console.error(
+        `❌ ${this.editMode === "edit" ? "レシピ更新" : "レシピ追加"}エラー:`,
+        error,
+      );
+      this.showErrorMessage(
+        `${this.editMode === "edit" ? "レシピの更新" : "レシピの追加"}に失敗しました: ${error.message}`,
+      );
     }
   }
 
@@ -2045,50 +2239,52 @@ class PetitRecipeApp {
 
   // レシピ削除確認開始
   confirmDeleteRecipe() {
-    console.log('🔘 confirmDeleteRecipe()メソッドが呼び出されました'); // ← 診断ログ追加
-    addBOC100Log('🔘 confirmDeleteRecipe()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
+    console.log("🔘 confirmDeleteRecipe()メソッドが呼び出されました"); // ← 診断ログ追加
+    addBOC100Log("🔘 confirmDeleteRecipe()メソッドが呼び出されました", "event"); // ← モバイル診断ログ追加
     try {
       const currentRecipeId = this.state.selectedRecipeId;
-      addBOC100Log(`🎯 削除対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`, 'info');
+      addBOC100Log(
+        `🎯 削除対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`,
+        "info",
+      );
 
       if (!currentRecipeId) {
-        addBOC100Log('❌ 削除対象レシピIDが未設定', 'error');
-        throw new Error('No recipe selected for deletion');
+        addBOC100Log("❌ 削除対象レシピIDが未設定", "error");
+        throw new Error("No recipe selected for deletion");
       }
 
-      console.log('🗑️ 削除確認開始:', currentRecipeId);
-      addBOC100Log(`🗑️ 削除確認開始: ${currentRecipeId}`, 'info');
+      console.log("🗑️ 削除確認開始:", currentRecipeId);
+      addBOC100Log(`🗑️ 削除確認開始: ${currentRecipeId}`, "info");
 
       // レシピ名取得・モーダル表示
       const recipe = this.recipeDB.getRecipeById(currentRecipeId);
       this.pendingDeleteRecipeId = currentRecipeId;
 
-      document.getElementById('delete-recipe-name').textContent = recipe.title;
-      document.getElementById('delete-modal').classList.add('active');
+      document.getElementById("delete-recipe-name").textContent = recipe.title;
+      document.getElementById("delete-modal").classList.add("active");
 
-      console.log('✅ 削除確認モーダル表示:', recipe.title);
-
+      console.log("✅ 削除確認モーダル表示:", recipe.title);
     } catch (error) {
-      console.error('❌ 削除確認エラー:', error);
+      console.error("❌ 削除確認エラー:", error);
       this.showErrorMessage(`削除確認を表示できませんでした: ${error.message}`);
     }
   }
 
   // レシピ削除キャンセル
   cancelDeleteRecipe() {
-    console.log('🚫 レシピ削除キャンセル');
+    console.log("🚫 レシピ削除キャンセル");
     this.pendingDeleteRecipeId = null;
-    document.getElementById('delete-modal').classList.remove('active');
+    document.getElementById("delete-modal").classList.remove("active");
   }
 
   // レシピ削除実行
   async executeDeleteRecipe() {
     try {
       if (!this.pendingDeleteRecipeId) {
-        throw new Error('No recipe pending for deletion');
+        throw new Error("No recipe pending for deletion");
       }
 
-      console.log('🗑️ レシピ削除実行開始:', this.pendingDeleteRecipeId);
+      console.log("🗑️ レシピ削除実行開始:", this.pendingDeleteRecipeId);
 
       // データベースから削除
       const result = this.recipeDB.deleteRecipe(this.pendingDeleteRecipeId);
@@ -2097,18 +2293,19 @@ class PetitRecipeApp {
       this.cancelDeleteRecipe();
 
       // 成功メッセージ
-      this.showSuccessMessage(`「${result.deletedRecipe.title}」を削除しました`);
+      this.showSuccessMessage(
+        `「${result.deletedRecipe.title}」を削除しました`,
+      );
 
       // レシピ一覧に戻る
-      this.showScreen('recipes-screen');
+      this.showScreen("recipes-screen");
 
       // レシピ一覧を再読み込み・再描画
       await this.refreshRecipeList();
 
-      console.log('✅ レシピ削除完了 - 残り件数:', result.remainingCount);
-
+      console.log("✅ レシピ削除完了 - 残り件数:", result.remainingCount);
     } catch (error) {
-      console.error('❌ レシピ削除エラー:', error);
+      console.error("❌ レシピ削除エラー:", error);
       this.showErrorMessage(`レシピの削除に失敗しました: ${error.message}`);
       this.cancelDeleteRecipe(); // エラー時もモーダルクローズ
     }
@@ -2120,26 +2317,29 @@ class PetitRecipeApp {
 
   // レシピ複製実行
   async duplicateRecipe() {
-    console.log('🔘 duplicateRecipe()メソッドが呼び出されました');
-    addBOC100Log('🔘 duplicateRecipe()メソッドが呼び出されました', 'event');
+    console.log("🔘 duplicateRecipe()メソッドが呼び出されました");
+    addBOC100Log("🔘 duplicateRecipe()メソッドが呼び出されました", "event");
     try {
       const currentRecipeId = this.state.selectedRecipeId;
-      addBOC100Log(`🎯 複製対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`, 'info');
+      addBOC100Log(
+        `🎯 複製対象レシピID: "${currentRecipeId}" (型: ${typeof currentRecipeId})`,
+        "info",
+      );
 
       if (!currentRecipeId) {
-        addBOC100Log('❌ 複製対象レシピIDが未設定', 'error');
-        throw new Error('No recipe selected for duplication');
+        addBOC100Log("❌ 複製対象レシピIDが未設定", "error");
+        throw new Error("No recipe selected for duplication");
       }
 
-      console.log('📋 レシピ複製開始:', currentRecipeId);
-      addBOC100Log(`📋 レシピ複製開始: ${currentRecipeId}`, 'info');
+      console.log("📋 レシピ複製開始:", currentRecipeId);
+      addBOC100Log(`📋 レシピ複製開始: ${currentRecipeId}`, "info");
 
       // データベースから複製実行
       const duplicatedRecipe = this.recipeDB.duplicateRecipe(currentRecipeId);
 
       // 成功メッセージ
       this.showSuccessMessage(`「${duplicatedRecipe.title}」を作成しました`);
-      addBOC100Log(`✅ 複製完了: ${duplicatedRecipe.title}`, 'success');
+      addBOC100Log(`✅ 複製完了: ${duplicatedRecipe.title}`, "success");
 
       // レシピ一覧を再読み込み・再描画
       await this.refreshRecipeList();
@@ -2147,14 +2347,13 @@ class PetitRecipeApp {
       // 複製されたレシピの詳細画面に遷移
       setTimeout(() => {
         this.showRecipeDetail(duplicatedRecipe.id);
-        addBOC100Log(`🔍 複製レシピ詳細表示: ${duplicatedRecipe.id}`, 'info');
+        addBOC100Log(`🔍 複製レシピ詳細表示: ${duplicatedRecipe.id}`, "info");
       }, 100); // 画面遷移後に詳細表示
 
-      console.log('✅ レシピ複製完了:', duplicatedRecipe.id);
-
+      console.log("✅ レシピ複製完了:", duplicatedRecipe.id);
     } catch (error) {
-      console.error('❌ レシピ複製エラー:', error);
-      addBOC100Log(`❌ 複製エラー: ${error.message}`, 'error');
+      console.error("❌ レシピ複製エラー:", error);
+      addBOC100Log(`❌ 複製エラー: ${error.message}`, "error");
       this.showErrorMessage(`レシピの複製に失敗しました: ${error.message}`);
     }
   }
@@ -2165,29 +2364,28 @@ class PetitRecipeApp {
 
   // 設定画面表示
   showSettings() {
-    console.log('🔘 showSettings()メソッドが呼び出されました'); // ← 診断ログ追加
-    addBOC100Log('🔘 showSettings()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
+    console.log("🔘 showSettings()メソッドが呼び出されました"); // ← 診断ログ追加
+    addBOC100Log("🔘 showSettings()メソッドが呼び出されました", "event"); // ← モバイル診断ログ追加
     try {
-      console.log('⚙️ 設定画面表示');
-      addBOC100Log('⚙️ 設定画面表示処理開始', 'info');
+      console.log("⚙️ 設定画面表示");
+      addBOC100Log("⚙️ 設定画面表示処理開始", "info");
 
       // 履歴に現在の画面を追加
       this.history.push(this.currentScreen);
-      this.currentScreen = 'settings-screen';
+      this.currentScreen = "settings-screen";
 
       // 画面切り替え
-      this.showScreen('settings-screen');
+      this.showScreen("settings-screen");
 
       // データベース状態表示更新
       this.updateSettingsInfo();
 
-      console.log('✅ 設定画面表示完了');
-      addBOC100Log('✅ 設定画面表示完了', 'success');
-
+      console.log("✅ 設定画面表示完了");
+      addBOC100Log("✅ 設定画面表示完了", "success");
     } catch (error) {
-      console.error('❌ 設定画面表示エラー:', error);
-      addBOC100Log(`❌ 設定画面表示エラー: ${error.message}`, 'error');
-      this.showErrorMessage('設定画面の表示に失敗しました');
+      console.error("❌ 設定画面表示エラー:", error);
+      addBOC100Log(`❌ 設定画面表示エラー: ${error.message}`, "error");
+      this.showErrorMessage("設定画面の表示に失敗しました");
     }
   }
 
@@ -2197,72 +2395,77 @@ class PetitRecipeApp {
       const stats = this.recipeDB.getBackupStats();
 
       // アプリバージョン更新
-      const versionElement = document.getElementById('app-version');
+      const versionElement = document.getElementById("app-version");
       if (versionElement) {
-        versionElement.textContent = 'Petit Recipe v3.0 (BOC-100)';
+        versionElement.textContent = "Petit Recipe v3.0 (BOC-100)";
       }
 
       // データベース状態更新
-      const dbStatusElement = document.getElementById('db-status');
+      const dbStatusElement = document.getElementById("db-status");
       if (dbStatusElement && stats) {
         const statusText = `レシピ: ${stats.currentData.recipes}件, 閲覧データ: ${stats.currentData.viewCounts}件 (v${stats.currentData.version})`;
         dbStatusElement.textContent = statusText;
       } else if (dbStatusElement) {
-        dbStatusElement.textContent = 'データ読み込みエラー';
+        dbStatusElement.textContent = "データ読み込みエラー";
       }
 
-      console.log('✅ 設定画面情報更新完了:', stats);
-
+      console.log("✅ 設定画面情報更新完了:", stats);
     } catch (error) {
-      console.error('❌ 設定画面情報更新エラー:', error);
-      const dbStatusElement = document.getElementById('db-status');
+      console.error("❌ 設定画面情報更新エラー:", error);
+      const dbStatusElement = document.getElementById("db-status");
       if (dbStatusElement) {
-        dbStatusElement.textContent = 'ステータス取得失敗';
+        dbStatusElement.textContent = "ステータス取得失敗";
       }
     }
   }
 
   // データエクスポート処理
   async exportData() {
-    console.log('🔘 exportData()メソッドが呼び出されました'); // ← 診断ログ追加
-    addBOC100Log('🔘 exportData()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
+    console.log("🔘 exportData()メソッドが呼び出されました"); // ← 診断ログ追加
+    addBOC100Log("🔘 exportData()メソッドが呼び出されました", "event"); // ← モバイル診断ログ追加
     try {
-      console.log('📦 データエクスポート処理開始');
-      addBOC100Log('📦 データエクスポート処理開始', 'info');
+      console.log("📦 データエクスポート処理開始");
+      addBOC100Log("📦 データエクスポート処理開始", "info");
 
       // データベースからエクスポートデータ取得
       const exportData = this.recipeDB.exportAllData();
 
       // ファイル名生成
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+      const timestamp = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/[:-]/g, "");
       const filename = `petit-recipe-backup-${timestamp}.json`;
 
       // JSON文字列変換（見やすい形式）
       const jsonString = JSON.stringify(exportData, null, 2);
 
       // ▼▼▼ BOC-100: Async File Save with Platform Detection ▼▼▼
-      const saveResult = await this.downloadFile(jsonString, filename, 'application/json');
+      const saveResult = await this.downloadFile(
+        jsonString,
+        filename,
+        "application/json",
+      );
       // ▲▲▲ BOC-100: Async File Save ▲▲▲
 
-      console.log('✅ データエクスポート完了:', {
+      console.log("✅ データエクスポート完了:", {
         filename: filename,
         recipes: exportData.totalRecipes,
         viewCounts: exportData.totalViewCounts,
-        size: (jsonString.length / 1024).toFixed(1) + 'KB'
+        size: (jsonString.length / 1024).toFixed(1) + "KB",
       });
 
       // ▼▼▼ BOC-100: Platform-specific Success Message ▼▼▼
       this.showSuccessMessage(saveResult.message);
-      addBOC100Log(`✅ エクスポート完了: ${filename}`, 'success');
+      addBOC100Log(`✅ エクスポート完了: ${filename}`, "success");
 
       if (saveResult.path) {
-        addBOC100Log(`📂 保存場所: ${saveResult.path}`, 'info');
+        addBOC100Log(`📂 保存場所: ${saveResult.path}`, "info");
       }
       // ▲▲▲ BOC-100: Platform-specific Success Message ▲▲▲
-
     } catch (error) {
-      console.error('❌ データエクスポートエラー:', error);
-      addBOC100Log(`❌ エクスポートエラー: ${error.message}`, 'error');
+      console.error("❌ データエクスポートエラー:", error);
+      addBOC100Log(`❌ エクスポートエラー: ${error.message}`, "error");
       this.showErrorMessage(`エクスポートに失敗しました: ${error.message}`);
     }
   }
@@ -2271,7 +2474,10 @@ class PetitRecipeApp {
   async downloadFile(content, filename, mimeType) {
     // プラットフォーム検出
     const isNative = window.Capacitor && window.Capacitor.isNativePlatform();
-    addBOC100Log(`🔍 プラットフォーム検出: ${isNative ? 'ネイティブAPK' : 'Webブラウザ'}`, 'info');
+    addBOC100Log(
+      `🔍 プラットフォーム検出: ${isNative ? "ネイティブAPK" : "Webブラウザ"}`,
+      "info",
+    );
 
     if (isNative) {
       // ネイティブ環境: Capacitor Filesystem API使用
@@ -2285,64 +2491,72 @@ class PetitRecipeApp {
   // ネイティブ環境でのファイル保存
   async saveFileNative(content, filename) {
     try {
-      addBOC100Log('📱 ネイティブファイル保存開始', 'info');
+      addBOC100Log("📱 ネイティブファイル保存開始", "info");
 
       // Capacitor プラットフォーム確認
       if (!window.Capacitor || !window.Capacitor.isNativePlatform()) {
-        throw new Error('ネイティブプラットフォームではありません');
+        throw new Error("ネイティブプラットフォームではありません");
       }
 
       // プラットフォーム基本確認（Device依存を削除）
       if (!window.Capacitor.Plugins) {
-        throw new Error('Capacitor プラグインシステムが利用できません');
+        throw new Error("Capacitor プラグインシステムが利用できません");
       }
-      addBOC100Log('✅ Capacitor プラットフォーム基本確認完了', 'success');
+      addBOC100Log("✅ Capacitor プラットフォーム基本確認完了", "success");
 
       // Capacitor 7.x 形式での Filesystem プラグイン取得
       const { Filesystem } = window.Capacitor.Plugins;
 
-      if (!Filesystem || typeof Filesystem.writeFile !== 'function') {
-        throw new Error('Filesystem プラグインが利用できません');
+      if (!Filesystem || typeof Filesystem.writeFile !== "function") {
+        throw new Error("Filesystem プラグインが利用できません");
       }
 
       // Directory 定数を直接定義（Capacitor 7.x互換）
       const DirectoryType = {
-        Documents: 'DOCUMENTS',
-        Data: 'DATA',
-        Library: 'LIBRARY',
-        Cache: 'CACHE',
-        External: 'EXTERNAL',
-        ExternalStorage: 'EXTERNAL_STORAGE'
+        Documents: "DOCUMENTS",
+        Data: "DATA",
+        Library: "LIBRARY",
+        Cache: "CACHE",
+        External: "EXTERNAL",
+        ExternalStorage: "EXTERNAL_STORAGE",
       };
 
       // ユーザー要求: Documents フォルダに保存 (storage/emulated/0/Documents/)
       const targetDirectory = DirectoryType.Documents;
-      addBOC100Log(`📂 保存先ディレクトリ: ${targetDirectory} (storage/emulated/0/Documents/)`, 'info');
-      addBOC100Log(`📄 ファイル名: ${filename}`, 'info');
+      addBOC100Log(
+        `📂 保存先ディレクトリ: ${targetDirectory} (storage/emulated/0/Documents/)`,
+        "info",
+      );
+      addBOC100Log(`📄 ファイル名: ${filename}`, "info");
 
       // BOC-104: petit-recipe/ サブディレクトリ作成・保存
-      const subDirectory = 'petit-recipe';
+      const subDirectory = "petit-recipe";
       const fullPath = `${subDirectory}/${filename}`;
-      addBOC100Log(`📁 サブディレクトリ作成: ${subDirectory}/`, 'info');
+      addBOC100Log(`📁 サブディレクトリ作成: ${subDirectory}/`, "info");
 
       const result = await Filesystem.writeFile({
         path: fullPath,
         data: content,
         directory: targetDirectory,
-        encoding: 'utf8',
-        recursive: true  // BOC-104: ディレクトリ自動作成
+        encoding: "utf8",
+        recursive: true, // BOC-104: ディレクトリ自動作成
       });
 
-      addBOC100Log(`✅ ファイル保存成功: ${result.uri || 'パス不明'}`, 'success');
+      addBOC100Log(
+        `✅ ファイル保存成功: ${result.uri || "パス不明"}`,
+        "success",
+      );
       return {
         success: true,
         path: result.uri || fullPath,
-        message: `ファイル「${filename}」をDocuments/petit-recipe/フォルダに保存しました`
+        message: `ファイル「${filename}」をDocuments/petit-recipe/フォルダに保存しました`,
       };
-
     } catch (error) {
-      addBOC100Log(`❌ ネイティブファイル保存エラー: ${error.message}`, 'error');
-      addBOC100Log(`🔧 エラー詳細: ${JSON.stringify(error)}`, 'error');
+      addBOC100Log(
+        `❌ ネイティブファイル保存エラー: ${error.message}`,
+        "error",
+      );
+      addBOC100Log(`🔧 エラー詳細: ${JSON.stringify(error)}`, "error");
       throw new Error(`ネイティブファイル保存失敗: ${error.message}`);
     }
   }
@@ -2350,16 +2564,16 @@ class PetitRecipeApp {
   // Web環境でのファイル保存（開発・テスト用フォールバック）
   // BOC-104: Capacitor-first戦略採用、本番環境はネイティブ保存を推奨
   saveFileWeb(content, filename, mimeType) {
-    addBOC100Log('🌐 Webファイルダウンロード開始（フォールバック）', 'info');
-    addBOC100Log('⚠️ 推奨: APK環境でのCapacitor Filesystem使用', 'warning');
+    addBOC100Log("🌐 Webファイルダウンロード開始（フォールバック）", "info");
+    addBOC100Log("⚠️ 推奨: APK環境でのCapacitor Filesystem使用", "warning");
 
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
 
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
     link.download = filename;
-    link.style.display = 'none';
+    link.style.display = "none";
 
     document.body.appendChild(link);
     link.click();
@@ -2368,34 +2582,33 @@ class PetitRecipeApp {
     // メモリ解放
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    addBOC100Log(`✅ Webダウンロード完了: ${filename}`, 'success');
+    addBOC100Log(`✅ Webダウンロード完了: ${filename}`, "success");
     return {
       success: true,
-      message: `ファイル「${filename}」をダウンロードしました`
+      message: `ファイル「${filename}」をダウンロードしました`,
     };
   }
   // ▲▲▲ BOC-100: Platform-aware File Saving ▲▲▲
 
   // データインポート処理開始
   importData() {
-    console.log('🔘 importData()メソッドが呼び出されました'); // ← 診断ログ追加
-    addBOC100Log('🔘 importData()メソッドが呼び出されました', 'event'); // ← モバイル診断ログ追加
+    console.log("🔘 importData()メソッドが呼び出されました"); // ← 診断ログ追加
+    addBOC100Log("🔘 importData()メソッドが呼び出されました", "event"); // ← モバイル診断ログ追加
     try {
-      console.log('📥 データインポート処理開始');
-      addBOC100Log('📥 データインポート処理開始', 'info');
+      console.log("📥 データインポート処理開始");
+      addBOC100Log("📥 データインポート処理開始", "info");
 
       // ファイル選択ダイアログをトリガー
-      const fileInput = document.getElementById('import-file-input');
+      const fileInput = document.getElementById("import-file-input");
       if (fileInput) {
         fileInput.click();
       } else {
-        throw new Error('ファイル入力要素が見つかりません');
+        throw new Error("ファイル入力要素が見つかりません");
       }
-
     } catch (error) {
-      console.error('❌ インポート開始エラー:', error);
-      addBOC100Log(`❌ インポート開始エラー: ${error.message}`, 'error');
-      this.showErrorMessage('インポート処理の開始に失敗しました');
+      console.error("❌ インポート開始エラー:", error);
+      addBOC100Log(`❌ インポート開始エラー: ${error.message}`, "error");
+      this.showErrorMessage("インポート処理の開始に失敗しました");
     }
   }
 
@@ -2404,15 +2617,20 @@ class PetitRecipeApp {
     try {
       const file = event.target.files[0];
       if (!file) {
-        console.log('📁 ファイル選択がキャンセルされました');
+        console.log("📁 ファイル選択がキャンセルされました");
         return;
       }
 
-      console.log('📂 ファイル選択:', file.name, file.type, file.size + 'bytes');
+      console.log(
+        "📂 ファイル選択:",
+        file.name,
+        file.type,
+        file.size + "bytes",
+      );
 
       // ファイル形式チェック
-      if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-        this.showErrorMessage('JSONファイルを選択してください');
+      if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+        this.showErrorMessage("JSONファイルを選択してください");
         return;
       }
 
@@ -2426,45 +2644,43 @@ class PetitRecipeApp {
           // 確認モーダル表示前にデータを保存
           this.pendingImportData = importData;
           this.showImportConfirmation();
-
         } catch (parseError) {
-          console.error('❌ JSONパースエラー:', parseError);
-          this.showErrorMessage('JSONファイルの形式が正しくありません');
+          console.error("❌ JSONパースエラー:", parseError);
+          this.showErrorMessage("JSONファイルの形式が正しくありません");
         }
       };
 
       reader.onerror = () => {
-        console.error('❌ ファイル読み込みエラー');
-        this.showErrorMessage('ファイルの読み込みに失敗しました');
+        console.error("❌ ファイル読み込みエラー");
+        this.showErrorMessage("ファイルの読み込みに失敗しました");
       };
 
       reader.readAsText(file);
 
       // ファイル入力をリセット（同じファイルを再選択可能にする）
-      event.target.value = '';
-
+      event.target.value = "";
     } catch (error) {
-      console.error('❌ ファイル選択処理エラー:', error);
-      this.showErrorMessage('ファイル処理でエラーが発生しました');
+      console.error("❌ ファイル選択処理エラー:", error);
+      this.showErrorMessage("ファイル処理でエラーが発生しました");
     }
   }
 
   // インポート確認モーダル表示
   showImportConfirmation() {
-    const modal = document.getElementById('import-confirmation-modal');
+    const modal = document.getElementById("import-confirmation-modal");
     if (modal) {
-      modal.style.display = 'flex';
-      console.log('⚠️ インポート確認モーダル表示');
+      modal.style.display = "flex";
+      console.log("⚠️ インポート確認モーダル表示");
     }
   }
 
   // インポート確認キャンセル
   cancelImport() {
-    const modal = document.getElementById('import-confirmation-modal');
+    const modal = document.getElementById("import-confirmation-modal");
     if (modal) {
-      modal.style.display = 'none';
+      modal.style.display = "none";
       this.pendingImportData = null;
-      console.log('❌ インポートキャンセル');
+      console.log("❌ インポートキャンセル");
     }
   }
 
@@ -2472,10 +2688,10 @@ class PetitRecipeApp {
   confirmImport() {
     try {
       if (!this.pendingImportData) {
-        throw new Error('インポートデータが見つかりません');
+        throw new Error("インポートデータが見つかりません");
       }
 
-      console.log('⚡ インポート実行開始');
+      console.log("⚡ インポート実行開始");
 
       // データベースにインポート実行
       const importLog = this.recipeDB.importAllData(this.pendingImportData);
@@ -2483,17 +2699,18 @@ class PetitRecipeApp {
       // モーダル非表示
       this.cancelImport();
 
-      console.log('✅ インポート完了:', importLog);
-      this.showSuccessMessage(`インポート完了: レシピ${importLog.importedRecipes}件、閲覧データ${importLog.importedViewCounts}件`);
+      console.log("✅ インポート完了:", importLog);
+      this.showSuccessMessage(
+        `インポート完了: レシピ${importLog.importedRecipes}件、閲覧データ${importLog.importedViewCounts}件`,
+      );
 
       // アプリリロード（新しいデータを完全反映）
       setTimeout(() => {
-        console.log('🔄 アプリリロード開始');
+        console.log("🔄 アプリリロード開始");
         location.reload();
       }, 2000);
-
     } catch (error) {
-      console.error('❌ インポート実行エラー:', error);
+      console.error("❌ インポート実行エラー:", error);
       this.cancelImport();
       this.showErrorMessage(`インポートに失敗しました: ${error.message}`);
     }
@@ -2518,24 +2735,24 @@ class PetitRecipeApp {
 
   // レシピのソート
   sortRecipes(sortType) {
-    addDebugLog('🔄 レシピソート開始: ' + sortType);
+    addDebugLog("🔄 レシピソート開始: " + sortType);
 
     switch (sortType) {
-      case 'time':
+      case "time":
         // 時系列順（デフォルト順序）
         this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
           return this.recipes.indexOf(a) - this.recipes.indexOf(b);
         });
         break;
 
-      case 'name':
+      case "name":
         // あいうえお順
         this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
-          return a.name.localeCompare(b.name, 'ja', { numeric: true });
+          return a.name.localeCompare(b.name, "ja", { numeric: true });
         });
         break;
 
-      case 'popular':
+      case "popular":
         // 人気順（閲覧数の多い順）
         this.filteredRecipes = [...this.filteredRecipes].sort((a, b) => {
           const viewCountA = this.getViewCount(a.id);
@@ -2545,7 +2762,7 @@ class PetitRecipeApp {
         break;
 
       default:
-        console.warn('⚠️ 不明なソートタイプ:', sortType);
+        console.warn("⚠️ 不明なソートタイプ:", sortType);
         break;
     }
 
@@ -2553,7 +2770,6 @@ class PetitRecipeApp {
     this.renderRecipes();
   }
 }
-
 
 // グローバルインスタンス
 let app;
@@ -2569,9 +2785,9 @@ document.addEventListener("DOMContentLoaded", function () {
   alert("初期化完了");
 
   // ▼▼▼ BOC-100: Mobile Debug System Initialization ▼▼▼
-  addBOC100Log('🚀 Petit Recipe App 初期化完了', 'success');
-  addBOC100Log('📱 モバイルデバッグシステム準備完了', 'info');
-  addBOC100Log('🔘 右下の🐛ボタンでデバッグパネル表示可能', 'info');
+  addBOC100Log("🚀 Petit Recipe App 初期化完了", "success");
+  addBOC100Log("📱 モバイルデバッグシステム準備完了", "info");
+  addBOC100Log("🔘 右下の🐛ボタンでデバッグパネル表示可能", "info");
   // ▲▲▲ BOC-100: Mobile Debug System ▲▲▲
 });
 
@@ -2579,90 +2795,114 @@ document.addEventListener("DOMContentLoaded", function () {
 function clearBOC100Logs() {
   boc100Logs.length = 0;
   updateMobileDebugPanel();
-  addBOC100Log('🗑️ デバッグログクリア完了', 'info');
+  addBOC100Log("🗑️ デバッグログクリア完了", "info");
 }
 
 function toggleMobileDebug() {
-  const debugPanel = document.getElementById('mobile-debug-panel');
+  const debugPanel = document.getElementById("mobile-debug-panel");
   if (debugPanel) {
-    const isVisible = debugPanel.style.display !== 'none';
-    debugPanel.style.display = isVisible ? 'none' : 'block';
-    addBOC100Log(`🐛 デバッグパネル${isVisible ? '非表示' : '表示'}`, 'info');
+    const isVisible = debugPanel.style.display !== "none";
+    debugPanel.style.display = isVisible ? "none" : "block";
+    addBOC100Log(`🐛 デバッグパネル${isVisible ? "非表示" : "表示"}`, "info");
   }
 }
 
 // ▼▼▼ BOC-100: Comprehensive LocalRecipeDatabase State Logging ▼▼▼
 function logLocalRecipeDatabaseState() {
-  addBOC100Log('🔍 LocalRecipeDatabase状態調査開始', 'info');
+  addBOC100Log("🔍 LocalRecipeDatabase状態調査開始", "info");
 
   if (window.app && window.app.recipeDB) {
     const db = window.app.recipeDB;
 
     // 基本状態ログ - LocalRecipeDBからロード
     const dbRecipes = db.loadRecipes();
-    addBOC100Log(`📊 レシピ総数(LocalDB): ${dbRecipes ? dbRecipes.length : '未定義'}`, 'info');
-    addBOC100Log(`🆔 レシピIDリスト(LocalDB): ${dbRecipes ? dbRecipes.map(r => r.id).join(', ') : '未定義'}`, 'info');
+    addBOC100Log(
+      `📊 レシピ総数(LocalDB): ${dbRecipes ? dbRecipes.length : "未定義"}`,
+      "info",
+    );
+    addBOC100Log(
+      `🆔 レシピIDリスト(LocalDB): ${dbRecipes ? dbRecipes.map((r) => r.id).join(", ") : "未定義"}`,
+      "info",
+    );
 
     // PetitRecipeAppのレシピ状態
     const appRecipes = window.app.recipes;
-    addBOC100Log(`📊 レシピ総数(App): ${appRecipes ? appRecipes.length : '未定義'}`, 'info');
-    addBOC100Log(`🆔 レシピIDリスト(App): ${appRecipes ? appRecipes.map(r => r.id).join(', ') : '未定義'}`, 'info');
+    addBOC100Log(
+      `📊 レシピ総数(App): ${appRecipes ? appRecipes.length : "未定義"}`,
+      "info",
+    );
+    addBOC100Log(
+      `🆔 レシピIDリスト(App): ${appRecipes ? appRecipes.map((r) => r.id).join(", ") : "未定義"}`,
+      "info",
+    );
 
     // 現在選択されているレシピ
     if (db.state && db.state.selectedRecipeId) {
-      addBOC100Log(`🎯 選択中レシピID: ${db.state.selectedRecipeId}`, 'info');
+      addBOC100Log(`🎯 選択中レシピID: ${db.state.selectedRecipeId}`, "info");
 
       // ID検索テスト
-      const foundRecipe = db.recipes ? db.recipes.find(r => r.id === db.state.selectedRecipeId) : null;
-      addBOC100Log(`🔍 ID検索結果: ${foundRecipe ? foundRecipe.name : 'レシピが見つかりません'}`, foundRecipe ? 'success' : 'error');
+      const foundRecipe = db.recipes
+        ? db.recipes.find((r) => r.id === db.state.selectedRecipeId)
+        : null;
+      addBOC100Log(
+        `🔍 ID検索結果: ${foundRecipe ? foundRecipe.name : "レシピが見つかりません"}`,
+        foundRecipe ? "success" : "error",
+      );
     }
 
     // データソース確認
-    addBOC100Log('📂 recipeDataManager利用（静的データは廃止）', 'info');
+    addBOC100Log("📂 recipeDataManager利用（静的データは廃止）", "info");
 
     // localStorage状態
-    const storageData = localStorage.getItem(db.STORAGE_KEY || 'petit-recipes');
-    addBOC100Log(`💾 localStorage状態: ${storageData ? 'データあり' : 'データなし'}`, 'info');
+    const storageData = localStorage.getItem(db.STORAGE_KEY || "petit-recipes");
+    addBOC100Log(
+      `💾 localStorage状態: ${storageData ? "データあり" : "データなし"}`,
+      "info",
+    );
 
     // ID形式チェック
     if (db.recipes && db.recipes.length > 0) {
-      const sampleIds = db.recipes.slice(0, 5).map(r => `"${r.id}"`);
-      addBOC100Log(`🔢 ID形式サンプル: ${sampleIds.join(', ')}`, 'info');
+      const sampleIds = db.recipes.slice(0, 5).map((r) => `"${r.id}"`);
+      addBOC100Log(`🔢 ID形式サンプル: ${sampleIds.join(", ")}`, "info");
     }
-
   } else {
-    addBOC100Log('❌ LocalRecipeDatabase未初期化または未定義', 'error');
+    addBOC100Log("❌ LocalRecipeDatabase未初期化または未定義", "error");
   }
 
-  addBOC100Log('✅ LocalRecipeDatabase状態調査完了', 'success');
+  addBOC100Log("✅ LocalRecipeDatabase状態調査完了", "success");
 }
 
 function testRecipeIdIntegrity() {
-  addBOC100Log('🧪 Recipe ID整合性テスト開始', 'info');
+  addBOC100Log("🧪 Recipe ID整合性テスト開始", "info");
 
   if (!window.app || !window.app.recipeDB) {
-    addBOC100Log('❌ アプリ未初期化', 'error');
+    addBOC100Log("❌ アプリ未初期化", "error");
     return;
   }
 
   const db = window.app.recipeDB;
   const appRecipes = window.app.recipes;
-  const testIds = ['1', '4', '10', '25', 'recipe_1', 'recipe_4'];
+  const testIds = ["1", "4", "10", "25", "recipe_1", "recipe_4"];
 
-  addBOC100Log(`🔬 テスト対象: App.recipes配列 (${appRecipes ? appRecipes.length : 0}件)`, 'info');
+  addBOC100Log(
+    `🔬 テスト対象: App.recipes配列 (${appRecipes ? appRecipes.length : 0}件)`,
+    "info",
+  );
 
-  testIds.forEach(testId => {
-    const recipe = appRecipes ? appRecipes.find(r => r.id === testId) : null;
-    const status = recipe ? 'success' : 'error';
-    const message = recipe ? `✅ ID "${testId}" → ${recipe.name}` : `❌ ID "${testId}" → 見つかりません`;
+  testIds.forEach((testId) => {
+    const recipe = appRecipes ? appRecipes.find((r) => r.id === testId) : null;
+    const status = recipe ? "success" : "error";
+    const message = recipe
+      ? `✅ ID "${testId}" → ${recipe.name}`
+      : `❌ ID "${testId}" → 見つかりません`;
     addBOC100Log(message, status);
   });
 
-  addBOC100Log('🧪 Recipe ID整合性テスト完了', 'success');
+  addBOC100Log("🧪 Recipe ID整合性テスト完了", "success");
 }
 
 function testBOC100Functions() {
-  addBOC100Log('🧪 BOC-100機能テスト開始', 'info');
+  addBOC100Log("🧪 BOC-100機能テスト開始", "info");
 
   // LocalRecipeDatabase状態ログ
   logLocalRecipeDatabaseState();
@@ -2672,66 +2912,89 @@ function testBOC100Functions() {
 
   // showRecipeDetail動作テスト
   if (window.app && window.app.showRecipeDetail) {
-    addBOC100Log('🧪 showRecipeDetail関数テスト', 'info');
+    addBOC100Log("🧪 showRecipeDetail関数テスト", "info");
 
     // テスト用ID（変換後の形式）
-    const testRecipeId = 'recipe_4';
-    addBOC100Log(`🎯 テスト対象ID: "${testRecipeId}"`, 'info');
+    const testRecipeId = "recipe_4";
+    addBOC100Log(`🎯 テスト対象ID: "${testRecipeId}"`, "info");
 
     try {
       // 実際にshowRecipeDetailを呼び出すのではなく、レシピ検索だけテスト
-      const testRecipe = window.app.recipes ? window.app.recipes.find(r => r.id === testRecipeId) : null;
+      const testRecipe = window.app.recipes
+        ? window.app.recipes.find((r) => r.id === testRecipeId)
+        : null;
       if (testRecipe) {
-        addBOC100Log(`✅ showRecipeDetail対象レシピ確認: ${testRecipe.name}`, 'success');
+        addBOC100Log(
+          `✅ showRecipeDetail対象レシピ確認: ${testRecipe.name}`,
+          "success",
+        );
       } else {
-        addBOC100Log(`❌ showRecipeDetail対象レシピ見つからず: ID "${testRecipeId}"`, 'error');
+        addBOC100Log(
+          `❌ showRecipeDetail対象レシピ見つからず: ID "${testRecipeId}"`,
+          "error",
+        );
       }
     } catch (error) {
-      addBOC100Log(`❌ showRecipeDetailテストエラー: ${error.message}`, 'error');
+      addBOC100Log(
+        `❌ showRecipeDetailテストエラー: ${error.message}`,
+        "error",
+      );
     }
   }
 
-  addBOC100Log('🧪 BOC-100機能テスト完了', 'success');
+  addBOC100Log("🧪 BOC-100機能テスト完了", "success");
 }
 
 // ▼▼▼ BOC-100: Recipe ID Diagnostic Function ▼▼▼
 function diagnoseRecipeIdProblem() {
-  addBOC100Log('🔬 Recipe ID問題診断開始', 'info');
+  addBOC100Log("🔬 Recipe ID問題診断開始", "info");
 
   if (!window.app) {
-    addBOC100Log('❌ window.app未定義', 'error');
+    addBOC100Log("❌ window.app未定義", "error");
     return;
   }
 
   // 1. App.recipes配列の状態確認
   const appRecipes = window.app.recipes;
-  addBOC100Log(`📊 App.recipes配列長: ${appRecipes ? appRecipes.length : '未定義'}`, 'info');
+  addBOC100Log(
+    `📊 App.recipes配列長: ${appRecipes ? appRecipes.length : "未定義"}`,
+    "info",
+  );
 
   if (appRecipes && appRecipes.length > 0) {
     // 全IDを表示
-    const allIds = appRecipes.map(r => r.id);
-    addBOC100Log(`🆔 全レシピID: ${allIds.join(', ')}`, 'info');
+    const allIds = appRecipes.map((r) => r.id);
+    addBOC100Log(`🆔 全レシピID: ${allIds.join(", ")}`, "info");
 
     // 特定のIDテスト
-    const testIds = ['recipe_4', '4', 'recipe_1'];
-    testIds.forEach(testId => {
-      const found = appRecipes.find(r => r.id === testId);
-      addBOC100Log(`🧪 ID "${testId}" 検索: ${found ? `✅ 発見 - ${found.name}` : '❌ 見つからず'}`, found ? 'success' : 'error');
+    const testIds = ["recipe_4", "4", "recipe_1"];
+    testIds.forEach((testId) => {
+      const found = appRecipes.find((r) => r.id === testId);
+      addBOC100Log(
+        `🧪 ID "${testId}" 検索: ${found ? `✅ 発見 - ${found.name}` : "❌ 見つからず"}`,
+        found ? "success" : "error",
+      );
     });
 
     // サンプルレシピの詳細表示
     const sampleRecipe = appRecipes[0];
-    addBOC100Log(`📋 サンプルレシピ: ID="${sampleRecipe.id}" name="${sampleRecipe.name}"`, 'info');
+    addBOC100Log(
+      `📋 サンプルレシピ: ID="${sampleRecipe.id}" name="${sampleRecipe.name}"`,
+      "info",
+    );
   }
 
   // 2. FilteredRecipes配列の状態確認
   const filteredRecipes = window.app.filteredRecipes;
-  addBOC100Log(`📊 FilteredRecipes配列長: ${filteredRecipes ? filteredRecipes.length : '未定義'}`, 'info');
+  addBOC100Log(
+    `📊 FilteredRecipes配列長: ${filteredRecipes ? filteredRecipes.length : "未定義"}`,
+    "info",
+  );
 
   // 3. recipeDataManager status check
-  addBOC100Log('📂 recipeDataManager使用中（静的データは廃止済み）', 'info');
+  addBOC100Log("📂 recipeDataManager使用中（静的データは廃止済み）", "info");
 
-  addBOC100Log('🔬 Recipe ID問題診断完了', 'success');
+  addBOC100Log("🔬 Recipe ID問題診断完了", "success");
 }
 // ▲▲▲ BOC-100: Recipe ID Diagnostic Function ▲▲▲
 
@@ -2741,13 +3004,13 @@ function diagnoseRecipeIdProblem() {
 
 // AI追加画面表示
 function showAIRecipeInput() {
-  addBOC100Log('🤖 AI追加画面表示', 'event');
-  const aiScreen = document.getElementById('ai-recipe-screen');
-  const recipesScreen = document.getElementById('recipes-screen');
+  addBOC100Log("🤖 AI追加画面表示", "event");
+  const aiScreen = document.getElementById("ai-recipe-screen");
+  const recipesScreen = document.getElementById("recipes-screen");
 
   if (aiScreen && recipesScreen) {
-    recipesScreen.classList.remove('active');
-    aiScreen.classList.add('active');
+    recipesScreen.classList.remove("active");
+    aiScreen.classList.add("active");
   }
 }
 
@@ -2755,37 +3018,40 @@ function showAIRecipeInput() {
 async function processAIRecipe(event) {
   event.preventDefault();
 
-  const recipeText = document.getElementById('ai-recipe-input').value.trim();
+  const recipeText = document.getElementById("ai-recipe-input").value.trim();
   if (!recipeText) {
-    showUserFeedback('❌ レシピテキストを入力してください', 'error');
+    showUserFeedback("❌ レシピテキストを入力してください", "error");
     return;
   }
 
-  addBOC100Log('🤖 AIレシピ処理開始', 'info');
+  addBOC100Log("🤖 AIレシピ処理開始", "info");
 
   // 処理状況表示
-  const processingDiv = document.getElementById('ai-processing');
-  const statusText = document.getElementById('ai-status-text');
+  const processingDiv = document.getElementById("ai-processing");
+  const statusText = document.getElementById("ai-status-text");
 
-  processingDiv.style.display = 'block';
-  statusText.textContent = 'レシピを準備中...';
+  processingDiv.style.display = "block";
+  statusText.textContent = "レシピを準備中...";
 
   try {
     // ユーザー体験向上: 段階的ステータス更新
-    await updateProcessingStatus('レシピテキストを解析中...', 500);
-    await updateProcessingStatus('Claude Code連携準備中...', 1000);
+    await updateProcessingStatus("レシピテキストを解析中...", 500);
+    await updateProcessingStatus("Claude Code連携準備中...", 1000);
 
     // 最適化: ローカルストレージ保存
     const timestamp = Date.now();
     const storageKey = `ai-recipe-${timestamp}`;
 
-    localStorage.setItem(storageKey, JSON.stringify({
-      text: recipeText,
-      timestamp: timestamp,
-      status: 'ready-for-processing'
-    }));
+    localStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        text: recipeText,
+        timestamp: timestamp,
+        status: "ready-for-processing",
+      }),
+    );
 
-    await updateProcessingStatus('準備完了！ 🎉', 500);
+    await updateProcessingStatus("準備完了！ 🎉", 500);
 
     // ユーザーフレンドリーな指示表示
     statusText.innerHTML = `
@@ -2808,50 +3074,53 @@ ${recipeText}`;
 
     if (navigator.clipboard) {
       await navigator.clipboard.writeText(command);
-      addBOC100Log('📋 処理コマンドをクリップボードにコピー', 'success');
+      addBOC100Log("📋 処理コマンドをクリップボードにコピー", "success");
 
       // フィードバック表示
       setTimeout(() => {
-        showUserFeedback('💡 処理コマンドをクリップボードにコピーしました', 'success');
+        showUserFeedback(
+          "💡 処理コマンドをクリップボードにコピーしました",
+          "success",
+        );
       }, 1500);
     }
 
-    addBOC100Log(`💾 レシピ保存完了 (キー: ${storageKey})`, 'success');
-
+    addBOC100Log(`💾 レシピ保存完了 (キー: ${storageKey})`, "success");
   } catch (error) {
-    addBOC100Log('❌ AI処理エラー: ' + error.message, 'error');
-    statusText.textContent = 'エラーが発生しました: ' + error.message;
-    showUserFeedback('エラーが発生しました。再度お試しください。', 'error');
+    addBOC100Log("❌ AI処理エラー: " + error.message, "error");
+    statusText.textContent = "エラーが発生しました: " + error.message;
+    showUserFeedback("エラーが発生しました。再度お試しください。", "error");
   }
 }
 
 // ユーザーフィードバック表示（UX向上）
-function showUserFeedback(message, type = 'info') {
+function showUserFeedback(message, type = "info") {
   // 既存のフィードバック要素を削除
-  const existing = document.querySelector('.user-feedback');
+  const existing = document.querySelector(".user-feedback");
   if (existing) existing.remove();
 
   // フィードバック要素作成
-  const feedback = document.createElement('div');
+  const feedback = document.createElement("div");
   feedback.className = `user-feedback feedback-${type}`;
   feedback.textContent = message;
 
   // スタイル設定
   Object.assign(feedback.style, {
-    position: 'fixed',
-    top: '20px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    background: type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#339af0',
-    color: 'white',
-    padding: '12px 24px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-    zIndex: '10000',
-    fontSize: '14px',
-    fontWeight: '600',
-    maxWidth: '90vw',
-    textAlign: 'center'
+    position: "fixed",
+    top: "20px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background:
+      type === "error" ? "#ff6b6b" : type === "success" ? "#51cf66" : "#339af0",
+    color: "white",
+    padding: "12px 24px",
+    borderRadius: "8px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    zIndex: "10000",
+    fontSize: "14px",
+    fontWeight: "600",
+    maxWidth: "90vw",
+    textAlign: "center",
   });
 
   document.body.appendChild(feedback);
@@ -2859,8 +3128,8 @@ function showUserFeedback(message, type = 'info') {
   // 3秒後に自動削除
   setTimeout(() => {
     if (feedback.parentNode) {
-      feedback.style.transition = 'opacity 0.3s ease';
-      feedback.style.opacity = '0';
+      feedback.style.transition = "opacity 0.3s ease";
+      feedback.style.opacity = "0";
       setTimeout(() => feedback.remove(), 300);
     }
   }, 3000);
@@ -2868,9 +3137,9 @@ function showUserFeedback(message, type = 'info') {
 
 // プロセス状況更新（UXアニメーション）
 async function updateProcessingStatus(message, delay = 0) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      const statusText = document.getElementById('ai-status-text');
+      const statusText = document.getElementById("ai-status-text");
       if (statusText) {
         statusText.textContent = message;
       }
@@ -2881,25 +3150,25 @@ async function updateProcessingStatus(message, delay = 0) {
 
 // 戻るボタン機能（既存関数がない場合の代替）
 function navigateBack() {
-  addBOC100Log('⬅️ 戻る操作', 'event');
+  addBOC100Log("⬅️ 戻る操作", "event");
 
-  const aiScreen = document.getElementById('ai-recipe-screen');
-  const recipesScreen = document.getElementById('recipes-screen');
+  const aiScreen = document.getElementById("ai-recipe-screen");
+  const recipesScreen = document.getElementById("recipes-screen");
 
   if (aiScreen && recipesScreen) {
-    aiScreen.classList.remove('active');
-    recipesScreen.classList.add('active');
+    aiScreen.classList.remove("active");
+    recipesScreen.classList.add("active");
 
     // フォームリセット
-    const form = document.getElementById('ai-recipe-form');
+    const form = document.getElementById("ai-recipe-form");
     if (form) {
       form.reset();
     }
 
     // 処理状況を非表示
-    const processingDiv = document.getElementById('ai-processing');
+    const processingDiv = document.getElementById("ai-processing");
     if (processingDiv) {
-      processingDiv.style.display = 'none';
+      processingDiv.style.display = "none";
     }
   }
 }
@@ -2911,7 +3180,7 @@ window.navigateBack = navigateBack;
 
 // JSON形式バリデーション
 function validateRecipeJSON(jsonData) {
-  const requiredFields = ['title', 'ingredients', 'instructions'];
+  const requiredFields = ["title", "ingredients", "instructions"];
 
   for (const field of requiredFields) {
     if (!jsonData[field]) {
@@ -2919,18 +3188,28 @@ function validateRecipeJSON(jsonData) {
     }
   }
 
-  if (!Array.isArray(jsonData.ingredients) || jsonData.ingredients.length === 0) {
-    throw new Error('材料配列が無効です');
+  if (
+    !Array.isArray(jsonData.ingredients) ||
+    jsonData.ingredients.length === 0
+  ) {
+    throw new Error("材料配列が無効です");
   }
 
-  if (!Array.isArray(jsonData.instructions) || jsonData.instructions.length === 0) {
-    throw new Error('手順配列が無効です');
+  if (
+    !Array.isArray(jsonData.instructions) ||
+    jsonData.instructions.length === 0
+  ) {
+    throw new Error("手順配列が無効です");
   }
 
   // 材料の構造チェック
   for (const ingredient of jsonData.ingredients) {
-    if (!ingredient.name || typeof ingredient.amount === 'undefined' || !ingredient.unit) {
-      throw new Error('材料の構造が無効です: name, amount, unit が必要');
+    if (
+      !ingredient.name ||
+      typeof ingredient.amount === "undefined" ||
+      !ingredient.unit
+    ) {
+      throw new Error("材料の構造が無効です: name, amount, unit が必要");
     }
   }
 
@@ -2948,27 +3227,31 @@ async function addAIProcessedRecipe(jsonData) {
       servings: jsonData.servings || 1,
       cookTime: jsonData.cookTime || "未設定",
       ingredients: jsonData.ingredients || [],
-      steps: jsonData.instructions || []
+      steps: jsonData.instructions || [],
     };
 
     // Add using recipeDataManager
     if (window.addNewRecipe) {
       const addedRecipe = await window.addNewRecipe(newRecipe);
-      addBOC100Log(`✅ AIレシピ追加完了: ${addedRecipe.name} (ID: ${addedRecipe.id})`, 'success');
+      addBOC100Log(
+        `✅ AIレシピ追加完了: ${addedRecipe.name} (ID: ${addedRecipe.id})`,
+        "success",
+      );
       return addedRecipe;
     } else {
-      throw new Error('recipeDataManager not available');
+      throw new Error("recipeDataManager not available");
     }
-
   } catch (error) {
-    addBOC100Log(`❌ レシピ追加エラー: ${error.message}`, 'error');
+    addBOC100Log(`❌ レシピ追加エラー: ${error.message}`, "error");
     throw error;
   }
 }
 
 // ユニークID生成（既存パターンに合わせて）
 function generateUniqueId(existingRecipes) {
-  const existingIds = existingRecipes.map(r => parseInt(r.id)).filter(id => !isNaN(id));
+  const existingIds = existingRecipes
+    .map((r) => parseInt(r.id))
+    .filter((id) => !isNaN(id));
   const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
   return String(maxId + 1);
 }
@@ -2978,51 +3261,53 @@ async function processAIRecipeWithValidation(recipeText) {
   const tempFilePath = `/tmp/ai-recipe-input-${Date.now()}.txt`;
 
   try {
-    addBOC100Log('📝 一時ファイル作成中...', 'info');
+    addBOC100Log("📝 一時ファイル作成中...", "info");
 
     // Web環境での一時ファイル作成（ローカルストレージ使用）
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('ai-recipe-temp', recipeText);
-      addBOC100Log('💾 ローカルストレージに保存完了', 'success');
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("ai-recipe-temp", recipeText);
+      addBOC100Log("💾 ローカルストレージに保存完了", "success");
     }
 
-    addBOC100Log('🤖 AI処理準備完了', 'success');
-    addBOC100Log('📋 次の手順: Claude Codeで「~/bin/ai-recipe-processor.sh」を実行', 'info');
+    addBOC100Log("🤖 AI処理準備完了", "success");
+    addBOC100Log(
+      "📋 次の手順: Claude Codeで「~/bin/ai-recipe-processor.sh」を実行",
+      "info",
+    );
 
     return {
       tempFile: tempFilePath,
       content: recipeText,
-      status: 'ready'
+      status: "ready",
     };
-
   } catch (error) {
-    addBOC100Log(`❌ 前処理エラー: ${error.message}`, 'error');
+    addBOC100Log(`❌ 前処理エラー: ${error.message}`, "error");
     throw error;
   }
 }
 
 // localStorage強制リフレッシュ機能（新レシピ反映用）
 function forceRefreshRecipeData() {
-  addBOC100Log('🔄 レシピデータ強制リフレッシュ開始', 'info');
+  addBOC100Log("🔄 レシピデータ強制リフレッシュ開始", "info");
 
   // localStorage クリア
-  localStorage.removeItem('petit_recipe_data');
-  localStorage.removeItem('petit_recipe_version');
+  localStorage.removeItem("petit_recipe_data");
+  localStorage.removeItem("petit_recipe_version");
 
   // Capacitor環境での追加クリア
-  if (typeof window.Capacitor !== 'undefined') {
-    addBOC100Log('📱 Capacitor環境: 追加データクリア実行', 'info');
+  if (typeof window.Capacitor !== "undefined") {
+    addBOC100Log("📱 Capacitor環境: 追加データクリア実行", "info");
     // Capacitor固有のストレージもクリア
     try {
-      sessionStorage.removeItem('petit_recipe_data');
-      sessionStorage.removeItem('petit_recipe_version');
+      sessionStorage.removeItem("petit_recipe_data");
+      sessionStorage.removeItem("petit_recipe_version");
     } catch (e) {
-      console.log('SessionStorage clear failed:', e);
+      console.log("SessionStorage clear failed:", e);
     }
   }
 
-  addBOC100Log('✅ localStorage + 環境固有データクリア完了', 'success');
-  addBOC100Log('🔄 ページリロード実行中...', 'info');
+  addBOC100Log("✅ localStorage + 環境固有データクリア完了", "success");
+  addBOC100Log("🔄 ページリロード実行中...", "info");
 
   // ページリロード
   setTimeout(() => {
@@ -3030,69 +3315,38 @@ function forceRefreshRecipeData() {
   }, 1000);
 }
 
-// ▼▼▼ BOC-108: Enhanced Recipe Data Reload Function ▼▼▼
-async function forceReloadRecipes() {
-  try {
-    addBOC100Log('🔄 BOC-108: Starting recipe reload...', 'info');
-
-    // Clear all caches
-    localStorage.clear();
-    sessionStorage.clear();
-    addBOC100Log('🧹 Cache cleared', 'info');
-
-    if (window.app) {
-      // Try recipes.json first
-      const jsonRecipes = await window.app.loadRecipesFromJSON();
-      if (jsonRecipes && jsonRecipes.length > 0) {
-        window.app.recipes = jsonRecipes;
-        window.app.filteredRecipes = [...jsonRecipes];
-        window.app.renderRecipes();
-
-        addBOC100Log(`✅ BOC-108: JSON reload successful - ${jsonRecipes.length} recipes`, 'success');
-        showUserFeedback(`recipes.jsonから${jsonRecipes.length}件のレシピを再読み込みしました`, 'success');
-        return;
-      }
-    }
-
-    // Fallback to recipeDataManager if JSON fails
-    addBOC100Log('⚠️ JSON loading failed, trying recipeDataManager...', 'info');
-    const fallbackSuccess = await useRecipeDataManager();
-    if (!fallbackSuccess) {
-      throw new Error('Both JSON and recipeDataManager data sources failed');
-    }
-  } catch (error) {
-    addBOC100Log(`❌ BOC-108: Reload failed - ${error.message}`, 'error');
-    showUserFeedback('再読み込みエラー: ' + error.message, 'error');
-  }
-}
+// ▼▼▼ BOC-108: Enhanced Recipe Data Reload Function (Uses the implementation at line 173) ▼▼▼
 
 // Use recipeDataManager instead of legacy global data (BOC-107)
 async function useRecipeDataManager() {
   try {
     if (!window.loadAllRecipes) {
-      addBOC100Log('❌ recipeDataManager not available', 'error');
+      addBOC100Log("❌ recipeDataManager not available", "error");
       return false;
     }
 
     const recipes = await window.loadAllRecipes();
     if (!recipes || recipes.length === 0) {
-      addBOC100Log('⚠️ No recipes found in recipeDataManager', 'info');
+      addBOC100Log("⚠️ No recipes found in recipeDataManager", "info");
       return false;
     }
 
-    addBOC100Log(`🔄 recipeDataManagerからデータ取得: ${recipes.length}件`, 'info');
+    addBOC100Log(
+      `🔄 recipeDataManagerからデータ取得: ${recipes.length}件`,
+      "info",
+    );
 
     // Update UI using the renderRecipesToUI function from recipeDataManager
     if (window.renderRecipesToUI) {
       window.renderRecipesToUI(recipes);
-      addBOC100Log('✅ UI更新完了', 'success');
+      addBOC100Log("✅ UI更新完了", "success");
       return true;
     } else {
-      addBOC100Log('❌ renderRecipesToUI function not found', 'error');
+      addBOC100Log("❌ renderRecipesToUI function not found", "error");
       return false;
     }
   } catch (error) {
-    addBOC100Log(`❌ recipeDataManager error: ${error.message}`, 'error');
+    addBOC100Log(`❌ recipeDataManager error: ${error.message}`, "error");
     return false;
   }
 }
@@ -3100,7 +3354,7 @@ async function useRecipeDataManager() {
 // Recipe data change check using recipeDataManager
 async function checkForNewRecipes() {
   try {
-    const lastRecipeCount = localStorage.getItem('last_recipe_count');
+    const lastRecipeCount = localStorage.getItem("last_recipe_count");
     let currentCount = 0;
 
     if (window.loadAllRecipes) {
@@ -3109,8 +3363,14 @@ async function checkForNewRecipes() {
     }
 
     if (lastRecipeCount && parseInt(lastRecipeCount) < currentCount) {
-      addBOC100Log(`🆕 新しいレシピ検出: ${lastRecipeCount} → ${currentCount}件`, 'success');
-      showUserFeedback('🆕 新しいレシピが追加されました！データを更新します', 'success');
+      addBOC100Log(
+        `🆕 新しいレシピ検出: ${lastRecipeCount} → ${currentCount}件`,
+        "success",
+      );
+      showUserFeedback(
+        "🆕 新しいレシピが追加されました！データを更新します",
+        "success",
+      );
 
       setTimeout(async () => {
         if (window.forceRefreshLocalRecipes) {
@@ -3119,9 +3379,9 @@ async function checkForNewRecipes() {
       }, 2000);
     }
 
-    localStorage.setItem('last_recipe_count', currentCount.toString());
+    localStorage.setItem("last_recipe_count", currentCount.toString());
   } catch (error) {
-    addBOC100Log(`❌ checkForNewRecipes error: ${error.message}`, 'error');
+    addBOC100Log(`❌ checkForNewRecipes error: ${error.message}`, "error");
   }
 }
 

@@ -11,8 +11,8 @@ export default [
       "android.backup/**/*",
       "android_backup_*/**/*",
       "dist/**/*",
-      "node_modules/**/*"
-    ]
+      "node_modules/**/*",
+    ],
   },
   // すべてのJSファイルにブラウザ環境を適用
   {

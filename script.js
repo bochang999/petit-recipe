@@ -131,6 +131,78 @@ window.testBOC100Functions = function() {
   addBOC100Log('🧪 BOC-100機能テスト完了', 'event');
 }
 
+// ▼▼▼ BOC-108: File-Based Recipe Data System Integration ▼▼▼
+
+/**
+ * Load recipes from JSON file (Primary method)
+ * Integrates with BOC-108 file-based system
+ */
+async function loadRecipesFromJSON() {
+    console.log('📁 BOC-108: Loading recipes from JSON file...');
+
+    try {
+        // Use BOC-108 RecipeDataManager
+        if (window.recipeDataManager) {
+            const recipes = await window.recipeDataManager.loadRecipes();
+            console.log(`✅ Loaded ${recipes.length} recipes from JSON file`);
+            return recipes;
+        } else {
+            console.warn('⚠️ RecipeDataManager not available, trying direct fetch...');
+
+            // Fallback: Direct fetch
+            const response = await fetch('./recipes.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const recipes = data.recipes || [];
+            console.log(`✅ Direct fetch: Loaded ${recipes.length} recipes`);
+            return recipes;
+        }
+    } catch (error) {
+        console.error('❌ Failed to load recipes from JSON:', error);
+        return [];
+    }
+}
+
+/**
+ * Enhanced refresh function using BOC-108 file-based system
+ * Replaces complex localStorage management
+ */
+async function forceReloadRecipes() {
+    console.log('🔄 BOC-108: Force reloading recipes from JSON...');
+
+    try {
+        // Clear any cached data
+        if (window.localStorage) {
+            localStorage.removeItem('petit_recipe_data');
+            localStorage.removeItem('petit_recipe_cache');
+        }
+
+        // Load fresh data from file
+        const recipes = await loadRecipesFromJSON();
+
+        // Update UI if app is available
+        if (window.app && typeof window.app.refreshRecipeList === 'function') {
+            window.app.updateRecipeData(recipes);
+            await window.app.refreshRecipeList();
+            console.log('✅ UI refreshed with new recipe data');
+        }
+
+        return recipes;
+    } catch (error) {
+        console.error('❌ Force reload failed:', error);
+        return [];
+    }
+}
+
+// Global registration for UI integration
+window.loadRecipesFromJSON = loadRecipesFromJSON;
+window.forceReloadRecipes = forceReloadRecipes;
+
+// ▲▲▲ BOC-108: File-Based Recipe Data System Integration ▲▲▲
+
 // ▼▼▼ BOC-97: Data Persistence Layer - localStorage Migration System ▼▼▼
 class LocalRecipeDatabase {
   constructor() {

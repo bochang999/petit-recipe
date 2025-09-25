@@ -378,25 +378,28 @@
         // Gemini's Recommended main() function for clean initialization flow
         async function main() {
             console.log("🚀 App initialization started...");
+            console.log("🔍 Capacitor environment check:", typeof window.Capacitor !== 'undefined' ? 'Available' : 'Not available');
 
             // 1. First execute debug function (highest priority)
             if (window.testFileRead) {
                 try {
                     console.log('🔍 BOC-107: Executing ultimate debug function...');
-                    await window.testFileRead();
-                    console.log('✅ BOC-107: Debug function completed');
+                    const debugResult = await window.testFileRead();
+                    console.log('✅ BOC-107: Debug function completed, result:', debugResult ? 'Data returned' : 'No data');
                 } catch (error) {
                     console.error('❌ BOC-107: Debug function failed:', error);
                 }
             } else {
-                console.error('❌ BOC-107: testFileRead function not found');
+                console.error('❌ BOC-107: testFileRead function not found - recipeDataManager.js may not be loaded');
             }
 
             // 2. Initialize and load recipes with enhanced error detection
             if (window.initializeAndLoadRecipes) {
                 try {
                     console.log('🚀 Executing initializeAndLoadRecipes...');
+                    console.log('🔍 Function type:', typeof window.initializeAndLoadRecipes);
                     const recipeData = await window.initializeAndLoadRecipes();
+                    console.log('📊 Recipe data result:', recipeData ? `${recipeData.recipes?.length || 0} recipes` : 'No data returned');
 
                     // 3. Success handling with error message clearing
                     if (recipeData && recipeData.recipes) {
@@ -436,11 +439,20 @@
 
         // Simple DOMContentLoaded listener that just calls main()
         document.addEventListener('DOMContentLoaded', () => {
-            // Gemini's recommended approach: main function manages everything
-            console.log('📱 DOM ready - calling main() function');
-            main().catch(error => {
-                console.error('❌ Main function failed:', error);
-            });
+            console.log('📱 DOM ready - waiting for scripts to load...');
+
+            // Wait a bit for all scripts to load, then execute main
+            setTimeout(() => {
+                console.log('📱 Starting main function execution...');
+                console.log('🔍 Available functions check:');
+                console.log('  - window.testFileRead:', typeof window.testFileRead);
+                console.log('  - window.initializeAndLoadRecipes:', typeof window.initializeAndLoadRecipes);
+                console.log('  - window.forceRefreshLocalRecipes:', typeof window.forceRefreshLocalRecipes);
+
+                main().catch(error => {
+                    console.error('❌ Main function failed:', error);
+                });
+            }, 2000); // Wait 2 seconds for script loading
         });
     </script>
 

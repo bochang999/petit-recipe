@@ -96,38 +96,28 @@ const ui = {
    * Setup event listeners
    */
   setupEventListeners() {
+    // Prevent multiple setup
+    if (this._listenersSetup) {
+      console.log('🔄 BOC-109: Event listeners already setup, skipping...');
+      return;
+    }
+
     console.log('🔗 BOC-109: Setting up UI event listeners');
 
-    // Refresh button (header) - Enhanced debugging
-    console.log('🔍 BOC-109: Looking for refresh button with ID "refresh-button"');
+    // Refresh button (header) - Simplified
     const refreshButton = document.getElementById('refresh-button');
-    console.log('🔍 BOC-109: Refresh button element:', refreshButton);
-    console.log('🔍 BOC-109: Refresh button exists:', !!refreshButton);
-
     if (refreshButton) {
-      // Remove any existing event listeners to prevent conflicts
-      const newButton = refreshButton.cloneNode(true);
-      refreshButton.parentNode.replaceChild(newButton, refreshButton);
-
-      newButton.addEventListener('click', (event) => {
-        console.log('🔄 BOC-109: Refresh button clicked - event:', event);
-        console.log('🔄 BOC-109: Checking app availability...');
-        console.log('🔄 BOC-109: window.app exists:', !!window.app);
-        console.log('🔄 BOC-109: app.refresh exists:', !!(window.app && window.app.refresh));
-        console.log('🔄 BOC-109: app.refresh type:', typeof (window.app && window.app.refresh));
-
+      refreshButton.addEventListener('click', () => {
+        console.log('🔄 Refresh button clicked - triggering app refresh');
         if (window.app && typeof window.app.refresh === 'function') {
-          console.log('🔄 BOC-109: Calling app.refresh()...');
           window.app.refresh();
-          console.log('🔄 BOC-109: app.refresh() called successfully');
         } else {
-          console.error('❌ BOC-109: app.refresh not available - window.app:', window.app);
+          console.error('❌ app.refresh not available');
         }
       });
-      console.log('✅ BOC-109: Header refresh button connected with enhanced debugging');
+      console.log('✅ Header refresh button connected');
     } else {
-      console.error('❌ BOC-109: Header refresh button not found in DOM');
-      console.log('🔍 BOC-109: Available buttons:', document.querySelectorAll('button'));
+      console.error('❌ Header refresh button not found');
     }
 
     // Settings button
@@ -160,39 +150,20 @@ const ui = {
       console.log('✅ AI Add button connected');
     }
 
-    // Data refresh button (search area) - Enhanced debugging
-    console.log('🔍 BOC-109: Looking for data refresh button with class "refresh-data-button"');
+    // Data refresh button (search area) - Simplified
     const refreshDataButton = document.querySelector('.refresh-data-button');
-    console.log('🔍 BOC-109: Data refresh button element:', refreshDataButton);
-    console.log('🔍 BOC-109: Data refresh button exists:', !!refreshDataButton);
-
     if (refreshDataButton) {
-      // Remove any existing event listeners to prevent conflicts
-      const newDataButton = refreshDataButton.cloneNode(true);
-      refreshDataButton.parentNode.replaceChild(newDataButton, refreshDataButton);
-
-      newDataButton.addEventListener('click', (event) => {
-        console.log('🔄 BOC-109: Data refresh button clicked - event:', event);
-        console.log('🔄 BOC-109: Checking refresh functions...');
-        console.log('🔄 BOC-109: forceReloadRecipes exists:', !!window.forceReloadRecipes);
-        console.log('🔄 BOC-109: app.refresh exists:', !!(window.app && window.app.refresh));
-
+      refreshDataButton.addEventListener('click', () => {
+        console.log('🔄 Data refresh button clicked');
         if (window.forceReloadRecipes) {
-          console.log('🔄 BOC-109: Calling forceReloadRecipes()...');
           window.forceReloadRecipes();
-          console.log('🔄 BOC-109: forceReloadRecipes() called successfully');
         } else if (window.app && typeof window.app.refresh === 'function') {
-          console.log('🔄 BOC-109: Calling app.refresh()...');
           window.app.refresh();
-          console.log('🔄 BOC-109: app.refresh() called successfully');
         } else {
-          console.error('❌ BOC-109: No refresh function available');
-          console.log('🔍 BOC-109: Available functions - forceReloadRecipes:', typeof window.forceReloadRecipes, 'app.refresh:', typeof (window.app && window.app.refresh));
+          console.error('❌ No refresh function available');
         }
       });
-      console.log('✅ BOC-109: Data refresh button connected with enhanced debugging');
-    } else {
-      console.error('❌ BOC-109: Data refresh button not found in DOM');
+      console.log('✅ Data refresh button connected');
     }
 
     // Sort tabs
@@ -347,6 +318,8 @@ const ui = {
       console.log('✅ Import button connected');
     }
 
+    // Mark as setup to prevent duplicate calls
+    this._listenersSetup = true;
     console.log('🔗 BOC-109: All UI event listeners setup completed');
   },
 

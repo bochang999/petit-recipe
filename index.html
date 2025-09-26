@@ -36,15 +36,15 @@
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
                     <button id="refresh-button" class="refresh-button" title="データをリフレッシュ">🔄</button>
-                    <button class="settings-button" onclick="console.log('Settings button clicked'); if(window.app && window.app.showSettings) { window.app.showSettings(); } else { console.error('window.app or showSettings not found!', window.app); }">⚙️</button>
-                    <button class="ai-add-button" onclick="showAIRecipeInput()">🤖 AI追加</button>
+                    <button class="settings-button">⚙️</button>
+                    <button class="ai-add-button">🤖 AI追加</button>
                 </div>
             </header>
 
             <div class="screen-content">
                 <div class="search-container">
                     <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
-                    <button class="refresh-data-button" onclick="console.log('🖱️ BOC-108 Refresh button clicked!'); if(window.forceReloadRecipes) { window.forceReloadRecipes(); } else { console.error('❌ BOC-108 forceReloadRecipes not found!'); }" title="BOC-108: JSONファイルから即座リフレッシュ">🔄</button>
+                    <button class="refresh-data-button" title="BOC-108: JSONファイルから即座リフレッシュ">🔄</button>
                 </div>
 
                 <div class="sort-tabs">

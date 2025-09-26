@@ -98,7 +98,7 @@ const ui = {
   setupEventListeners() {
     console.log('🔗 BOC-109: Setting up UI event listeners');
 
-    // Refresh button
+    // Refresh button (header)
     const refreshButton = document.getElementById('refresh-button');
     if (refreshButton) {
       refreshButton.addEventListener('click', () => {
@@ -109,12 +109,77 @@ const ui = {
           console.error('❌ app.refresh not available');
         }
       });
-      console.log('✅ Refresh button connected');
+      console.log('✅ Header refresh button connected');
     } else {
-      console.error('❌ Refresh button not found');
+      console.error('❌ Header refresh button not found');
     }
 
-    // Future: Add other event listeners here
+    // Settings button
+    const settingsButton = document.querySelector('.settings-button');
+    if (settingsButton) {
+      settingsButton.addEventListener('click', () => {
+        console.log('⚙️ Settings button clicked');
+        if (window.app && window.app.showSettings) {
+          window.app.showSettings();
+        } else {
+          console.error('❌ app.showSettings not available');
+          alert('設定機能は準備中です');
+        }
+      });
+      console.log('✅ Settings button connected');
+    }
+
+    // AI Recipe Add button
+    const aiAddButton = document.querySelector('.ai-add-button');
+    if (aiAddButton) {
+      aiAddButton.addEventListener('click', () => {
+        console.log('🤖 AI Add button clicked');
+        if (window.showAIRecipeInput) {
+          window.showAIRecipeInput();
+        } else {
+          console.error('❌ showAIRecipeInput not available');
+          alert('AI追加機能は準備中です');
+        }
+      });
+      console.log('✅ AI Add button connected');
+    }
+
+    // Data refresh button (search area)
+    const refreshDataButton = document.querySelector('.refresh-data-button');
+    if (refreshDataButton) {
+      refreshDataButton.addEventListener('click', () => {
+        console.log('🔄 Data refresh button clicked');
+        if (window.forceReloadRecipes) {
+          window.forceReloadRecipes();
+        } else if (window.app && typeof window.app.refresh === 'function') {
+          window.app.refresh();
+        } else {
+          console.error('❌ No refresh function available');
+        }
+      });
+      console.log('✅ Data refresh button connected');
+    }
+
+    // Sort tabs
+    const sortTabs = document.querySelectorAll('.sort-tab');
+    sortTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const sortType = tab.dataset.sort;
+        console.log(`📊 Sort tab clicked: ${sortType}`);
+
+        // Update active tab
+        sortTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Future: implement sorting
+        console.log('🔮 Sorting feature coming soon');
+      });
+    });
+    if (sortTabs.length > 0) {
+      console.log(`✅ ${sortTabs.length} sort tabs connected`);
+    }
+
+    console.log('🔗 BOC-109: All UI event listeners setup completed');
   },
 
   /**
@@ -130,11 +195,8 @@ const ui = {
 // Make ui globally available
 window.ui = ui;
 
-// Setup event listeners when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔧 BOC-109: DOM loaded, setting up UI event listeners');
-  window.ui.setupEventListeners();
-});
+// NOTE: Event listeners are now set up by core.js after initialization
+// This ensures proper initialization order: core.js → data loading → UI render → event listeners
 
 // Re-render when app is initialized or refreshed
 document.addEventListener('DOMContentLoaded', () => {

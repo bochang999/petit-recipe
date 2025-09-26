@@ -50,6 +50,16 @@ const app = {
         window.ui.render();
       }
 
+      // ▼▼▼ BOC-109: UI Neural Connection - Connect buttons to brain ▼▼▼
+      // UIの神経接続（イベントリスナー）を開始する
+      if (window.ui && typeof window.ui.setupEventListeners === 'function') {
+        window.ui.setupEventListeners();
+        console.log('🔗 BOC-109: UI event listeners connected - Neural pathways active');
+      } else {
+        console.error('❌ BOC-109: ui.setupEventListeners not available - Neural connection failed');
+      }
+      // ▲▲▲ BOC-109: UI Neural Connection Complete ▲▲▲
+
     } catch (error) {
       console.error('❌ BOC-109: Core app initialization failed:', error);
       this.recipes = [];

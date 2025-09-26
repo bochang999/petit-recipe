@@ -363,16 +363,20 @@
         <!-- ▲▲▲ BOC-100: Settings Screen ▲▲▲ -->
     </div>
 
-    <!-- BOC-107: Clean Simple Recipe System - FIXED ORDER -->
-    <!-- 1. Single Source of Truth Data Manager (FIRST - must load before other scripts) -->
+    <!-- BOC-109: Radical Architecture Fix - Clean Separation of Concerns -->
+    <!-- 1. Core application state (Single Source of Truth) -->
+    <script src="core.js"></script>
+
+    <!-- 2. Data management layer -->
     <script src="recipeDataManager.js"></script>
 
-    <!-- 2. Essential UI functions (depends on recipeDataManager) -->
-    <script src="app.js"></script>
+    <!-- 3. UI rendering layer -->
+    <script src="ui.js"></script>
 
-    <!-- 3. UI integration (depends on both above) -->
-    <script src="local-recipe-ui-integration.js"></script>
-    <script type="module" src="script.js"></script>
+    <!-- OLD ARCHITECTURE DISABLED FOR DEBUGGING -->
+    <!-- <script src="app.js"></script> -->
+    <!-- <script src="local-recipe-ui-integration.js"></script> -->
+    <!-- <script type="module" src="script.js"></script> -->
 
     <!-- Gemini's Solution: Simplified main() Function Architecture -->
     <script>

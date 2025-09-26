@@ -179,6 +179,139 @@ const ui = {
       console.log(`✅ ${sortTabs.length} sort tabs connected`);
     }
 
+    // Debug toggle button (floating)
+    const debugToggleBtn = document.getElementById('debug-toggle-btn');
+    if (debugToggleBtn) {
+      debugToggleBtn.addEventListener('click', () => {
+        console.log('🐛 Debug toggle button clicked');
+        if (window.toggleMobileDebug) {
+          window.toggleMobileDebug();
+        } else {
+          console.error('❌ toggleMobileDebug function not available');
+          alert('デバッグ機能は準備中です');
+        }
+      });
+      console.log('✅ Debug toggle button connected');
+    }
+
+    // Debug panel buttons
+    const debugTestBtn = document.querySelector('.debug-btn.test');
+    if (debugTestBtn) {
+      debugTestBtn.addEventListener('click', () => {
+        console.log('🧪 Debug test button clicked');
+        if (window.testBOC100Functions) {
+          window.testBOC100Functions();
+        } else {
+          console.error('❌ testBOC100Functions not available');
+          alert('テスト機能は準備中です');
+        }
+      });
+      console.log('✅ Debug test button connected');
+    }
+
+    const debugDiagnoseBtn = document.querySelector('.debug-btn.diagnose');
+    if (debugDiagnoseBtn) {
+      debugDiagnoseBtn.addEventListener('click', () => {
+        console.log('🔬 Debug diagnose button clicked');
+        if (window.diagnoseRecipeIdProblem) {
+          window.diagnoseRecipeIdProblem();
+        } else {
+          console.error('❌ diagnoseRecipeIdProblem not available');
+          alert('ID診断機能は準備中です');
+        }
+      });
+      console.log('✅ Debug diagnose button connected');
+    }
+
+    const debugClearBtn = document.querySelector('.debug-btn.clear');
+    if (debugClearBtn) {
+      debugClearBtn.addEventListener('click', () => {
+        console.log('🗑️ Debug clear button clicked');
+        if (window.clearBOC100Logs) {
+          window.clearBOC100Logs();
+        } else {
+          console.error('❌ clearBOC100Logs not available');
+          alert('ログクリア機能は準備中です');
+        }
+      });
+      console.log('✅ Debug clear button connected');
+    }
+
+    const debugCloseBtn = document.querySelector('.debug-btn.close');
+    if (debugCloseBtn) {
+      debugCloseBtn.addEventListener('click', () => {
+        console.log('✕ Debug close button clicked');
+        if (window.toggleMobileDebug) {
+          window.toggleMobileDebug();
+        } else {
+          console.error('❌ toggleMobileDebug not available');
+          alert('デバッグパネル機能は準備中です');
+        }
+      });
+      console.log('✅ Debug close button connected');
+    }
+
+    // FAB (Floating Action Button) for recipe addition
+    const fabButton = document.querySelector('.fab');
+    if (fabButton) {
+      fabButton.addEventListener('click', () => {
+        console.log('➕ FAB button clicked - Add new recipe');
+        if (window.app && window.app.showAddRecipeScreen) {
+          window.app.showAddRecipeScreen();
+        } else {
+          console.error('❌ app.showAddRecipeScreen not available');
+          alert('レシピ追加機能は準備中です');
+        }
+      });
+      console.log('✅ FAB button connected');
+    }
+
+    // Recipe detail screen buttons
+    const backButtons = document.querySelectorAll('.back-button');
+    backButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        console.log('← Back button clicked');
+        if (window.app && window.app.navigateBack) {
+          window.app.navigateBack();
+        } else {
+          console.error('❌ app.navigateBack not available');
+          alert('戻る機能は準備中です');
+        }
+      });
+    });
+    if (backButtons.length > 0) {
+      console.log(`✅ ${backButtons.length} back buttons connected`);
+    }
+
+    // Settings screen buttons
+    const exportButton = document.querySelector('button[onclick*="exportData"]');
+    if (exportButton) {
+      exportButton.addEventListener('click', () => {
+        console.log('📦 Export button clicked');
+        if (window.app && window.app.exportData) {
+          window.app.exportData();
+        } else {
+          console.error('❌ app.exportData not available');
+          alert('エクスポート機能は準備中です');
+        }
+      });
+      console.log('✅ Export button connected');
+    }
+
+    const importButton = document.querySelector('button[onclick*="importData"]');
+    if (importButton) {
+      importButton.addEventListener('click', () => {
+        console.log('📥 Import button clicked');
+        if (window.app && window.app.importData) {
+          window.app.importData();
+        } else {
+          console.error('❌ app.importData not available');
+          alert('インポート機能は準備中です');
+        }
+      });
+      console.log('✅ Import button connected');
+    }
+
     console.log('🔗 BOC-109: All UI event listeners setup completed');
   },
 

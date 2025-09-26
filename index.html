@@ -58,7 +58,7 @@
                 </div>
 
                 <!-- ▼▼▼ BOC-98: Floating Action Button for Recipe Addition ▼▼▼ -->
-                <button class="fab" onclick="window.app.showAddRecipeScreen()" title="新しいレシピを追加">
+                <button class="fab" title="新しいレシピを追加">
                     ➕
                 </button>
                 <!-- ▲▲▲ BOC-98: Recipe Addition Button ▲▲▲ -->
@@ -283,7 +283,7 @@
                                 <h4>データをエクスポート（バックアップ）</h4>
                                 <p>全てのレシピと閲覧データをJSONファイルで保存します</p>
                             </div>
-                            <button class="setting-button primary" onclick="window.app.exportData()">
+                            <button class="setting-button primary">
                                 📦 エクスポート
                             </button>
                         </div>
@@ -294,7 +294,7 @@
                                 <p>バックアップファイルからデータを復元します</p>
                                 <small class="warning">⚠️ 現在のデータは全て上書きされます</small>
                             </div>
-                            <button class="setting-button danger" onclick="window.app.importData()">
+                            <button class="setting-button danger">
                                 📥 インポート
                             </button>
                         </div>
@@ -343,10 +343,10 @@
             <div class="debug-header">
                 <h4>🐛 BOC-100 Debug Monitor</h4>
                 <div class="debug-controls">
-                    <button class="debug-btn test" onclick="testBOC100Functions()">🧪 Test</button>
-                    <button class="debug-btn diagnose" onclick="diagnoseRecipeIdProblem()">🔬 ID診断</button>
-                    <button class="debug-btn clear" onclick="clearBOC100Logs()">🗑️ Clear</button>
-                    <button class="debug-btn close" onclick="toggleMobileDebug()">✕</button>
+                    <button class="debug-btn test">🧪 Test</button>
+                    <button class="debug-btn diagnose">🔬 ID診断</button>
+                    <button class="debug-btn clear">🗑️ Clear</button>
+                    <button class="debug-btn close">✕</button>
                 </div>
             </div>
             <div id="mobile-debug-content" class="debug-content">
@@ -355,7 +355,7 @@
         </div>
 
         <!-- Debug toggle button (floating) -->
-        <button id="debug-toggle-btn" class="debug-toggle-btn" onclick="toggleMobileDebug()">🐛</button>
+        <button id="debug-toggle-btn" class="debug-toggle-btn">🐛</button>
         <!-- ▲▲▲ BOC-100: Mobile Debug Panel ▲▲▲ -->
 
         <!-- Hidden file input for import -->

@@ -35,6 +35,7 @@
             <header class="screen-header">
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
+                    <button id="refresh-button" class="refresh-button" title="データをリフレッシュ">🔄</button>
                     <button class="settings-button" onclick="console.log('Settings button clicked'); if(window.app && window.app.showSettings) { window.app.showSettings(); } else { console.error('window.app or showSettings not found!', window.app); }">⚙️</button>
                     <button class="ai-add-button" onclick="showAIRecipeInput()">🤖 AI追加</button>
                 </div>

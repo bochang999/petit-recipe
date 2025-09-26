@@ -153,7 +153,9 @@ async function loadRecipesFromJSON() {
       );
 
       // Fallback: Direct fetch
+      console.log("🔍 BOC-109: Fetching initial recipes from path: ./recipes.json");
       const response = await fetch("./recipes.json");
+      console.log(`📥 BOC-109: Fetch response status: ${response.status}, ok: ${response.ok}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -2635,23 +2637,31 @@ class PetitRecipeApp {
       }
 
       // ファイル読み込み
+      console.log(`🔍 BOC-109: ファイル選択: ${file.name}, サイズ: ${file.size}bytes`); // ★ログ1
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
           const jsonContent = e.target.result;
+          console.log('📄 BOC-109: ファイル読み込み成功(onload)。中身の最初の50文字:', jsonContent ? jsonContent.substring(0, 50) : 'NULL'); // ★ログ2
+
+          if (!jsonContent) {
+            throw new Error('ファイル内容が空です');
+          }
+
           const importData = JSON.parse(jsonContent);
+          console.log('✅ BOC-109: JSONパース成功。データキー:', Object.keys(importData)); // ★ログ3
 
           // 確認モーダル表示前にデータを保存
           this.pendingImportData = importData;
           this.showImportConfirmation();
         } catch (parseError) {
-          console.error("❌ JSONパースエラー:", parseError);
+          console.error("❌ BOC-109: JSONパース失敗:", parseError); // ★ログ4
           this.showErrorMessage("JSONファイルの形式が正しくありません");
         }
       };
 
-      reader.onerror = () => {
-        console.error("❌ ファイル読み込みエラー");
+      reader.onerror = (e) => {
+        console.error("❌ BOC-109: FileReaderエラー:", e); // ★ログ5
         this.showErrorMessage("ファイルの読み込みに失敗しました");
       };
 
@@ -3392,3 +3402,25 @@ window.useRecipeDataManager = useRecipeDataManager;
 window.checkForNewRecipes = checkForNewRecipes;
 
 // ▲▲▲ BOC-106: AI Recipe Integration Functions ▲▲▲
+
+// ▼▼▼ BOC-109: 断線修正 - リフレッシュボタン接続 ▼▼▼
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🔧 BOC-109: リフレッシュボタン接続処理開始');
+
+  // リフレッシュボタンを再接続
+  const refreshButton = document.getElementById('refresh-button');
+  if (refreshButton) {
+    refreshButton.addEventListener('click', () => {
+      console.log('🔄 リフレッシュボタンがクリックされました');
+      if (typeof forceReloadRecipes === 'function') {
+        forceReloadRecipes();
+      } else {
+        console.error('❌ forceReloadRecipes関数が見つかりません');
+      }
+    });
+    console.log('✅ リフレッシュボタンの再接続完了');
+  } else {
+    console.error('❌ リフレッシュボタンが見つかりません (ID: refresh-button)');
+  }
+});
+// ▲▲▲ BOC-109: リフレッシュボタン接続完了 ▲▲▲

@@ -330,6 +330,190 @@ const ui = {
     console.log(`📢 UI Message (${type}): ${message}`);
     // Future: implement actual message display
     alert(message); // Temporary simple implementation
+  },
+
+  /**
+   * Screen navigation functions
+   */
+  showScreen(screenId) {
+    console.log(`🔄 Switching to screen: ${screenId}`);
+
+    // Hide all screens
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => {
+      screen.classList.remove('active');
+    });
+
+    // Show target screen
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+      targetScreen.classList.add('active');
+      console.log(`✅ Screen ${screenId} activated`);
+    } else {
+      console.error(`❌ Screen ${screenId} not found`);
+    }
+  },
+
+  /**
+   * Debug logs functions
+   */
+  showDebugLogs() {
+    console.log('🐛 Opening debug logs modal');
+
+    // Show debug panel instead of modal for mobile compatibility
+    const debugPanel = document.getElementById('mobile-debug-panel');
+    if (debugPanel) {
+      debugPanel.style.display = 'block';
+      this.refreshDebugLogs();
+      console.log('✅ Debug panel shown');
+    } else {
+      console.error('❌ Debug panel not found');
+    }
+  },
+
+  hideDebugLogs() {
+    console.log('🐛 Closing debug logs');
+
+    const debugPanel = document.getElementById('mobile-debug-panel');
+    if (debugPanel) {
+      debugPanel.style.display = 'none';
+      console.log('✅ Debug panel hidden');
+    }
+  },
+
+  refreshDebugLogs() {
+    console.log('🔄 Refreshing debug logs');
+
+    const content = document.getElementById('mobile-debug-content');
+    if (!content) {
+      console.error('❌ Debug content area not found');
+      return;
+    }
+
+    // Get logs from various sources
+    let allLogs = [];
+
+    // BOC-100 logs if available
+    if (window.boc100Logs && Array.isArray(window.boc100Logs)) {
+      allLogs = allLogs.concat(window.boc100Logs.map(log =>
+        `[${log.time}] [${log.type.toUpperCase()}] ${log.message}`
+      ));
+    }
+
+    // General debug logs if available
+    if (window.debugLogs && Array.isArray(window.debugLogs)) {
+      allLogs = allLogs.concat(window.debugLogs);
+    }
+
+    // Recent console logs (simplified)
+    allLogs.push(`[${new Date().toLocaleTimeString()}] [INFO] Debug logs refreshed`);
+    allLogs.push(`[${new Date().toLocaleTimeString()}] [INFO] App initialized: ${!!window.app?.isInitialized}`);
+    allLogs.push(`[${new Date().toLocaleTimeString()}] [INFO] Recipes loaded: ${window.app?.getRecipes()?.length || 0}`);
+
+    // Create scrollable log display with copy functionality
+    content.innerHTML = `
+      <div class="debug-logs-container">
+        <div class="debug-controls-top">
+          <button onclick="window.ui.copyAllLogs()" class="debug-button">📋 全ログコピー</button>
+          <button onclick="window.ui.clearDebugLogs()" class="debug-button">🧹 クリア</button>
+          <button onclick="window.ui.scrollToBottom()" class="debug-button">⬇️ 最下部へ</button>
+        </div>
+        <div id="debug-logs-scroll" class="debug-logs-scroll">
+          ${allLogs.length > 0 ?
+            allLogs.map((log, index) =>
+              `<div class="debug-log-line" onclick="window.ui.copyLogLine(${index})">${log}</div>`
+            ).join('') :
+            '<div class="debug-log-line">ログがありません</div>'
+          }
+        </div>
+      </div>
+    `;
+
+    // Auto scroll to bottom
+    this.scrollToBottom();
+
+    console.log(`✅ Debug logs refreshed: ${allLogs.length} entries`);
+  },
+
+  copyAllLogs() {
+    console.log('📋 Copying all debug logs');
+
+    const logLines = document.querySelectorAll('.debug-log-line');
+    const allText = Array.from(logLines).map(line => line.textContent).join('\n');
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(allText).then(() => {
+        alert('✅ 全ログをコピーしました');
+      }).catch(err => {
+        console.error('❌ Clipboard copy failed:', err);
+        this.fallbackCopy(allText);
+      });
+    } else {
+      this.fallbackCopy(allText);
+    }
+  },
+
+  copyLogLine(index) {
+    console.log(`📋 Copying log line ${index}`);
+
+    const logLine = document.querySelectorAll('.debug-log-line')[index];
+    if (!logLine) {
+      console.error('❌ Log line not found');
+      return;
+    }
+
+    const text = logLine.textContent;
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert(`✅ ログをコピーしました: ${text.substring(0, 50)}...`);
+      }).catch(err => {
+        console.error('❌ Clipboard copy failed:', err);
+        this.fallbackCopy(text);
+      });
+    } else {
+      this.fallbackCopy(text);
+    }
+  },
+
+  fallbackCopy(text) {
+    // Fallback for older browsers or restricted environments
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+      document.execCommand('copy');
+      alert('✅ ログをコピーしました (fallback method)');
+    } catch (err) {
+      console.error('❌ Fallback copy failed:', err);
+      alert('❌ コピーに失敗しました。手動でテキストを選択してください。');
+    }
+    document.body.removeChild(textarea);
+  },
+
+  scrollToBottom() {
+    const scrollContainer = document.getElementById('debug-logs-scroll');
+    if (scrollContainer) {
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }
+  },
+
+  clearDebugLogs() {
+    console.log('🧹 Clearing debug logs');
+
+    // Clear global log arrays
+    if (window.boc100Logs) {
+      window.boc100Logs.length = 0;
+    }
+    if (window.debugLogs) {
+      window.debugLogs.length = 0;
+    }
+
+    // Refresh display
+    this.refreshDebugLogs();
+
+    alert('✅ デバッグログをクリアしました');
   }
 };
 

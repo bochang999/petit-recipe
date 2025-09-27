@@ -36,7 +36,7 @@
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
                     <button id="refresh-button" class="refresh-button" title="レシピデータをリロード" onclick="alert('🔄 RELOAD BUTTON CLICKED!'); console.log('🔄 RELOAD BUTTON CLICKED!'); console.log('app exists:', !!window.app); console.log('recipeDataManager exists:', !!window.recipeDataManager); if(window.app && window.app.refresh) { alert('📞 Calling app.refresh()'); window.app.refresh(); } else { alert('❌ app.refresh not found'); }">🔄</button>
-                    <button class="settings-button">⚙️</button>
+                    <button class="settings-button" onclick="window.ui.showScreen('settings-screen')">⚙️</button>
                     <button class="ai-add-button">🤖 AI追加</button>
                 </div>
             </header>
@@ -275,6 +275,21 @@
             </header>
 
             <div class="screen-content">
+                <div class="settings-section">
+                    <h3>🔧 デバッグ機能</h3>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>🐛 デバッグログ表示</h4>
+                                <p>アプリの動作ログとエラー情報を確認できます</p>
+                            </div>
+                            <button id="debug-logs-button" class="setting-button primary" onclick="window.ui.showDebugLogs()">
+                                🐛 ログ表示
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="settings-section">
                     <h3>データ管理</h3>
                     <div class="settings-group">

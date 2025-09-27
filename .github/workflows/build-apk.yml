@@ -136,7 +136,7 @@ jobs:
 
         # distディレクトリ作成とファイルコピー
         mkdir -p dist
-        cp index.html style.css core.js ui.js local-recipe-ui-integration.js app.js recipeDataManager.js test.js manifest.json sw.js recipes.json dist/
+        cp index.html style.css enhanced-recipe-card.css core.js ui.js local-recipe-ui-integration.js app.js recipeDataManager.js test.js magic-component-generator.js manifest.json sw.js recipes.json dist/
 
         # iconsディレクトリも含める
         if [ -d "icons" ]; then

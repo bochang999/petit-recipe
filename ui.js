@@ -50,37 +50,211 @@ const ui = {
   },
 
   /**
-   * Create a single recipe element
+   * Create a single recipe element using Magic Enhanced Recipe Card
    */
   createRecipeElement(recipe) {
-    const element = document.createElement("div");
-    element.className = "recipe-item";
-    element.innerHTML = `
-      <div class="recipe-card">
-        <h3 class="recipe-title">${recipe.name || "No title"}</h3>
-        <div class="recipe-info">
-          <span class="cook-time">⏱️ ${recipe.cookTime || "30分"}</span>
-          <span class="servings">👥 ${recipe.servings || 4}人前</span>
-        </div>
-        <div class="recipe-ingredients">
-          <strong>材料:</strong> ${this.formatIngredients(recipe.ingredients)}
-        </div>
-      </div>
-    `;
+    // Use Magic Enhanced Recipe Card if available
+    if (window.EnhancedRecipeCard) {
+      console.log(`🔮 Using Magic Enhanced Recipe Card for: ${recipe.name}`);
 
-    // Add click handler for recipe details
-    element.addEventListener("click", () => {
-      console.log(`🍳 Recipe clicked: ${recipe.name} (ID: ${recipe.id})`);
+      const container = document.createElement("div");
+      container.className = "recipe-item enhanced";
 
-      if (window.app && typeof window.app.showRecipeDetails === "function") {
-        window.app.showRecipeDetails(recipe.id);
-      } else {
-        console.error("❌ app.showRecipeDetails not available");
-        alert("レシピ詳細機能は準備中です");
+      // Prepare recipe data for enhanced card
+      const enhancedRecipeData = {
+        id: recipe.id,
+        name: recipe.name || "No title",
+        thumbnail: recipe.thumbnail || null,
+        category: recipe.category || this.getCategoryFromIngredients(recipe.ingredients),
+        servings: recipe.servings || 4,
+        cookTime: recipe.cookTime || "30分",
+        difficulty: recipe.difficulty || this.calculateDifficulty(recipe)
+      };
+
+      // Render using Magic Enhanced Recipe Card
+      window.EnhancedRecipeCard.render(enhancedRecipeData, container);
+
+      return container;
+    } else {
+      // Fallback: Use traditional recipe card with enhanced styling
+      console.log(`🔧 Using fallback enhanced recipe card for: ${recipe.name}`);
+
+      const element = document.createElement("div");
+      element.className = "recipe-item";
+      element.innerHTML = `
+        <div class="recipe-card-enhanced" data-recipe-id="${recipe.id}" role="article" tabindex="0" aria-label="Recipe: ${recipe.name}">
+          <div class="recipe-card-inner">
+            ${recipe.thumbnail ? `
+            <div class="recipe-thumbnail">
+              <img src="${recipe.thumbnail}" alt="${recipe.name}" loading="lazy" />
+              <div class="recipe-overlay">
+                <span class="recipe-category">${recipe.category || this.getCategoryFromIngredients(recipe.ingredients)}</span>
+              </div>
+            </div>
+            ` : `
+            <div class="recipe-thumbnail no-image">
+              🍳
+            </div>
+            `}
+
+            <div class="recipe-content">
+              <h3 class="recipe-title">${recipe.name || "No title"}</h3>
+
+              <div class="recipe-meta">
+                <div class="meta-item">
+                  <svg class="meta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2L13.09 8.26L18 7L16.74 12.26L22 14L15.74 15.09L17 20L11.74 18.74L10 24L8.26 17.74L3 19L4.26 13.74L0 12L6.26 10.91L5 5L10.26 6.26L12 2Z"/>
+                  </svg>
+                  <span>${recipe.servings || 4} servings</span>
+                </div>
+
+                <div class="meta-item">
+                  <svg class="meta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z"/>
+                  </svg>
+                  <span>${recipe.cookTime || "30分"}</span>
+                </div>
+
+                <div class="meta-item">
+                  <svg class="meta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
+                  </svg>
+                  <span class="difficulty-${recipe.difficulty || this.calculateDifficulty(recipe)}">${recipe.difficulty || this.calculateDifficulty(recipe)}</span>
+                </div>
+              </div>
+
+              <div class="recipe-actions">
+                <button class="action-btn primary" onclick="window.app?.showRecipeDetails('${recipe.id}')" aria-label="View ${recipe.name} details">
+                  <span>View Recipe</span>
+                  <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Add enhanced click handler
+      const cardElement = element.querySelector('.recipe-card-enhanced');
+      if (cardElement) {
+        cardElement.addEventListener("click", (event) => {
+          // Prevent double-clicks
+          if (event.detail > 1) return;
+
+          console.log(`🍳 Enhanced Recipe clicked: ${recipe.name} (ID: ${recipe.id})`);
+
+          if (window.app && typeof window.app.showRecipeDetails === "function") {
+            // Add visual feedback
+            cardElement.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+              cardElement.style.transform = '';
+              window.app.showRecipeDetails(recipe.id);
+            }, 100);
+          } else {
+            console.error("❌ app.showRecipeDetails not available");
+            alert("レシピ詳細機能は準備中です");
+          }
+        });
+
+        // Keyboard navigation
+        cardElement.addEventListener("keydown", (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            cardElement.click();
+          }
+        });
       }
-    });
 
-    return element;
+      return element;
+    }
+  },
+
+  /**
+   * Get category from ingredients (helper function)
+   */
+  getCategoryFromIngredients(ingredients) {
+    if (!Array.isArray(ingredients) || ingredients.length === 0) {
+      return 'Recipe';
+    }
+
+    // Simple category detection based on ingredients
+    const ingredientNames = ingredients.map(ing => (ing.name || '').toLowerCase()).join(' ');
+
+    if (ingredientNames.includes('肉') || ingredientNames.includes('beef') || ingredientNames.includes('pork') || ingredientNames.includes('chicken')) {
+      return 'Meat';
+    } else if (ingredientNames.includes('魚') || ingredientNames.includes('fish') || ingredientNames.includes('salmon') || ingredientNames.includes('tuna')) {
+      return 'Fish';
+    } else if (ingredientNames.includes('野菜') || ingredientNames.includes('vegetable') || ingredientNames.includes('salad')) {
+      return 'Vegetable';
+    } else if (ingredientNames.includes('米') || ingredientNames.includes('rice') || ingredientNames.includes('pasta') || ingredientNames.includes('noodle')) {
+      return 'Carbs';
+    } else if (ingredientNames.includes('デザート') || ingredientNames.includes('dessert') || ingredientNames.includes('sweet') || ingredientNames.includes('cake')) {
+      return 'Dessert';
+    }
+
+    return 'Recipe';
+  },
+
+  /**
+   * Calculate difficulty based on recipe complexity (helper function)
+   */
+  calculateDifficulty(recipe) {
+    if (recipe.difficulty) {
+      return recipe.difficulty;
+    }
+
+    // Simple difficulty calculation
+    const ingredientCount = (recipe.ingredients || []).length;
+    const stepCount = (recipe.steps || []).length;
+    const cookTimeMinutes = this.parseCookTime(recipe.cookTime);
+
+    let difficultyScore = 0;
+    difficultyScore += Math.min(ingredientCount * 0.5, 5); // Max 5 points for ingredients
+    difficultyScore += Math.min(stepCount * 0.8, 8); // Max 8 points for steps
+    difficultyScore += Math.min(cookTimeMinutes * 0.05, 3); // Max 3 points for time
+
+    if (difficultyScore <= 5) {
+      return 'easy';
+    } else if (difficultyScore <= 10) {
+      return 'medium';
+    } else {
+      return 'hard';
+    }
+  },
+
+  /**
+   * Parse cook time to minutes (helper function)
+   */
+  parseCookTime(cookTime) {
+    if (!cookTime || typeof cookTime !== 'string') {
+      return 30; // Default 30 minutes
+    }
+
+    const timeStr = cookTime.toLowerCase();
+    let minutes = 0;
+
+    // Extract hours and minutes
+    const hourMatch = timeStr.match(/(\d+)\s*(時間|hour|h)/);
+    const minuteMatch = timeStr.match(/(\d+)\s*(分|minute|min|m)/);
+
+    if (hourMatch) {
+      minutes += parseInt(hourMatch[1]) * 60;
+    }
+    if (minuteMatch) {
+      minutes += parseInt(minuteMatch[1]);
+    }
+
+    // If no specific time found, try to extract just numbers
+    if (minutes === 0) {
+      const numberMatch = timeStr.match(/(\d+)/);
+      if (numberMatch) {
+        minutes = parseInt(numberMatch[1]);
+      }
+    }
+
+    return minutes || 30;
   },
 
   /**

@@ -35,7 +35,7 @@
             <header class="screen-header">
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
-                    <button id="refresh-button" class="refresh-button" title="データをリフレッシュ" onclick="if(window.app&&window.app.refresh){console.log('🔄 Direct onclick refresh');window.app.refresh();}else{console.error('❌ Direct onclick: app.refresh not available');}">🔄</button>
+                    <button id="refresh-button" class="refresh-button" title="レシピデータをリロード" onclick="if(window.app&&window.app.refresh){console.log('🔄 Direct onclick recipe data reload');window.app.refresh();}else{console.error('❌ Direct onclick: app.refresh not available');}">🔄</button>
                     <button class="settings-button">⚙️</button>
                     <button class="ai-add-button">🤖 AI追加</button>
                 </div>
@@ -44,7 +44,7 @@
             <div class="screen-content">
                 <div class="search-container">
                     <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
-                    <button class="refresh-data-button" title="BOC-108: JSONファイルから即座リフレッシュ" onclick="if(window.forceReloadRecipes){console.log('🔄 Direct onclick data refresh');window.forceReloadRecipes();}else if(window.app&&window.app.refresh){window.app.refresh();}else{console.error('❌ Direct onclick: no refresh function available');}">🔄</button>
+                    <button class="refresh-data-button" title="レシピデータをリロード" onclick="if(window.forceReloadRecipes){console.log('🔄 Direct onclick recipe data reload');window.forceReloadRecipes();}else if(window.app&&window.app.refresh){window.app.refresh();}else{console.error('❌ Direct onclick: no recipe reload function available');}">🔄</button>
                 </div>
 
                 <div class="sort-tabs">

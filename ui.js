@@ -108,7 +108,7 @@ const ui = {
     const refreshButton = document.getElementById('refresh-button');
     if (refreshButton) {
       refreshButton.addEventListener('click', () => {
-        console.log('🔄 Refresh button clicked - triggering app refresh');
+        console.log('🔄 Recipe data reload button clicked');
         if (window.app && typeof window.app.refresh === 'function') {
           window.app.refresh();
         } else {
@@ -154,13 +154,13 @@ const ui = {
     const refreshDataButton = document.querySelector('.refresh-data-button');
     if (refreshDataButton) {
       refreshDataButton.addEventListener('click', () => {
-        console.log('🔄 Data refresh button clicked');
+        console.log('🔄 Recipe data reload button clicked');
         if (window.forceReloadRecipes) {
           window.forceReloadRecipes();
         } else if (window.app && typeof window.app.refresh === 'function') {
           window.app.refresh();
         } else {
-          console.error('❌ No refresh function available');
+          console.error('❌ No recipe reload function available');
         }
       });
       console.log('✅ Data refresh button connected');

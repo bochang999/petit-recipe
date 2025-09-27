@@ -150,18 +150,13 @@ const ui = {
       return '<li class="ingredient-item">材料情報がありません</li>';
     }
 
-    // Limit to first 4 ingredients for card display
-    const displayIngredients = ingredients.slice(0, 4);
-    const hasMore = ingredients.length > 4;
-
-    const formattedIngredients = displayIngredients.map(ingredient => {
+    // Display all ingredients
+    const formattedIngredients = ingredients.map(ingredient => {
       const ingredientText = typeof ingredient === 'string' ? ingredient : (ingredient.name || '不明な材料');
       return `<li class="ingredient-item">${ingredientText}</li>`;
     }).join('');
 
-    const moreText = hasMore ? `<li class="ingredient-more">...他${ingredients.length - 4}個</li>` : '';
-
-    return formattedIngredients + moreText;
+    return formattedIngredients;
   },
 
   /**

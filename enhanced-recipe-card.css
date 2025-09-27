@@ -119,6 +119,8 @@
 /* Recipe Ingredients Section */
 .recipe-ingredients {
   padding: 0 16px 8px 16px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .ingredients-title {
@@ -136,14 +138,17 @@
   padding: 0;
   font-size: 13px;
   line-height: 1.4;
+  max-height: 180px;
+  overflow-y: auto;
 }
 
 .ingredient-item {
-  padding: 2px 0;
+  padding: 3px 0;
   color: #666;
   border-left: 3px solid #e3f2fd;
   padding-left: 8px;
   margin-bottom: 2px;
+  word-wrap: break-word;
 }
 
 .ingredient-more {

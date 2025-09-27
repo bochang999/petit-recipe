@@ -38,12 +38,15 @@ class RecipeDataManager {
 
       // APK-exclusive: Always use Capacitor FileSystem
       try {
+        alert("📁 READING: Attempting to read Documents/recipes.json");
         const result = await this.filesystem.readFile({
           path: this.filePath,
           directory: this.directory,
           encoding: this.encoding,
         });
+        alert(`📁 READ SUCCESS: File size ${result.data.length} characters`);
         const data = JSON.parse(result.data);
+        alert(`📁 PARSE SUCCESS: Found ${data.recipes.length} recipes`);
         console.log(
           `✅ Loaded ${data.recipes.length} recipes from Documents/${this.filePath}`,
         );
@@ -52,7 +55,10 @@ class RecipeDataManager {
         console.log(
           "📝 No recipes.json found in Documents, initializing from APK assets",
         );
-        return await this.createInitialRecipesFile();
+        alert("📝 CREATING INITIAL FILE: recipes.json not found in Documents");
+        const result = await this.createInitialRecipesFile();
+        alert(`📝 INITIAL FILE RESULT: Created ${result.length} recipes`);
+        return result;
       }
     } catch (error) {
       console.error("❌ loadRecipes failed:", error);

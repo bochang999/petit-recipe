@@ -298,7 +298,7 @@
                                 <h4>データをエクスポート（バックアップ）</h4>
                                 <p>全てのレシピと閲覧データをJSONファイルで保存します</p>
                             </div>
-                            <button class="setting-button primary">
+                            <button class="setting-button primary" onclick="window.ui.exportData()">
                                 📦 エクスポート
                             </button>
                         </div>
@@ -309,7 +309,7 @@
                                 <p>バックアップファイルからデータを復元します</p>
                                 <small class="warning">⚠️ 現在のデータは全て上書きされます</small>
                             </div>
-                            <button class="setting-button danger">
+                            <button class="setting-button danger" onclick="window.ui.importData()">
                                 📥 インポート
                             </button>
                         </div>

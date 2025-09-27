@@ -514,6 +514,219 @@ const ui = {
     this.refreshDebugLogs();
 
     alert('✅ デバッグログをクリアしました');
+  },
+
+  /**
+   * Export data functionality
+   */
+  async exportData() {
+    console.log('📦 Starting data export');
+
+    try {
+      // Get all recipes from app
+      const recipes = window.app ? window.app.getRecipes() : [];
+
+      // Create export data structure
+      const exportData = {
+        version: "1.0",
+        exportDate: new Date().toISOString(),
+        recipesCount: recipes.length,
+        recipes: recipes,
+        metadata: {
+          appVersion: "Petit Recipe v3.0",
+          exportSource: "Settings Screen"
+        }
+      };
+
+      // Convert to JSON
+      const jsonData = JSON.stringify(exportData, null, 2);
+      const blob = new Blob([jsonData], { type: 'application/json' });
+
+      // Create download
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const filename = `petit-recipe-backup-${timestamp}.json`;
+
+      if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        // APK environment - use Capacitor FileSystem
+        const { Filesystem, Directory, Encoding } = window.Capacitor.Plugins;
+
+        await Filesystem.writeFile({
+          path: filename,
+          data: jsonData,
+          directory: Directory.Documents,
+          encoding: Encoding.UTF8,
+        });
+
+        alert(`✅ データをエクスポートしました: Documents/${filename}\n\nレシピ数: ${recipes.length}件`);
+      } else {
+        // Web environment - use download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert(`✅ データをエクスポートしました: ${filename}\n\nレシピ数: ${recipes.length}件`);
+      }
+
+      console.log(`✅ Export completed: ${recipes.length} recipes`);
+
+    } catch (error) {
+      console.error('❌ Export failed:', error);
+      alert(`❌ エクスポートに失敗しました: ${error.message}`);
+    }
+  },
+
+  /**
+   * Import data functionality
+   */
+  async importData() {
+    console.log('📥 Starting data import');
+
+    try {
+      if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+        // APK environment - show file picker instructions
+        const proceed = confirm('📥 データをインポートしますか？\n\n⚠️ 現在のデータは全て上書きされます。\n\n📁 Documents フォルダにバックアップファイル(*.json)を配置してからOKを押してください。');
+
+        if (!proceed) {
+          console.log('Import cancelled by user');
+          return;
+        }
+
+        // Try to find backup files in Documents
+        const { Filesystem, Directory } = window.Capacitor.Plugins;
+
+        try {
+          const files = await Filesystem.readdir({
+            path: '',
+            directory: Directory.Documents
+          });
+
+          const backupFiles = files.files.filter(file =>
+            file.name.endsWith('.json') &&
+            (file.name.includes('backup') || file.name.includes('petit-recipe'))
+          );
+
+          if (backupFiles.length === 0) {
+            alert('❌ バックアップファイルが見つかりません。\n\nDocuments フォルダに *.json ファイルを配置してください。');
+            return;
+          }
+
+          // Use the most recent backup file
+          const latestFile = backupFiles.sort((a, b) => b.name.localeCompare(a.name))[0];
+
+          const fileData = await Filesystem.readFile({
+            path: latestFile.name,
+            directory: Directory.Documents,
+            encoding: 'utf8'
+          });
+
+          await this.processImportData(fileData.data, latestFile.name);
+
+        } catch (fileError) {
+          console.error('File system error:', fileError);
+          alert('❌ ファイル読み込みエラー: Documents フォルダにアクセスできません。');
+        }
+
+      } else {
+        // Web environment - use file input
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+
+        input.onchange = async (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = async (e) => {
+            try {
+              await this.processImportData(e.target.result, file.name);
+            } catch (error) {
+              console.error('❌ Import processing failed:', error);
+              alert(`❌ インポート処理に失敗しました: ${error.message}`);
+            }
+          };
+          reader.readAsText(file);
+        };
+
+        input.click();
+      }
+
+    } catch (error) {
+      console.error('❌ Import failed:', error);
+      alert(`❌ インポートに失敗しました: ${error.message}`);
+    }
+  },
+
+  /**
+   * Process imported data
+   */
+  async processImportData(jsonData, filename) {
+    console.log(`📥 Processing import data from: ${filename}`);
+
+    try {
+      const importData = JSON.parse(jsonData);
+
+      // Validate import data
+      if (!importData.recipes || !Array.isArray(importData.recipes)) {
+        throw new Error('無効なバックアップファイル形式です');
+      }
+
+      const recipeCount = importData.recipes.length;
+
+      const confirm = window.confirm(
+        `📥 データをインポートしますか？\n\n` +
+        `ファイル: ${filename}\n` +
+        `レシピ数: ${recipeCount}件\n` +
+        `エクスポート日: ${importData.exportDate || '不明'}\n\n` +
+        `⚠️ 現在のデータは全て上書きされます。`
+      );
+
+      if (!confirm) {
+        console.log('Import cancelled by user');
+        return;
+      }
+
+      // Save imported data using recipeDataManager
+      if (window.recipeDataManager && typeof window.recipeDataManager.saveRecipes === 'function') {
+        console.log('📥 Using recipeDataManager to save imported data');
+
+        const success = await window.recipeDataManager.saveRecipes(importData.recipes);
+
+        if (success) {
+          // Update app state
+          if (window.app) {
+            window.app.recipes = importData.recipes;
+            window.app.isInitialized = true;
+          }
+
+          // Re-render UI
+          if (window.ui) {
+            window.ui.render();
+          }
+
+          alert(`✅ データをインポートしました！\n\nインポート件数: ${recipeCount}件\nファイル: ${filename}`);
+          console.log(`✅ Import completed: ${recipeCount} recipes imported`);
+
+          // Navigate back to main screen
+          this.showScreen('recipes-screen');
+
+        } else {
+          throw new Error('レシピデータの保存に失敗しました');
+        }
+
+      } else {
+        throw new Error('recipeDataManager が利用できません');
+      }
+
+    } catch (error) {
+      console.error('❌ Import processing failed:', error);
+      alert(`❌ インポート処理に失敗しました: ${error.message}`);
+    }
   }
 };
 

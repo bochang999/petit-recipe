@@ -26,8 +26,9 @@ const app = {
       // Load recipes using recipeDataManager if available
       if (window.recipeDataManager) {
         console.log('📁 Using recipeDataManager for data loading');
+        console.log('🔍 RecipeDataManager type:', typeof window.recipeDataManager);
         this.recipes = await window.recipeDataManager.loadRecipes();
-        console.log(`✅ Loaded ${this.recipes.length} recipes from JSON file`);
+        console.log(`✅ Loaded ${this.recipes.length} recipes from Capacitor FileSystem`);
       } else {
         // Fallback: Direct fetch
         console.log('⚠️ RecipeDataManager not available, using direct fetch');
@@ -72,8 +73,16 @@ const app = {
    */
   async refresh() {
     console.log('🔄 BOC-109: Core app refresh started');
-    this.isInitialized = false;
-    await this.initialize();
+    console.log('🔍 Checking recipeDataManager availability:', !!window.recipeDataManager);
+
+    try {
+      this.isInitialized = false;
+      await this.initialize();
+      console.log('✅ BOC-109: Core app refresh completed successfully');
+    } catch (error) {
+      console.error('❌ BOC-109: Core app refresh failed:', error);
+      alert('データリロード失敗: ' + error.message);
+    }
   },
 
   /**

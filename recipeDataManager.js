@@ -613,7 +613,11 @@ window.initializeAndLoadRecipes = async function () {
   }
 };
 
+// Create global instance for app integration
+window.recipeDataManager = new RecipeDataManager();
+
 console.log("✅ APK専用 Simple Recipe Data Manager loaded");
+console.log("🔧 Global instance created: window.recipeDataManager");
 console.log("🔧 Available functions:");
 console.log("  - testFileRead() - 究極のデバッグ関数（BOC-107対応）");
 console.log("  - initializeAndLoadRecipes() - APK専用起動時初期化");

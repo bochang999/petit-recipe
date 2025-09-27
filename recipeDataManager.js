@@ -44,9 +44,16 @@ class RecipeDataManager {
           directory: this.directory,
           encoding: this.encoding,
         });
+        alert(`📁 READ RESULT: ${JSON.stringify(result).substring(0, 100)}`);
+
+        if (!result || !result.data) {
+          alert("❌ READ FAILED: result or result.data is null/undefined");
+          throw new Error("No data returned from readFile");
+        }
+
         alert(`📁 READ SUCCESS: File size ${result.data.length} characters`);
         const data = JSON.parse(result.data);
-        alert(`📁 PARSE SUCCESS: Found ${data.recipes.length} recipes`);
+        alert(`📁 PARSE SUCCESS: Found ${data.recipes ? data.recipes.length : 'NO RECIPES PROPERTY'} recipes`);
         console.log(
           `✅ Loaded ${data.recipes.length} recipes from Documents/${this.filePath}`,
         );

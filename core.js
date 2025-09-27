@@ -68,6 +68,7 @@ const app = {
 
     } catch (error) {
       alert('❌ INITIALIZATION ERROR: ' + error.message);
+      alert('❌ ERROR DETAILS: ' + error.name + ' - ' + error.toString());
       console.error('❌ BOC-109: Core app initialization failed:', error);
       this.recipes = [];
       this.isInitialized = false;

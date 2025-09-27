@@ -150,9 +150,37 @@ const ui = {
       return '<li class="ingredient-item">材料情報がありません</li>';
     }
 
-    // Display all ingredients
+    // Display all ingredients with proper formatting
     const formattedIngredients = ingredients.map(ingredient => {
-      const ingredientText = typeof ingredient === 'string' ? ingredient : (ingredient.name || '不明な材料');
+      let ingredientText = '';
+
+      if (typeof ingredient === 'string') {
+        // String format - display as is
+        ingredientText = ingredient;
+      } else if (typeof ingredient === 'object' && ingredient !== null) {
+        // Object format - format with name, amount, and unit
+        const name = ingredient.name || '不明な材料';
+        const amount = ingredient.amount;
+        const unit = ingredient.unit;
+
+        if (amount && unit) {
+          // Both amount and unit exist
+          ingredientText = `${name} ${amount}${unit}`;
+        } else if (amount) {
+          // Only amount exists
+          ingredientText = `${name} ${amount}`;
+        } else if (unit && unit !== '個' && unit !== '適量') {
+          // Only unit exists (and it's meaningful)
+          ingredientText = `${name} ${unit}`;
+        } else {
+          // Only name exists
+          ingredientText = name;
+        }
+      } else {
+        // Fallback
+        ingredientText = '不明な材料';
+      }
+
       return `<li class="ingredient-item">${ingredientText}</li>`;
     }).join('');
 

@@ -49,8 +49,9 @@ class RecipeDataManager {
         // ファイルが存在し、中身が空でないことを確認
         if (result.data && result.data.trim() !== '') {
             console.log(`✅ READ SUCCESS: ${result.data.length} bytes read from Documents.`);
-            // シンプルな配列形式をそのまま返す
-            return JSON.parse(result.data);
+            // 安定版と同じ形式：ネストされたオブジェクトから.recipesを抽出
+            const data = JSON.parse(result.data);
+            return data.recipes || [];
         } else {
             // ファイルは存在するが空の場合
             console.warn('⚠️ File exists in Documents but is empty. Treating as first launch.');
@@ -84,8 +85,9 @@ class RecipeDataManager {
             });
 
             console.log(`✅ CREATE SUCCESS: Initial file created in Documents.`);
-            // シンプルな配列形式をそのまま返す
-            return JSON.parse(bundledDataText);
+            // 安定版と同じ形式：ネストされたオブジェクトから.recipesを抽出
+            const data = JSON.parse(bundledDataText);
+            return data.recipes || [];
         } catch (creationError) {
             console.error('❌ FATAL: Failed to create initial recipe file!', creationError);
             alert('致命的なエラー: 初期レシピファイルの作成に失敗しました。アプリを再インストールしてみてください。');

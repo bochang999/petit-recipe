@@ -116,8 +116,48 @@
 .difficulty-medium { color: #f39c12; }
 .difficulty-hard { color: #e74c3c; }
 
+/* Recipe Ingredients Section */
+.recipe-ingredients {
+  padding: 0 16px 8px 16px;
+}
+
+.ingredients-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  margin: 0 0 8px 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 4px;
+}
+
+.ingredients-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ingredient-item {
+  padding: 2px 0;
+  color: #666;
+  border-left: 3px solid #e3f2fd;
+  padding-left: 8px;
+  margin-bottom: 2px;
+}
+
+.ingredient-more {
+  padding: 2px 0;
+  color: #999;
+  font-style: italic;
+  border-left: 3px solid #f5f5f5;
+  padding-left: 8px;
+  margin-bottom: 2px;
+}
+
 .recipe-actions {
   margin-top: auto;
+  padding-top: 8px;
 }
 
 .action-btn {

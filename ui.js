@@ -84,48 +84,19 @@ const ui = {
       element.innerHTML = `
         <div class="recipe-card-enhanced" data-recipe-id="${recipe.id}" role="article" tabindex="0" aria-label="Recipe: ${recipe.name}">
           <div class="recipe-card-inner">
-            ${recipe.thumbnail ? `
-            <div class="recipe-thumbnail">
-              <img src="${recipe.thumbnail}" alt="${recipe.name}" loading="lazy" />
-              <div class="recipe-overlay">
-                <span class="recipe-category">${recipe.category || this.getCategoryFromIngredients(recipe.ingredients)}</span>
-              </div>
-            </div>
-            ` : `
-            <div class="recipe-thumbnail no-image">
-              🍳
-            </div>
-            `}
-
             <div class="recipe-content">
               <h3 class="recipe-title">${recipe.name || "No title"}</h3>
 
-              <div class="recipe-meta">
-                <div class="meta-item">
-                  <svg class="meta-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 2L13.09 8.26L18 7L16.74 12.26L22 14L15.74 15.09L17 20L11.74 18.74L10 24L8.26 17.74L3 19L4.26 13.74L0 12L6.26 10.91L5 5L10.26 6.26L12 2Z"/>
-                  </svg>
-                  <span>${recipe.servings || 4} servings</span>
-                </div>
-
-                <div class="meta-item">
-                  <svg class="meta-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z"/>
-                  </svg>
-                  <span>${recipe.cookTime || "30分"}</span>
-                </div>
-
-                <div class="meta-item">
-                  <svg class="meta-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.46,13.97L5.82,21L12,17.27Z"/>
-                  </svg>
-                  <span class="difficulty-${recipe.difficulty || this.calculateDifficulty(recipe)}">${recipe.difficulty || this.calculateDifficulty(recipe)}</span>
-                </div>
+              <div class="recipe-ingredients">
+                <h4 class="ingredients-title">材料</h4>
+                <ul class="ingredients-list">
+                  ${this.formatIngredientsForCard(recipe.ingredients)}
+                </ul>
               </div>
 
               <div class="recipe-actions">
                 <button class="action-btn primary" onclick="window.app?.showRecipeDetails('${recipe.id}')" aria-label="View ${recipe.name} details">
-                  <span>View Recipe</span>
+                  <span>作り方を見る</span>
                   <svg class="action-icon" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
                   </svg>
@@ -169,6 +140,28 @@ const ui = {
 
       return element;
     }
+  },
+
+  /**
+   * Format ingredients for card display
+   */
+  formatIngredientsForCard(ingredients) {
+    if (!Array.isArray(ingredients) || ingredients.length === 0) {
+      return '<li class="ingredient-item">材料情報がありません</li>';
+    }
+
+    // Limit to first 4 ingredients for card display
+    const displayIngredients = ingredients.slice(0, 4);
+    const hasMore = ingredients.length > 4;
+
+    const formattedIngredients = displayIngredients.map(ingredient => {
+      const ingredientText = typeof ingredient === 'string' ? ingredient : (ingredient.name || '不明な材料');
+      return `<li class="ingredient-item">${ingredientText}</li>`;
+    }).join('');
+
+    const moreText = hasMore ? `<li class="ingredient-more">...他${ingredients.length - 4}個</li>` : '';
+
+    return formattedIngredients + moreText;
   },
 
   /**

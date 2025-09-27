@@ -118,10 +118,184 @@ const app = {
   },
 
   /**
+   * Get sorted recipes
+   * @param {string} sortType - 'time' for chronological, 'name' for alphabetical
+   */
+  getSortedRecipes(sortType = 'time') {
+    const recipesCopy = [...this.recipes];
+
+    switch (sortType) {
+      case 'time':
+        // Sort by ID (chronological order - newest first)
+        return recipesCopy.sort((a, b) => (b.id || 0) - (a.id || 0));
+
+      case 'name':
+        // Sort alphabetically by title (Japanese character ordering)
+        return recipesCopy.sort((a, b) => {
+          const titleA = a.title || a.name || '';
+          const titleB = b.title || b.name || '';
+          return titleA.localeCompare(titleB, 'ja-JP');
+        });
+
+      default:
+        console.warn(`Unknown sort type: ${sortType}, defaulting to time`);
+        return recipesCopy.sort((a, b) => (b.id || 0) - (a.id || 0));
+    }
+  },
+
+  /**
    * Get recipe by ID
    */
   getRecipeById(id) {
     return this.recipes.find((recipe) => recipe.id === id);
+  },
+
+  /**
+   * Add new recipe
+   * @param {Object} recipeData - Recipe data with title, ingredients, instructions
+   */
+  async addRecipe(recipeData) {
+    console.log("📝 Adding new recipe:", recipeData.title);
+
+    try {
+      // Generate new ID (highest existing ID + 1)
+      const maxId = this.recipes.length > 0 ? Math.max(...this.recipes.map(r => r.id || 0)) : 0;
+      const newId = maxId + 1;
+
+      // Create new recipe object
+      const newRecipe = {
+        id: newId,
+        title: recipeData.title,
+        name: recipeData.title, // For compatibility
+        ingredients: this.parseIngredients(recipeData.ingredients),
+        instructions: this.parseInstructions(recipeData.instructions),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Add to recipes array
+      this.recipes.push(newRecipe);
+
+      // Save to file if recipeDataManager is available
+      if (window.recipeDataManager && window.recipeDataManager.saveRecipes) {
+        await window.recipeDataManager.saveRecipes(this.recipes);
+        console.log("✅ Recipe saved to file");
+      }
+
+      // Re-render UI
+      if (window.ui && window.ui.render) {
+        window.ui.render();
+      }
+
+      console.log(`✅ Recipe "${recipeData.title}" added successfully with ID: ${newId}`);
+      return newRecipe;
+    } catch (error) {
+      console.error("❌ Failed to add recipe:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update existing recipe
+   * @param {number} id - Recipe ID
+   * @param {Object} recipeData - Updated recipe data
+   */
+  async updateRecipe(id, recipeData) {
+    console.log(`📝 Updating recipe ID: ${id}`, recipeData.title);
+
+    try {
+      const recipeIndex = this.recipes.findIndex(r => r.id === id);
+      if (recipeIndex === -1) {
+        throw new Error(`Recipe with ID ${id} not found`);
+      }
+
+      // Update recipe object
+      const updatedRecipe = {
+        ...this.recipes[recipeIndex],
+        title: recipeData.title,
+        name: recipeData.title, // For compatibility
+        ingredients: this.parseIngredients(recipeData.ingredients),
+        instructions: this.parseInstructions(recipeData.instructions),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Update in recipes array
+      this.recipes[recipeIndex] = updatedRecipe;
+
+      // Save to file if recipeDataManager is available
+      if (window.recipeDataManager && window.recipeDataManager.saveRecipes) {
+        await window.recipeDataManager.saveRecipes(this.recipes);
+        console.log("✅ Recipe updated in file");
+      }
+
+      // Re-render UI
+      if (window.ui && window.ui.render) {
+        window.ui.render();
+      }
+
+      console.log(`✅ Recipe "${recipeData.title}" updated successfully`);
+      return updatedRecipe;
+    } catch (error) {
+      console.error("❌ Failed to update recipe:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Delete recipe
+   * @param {number} id - Recipe ID
+   */
+  async deleteRecipe(id) {
+    console.log(`🗑️ Deleting recipe ID: ${id}`);
+
+    try {
+      const recipeIndex = this.recipes.findIndex(r => r.id === id);
+      if (recipeIndex === -1) {
+        throw new Error(`Recipe with ID ${id} not found`);
+      }
+
+      const recipeName = this.recipes[recipeIndex].title || this.recipes[recipeIndex].name;
+
+      // Remove from recipes array
+      this.recipes.splice(recipeIndex, 1);
+
+      // Save to file if recipeDataManager is available
+      if (window.recipeDataManager && window.recipeDataManager.saveRecipes) {
+        await window.recipeDataManager.saveRecipes(this.recipes);
+        console.log("✅ Recipe deleted from file");
+      }
+
+      // Re-render UI
+      if (window.ui && window.ui.render) {
+        window.ui.render();
+      }
+
+      console.log(`✅ Recipe "${recipeName}" deleted successfully`);
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to delete recipe:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Parse ingredients text into array
+   */
+  parseIngredients(ingredientsText) {
+    if (Array.isArray(ingredientsText)) {
+      return ingredientsText;
+    }
+    return ingredientsText.split('\n').filter(line => line.trim() !== '');
+  },
+
+  /**
+   * Parse instructions text into array
+   */
+  parseInstructions(instructionsText) {
+    if (Array.isArray(instructionsText)) {
+      return instructionsText;
+    }
+    return instructionsText.split('\n').filter(line => line.trim() !== '');
   },
 
   /**

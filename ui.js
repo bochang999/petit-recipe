@@ -9,8 +9,9 @@ const ui = {
   /**
    * Render all recipes to the UI
    * This function receives data and displays it - no data management
+   * @param {string} sortType - Optional sort type ('time' or 'name')
    */
-  render() {
+  render(sortType = null) {
     console.log("🎨 BOC-109: UI render started");
 
     if (!window.app || !window.app.isInitialized) {
@@ -18,8 +19,18 @@ const ui = {
       return;
     }
 
-    const recipes = window.app.getRecipes();
-    console.log(`🎨 Rendering ${recipes.length} recipes to UI`);
+    // Get sorted recipes if sortType is specified, otherwise use default
+    let recipes;
+    if (sortType && window.app.getSortedRecipes) {
+      recipes = window.app.getSortedRecipes(sortType);
+      console.log(`🎨 Rendering ${recipes.length} recipes with sort: ${sortType}`);
+    } else {
+      // Get current active sort from UI
+      const activeTab = document.querySelector('.sort-tab.active');
+      const currentSort = activeTab ? activeTab.dataset.sort : 'time';
+      recipes = window.app.getSortedRecipes ? window.app.getSortedRecipes(currentSort) : window.app.getRecipes();
+      console.log(`🎨 Rendering ${recipes.length} recipes with active sort: ${currentSort}`);
+    }
 
     const recipesListElement = document.getElementById("recipes-list");
     if (!recipesListElement) {
@@ -374,8 +385,9 @@ const ui = {
         sortTabs.forEach((t) => t.classList.remove("active"));
         tab.classList.add("active");
 
-        // Future: implement sorting
-        console.log("🔮 Sorting feature coming soon");
+        // Re-render with new sort
+        window.ui.render(sortType);
+        console.log(`✅ Recipes sorted by: ${sortType}`);
       });
     });
     if (sortTabs.length > 0) {
@@ -1041,10 +1053,162 @@ const ui = {
 
     console.log("✅ Recipe details rendered successfully");
   },
+
+  /**
+   * BOC-111: Debug Panel Management Functions
+   */
+
+  /**
+   * Toggle mobile debug panel visibility
+   */
+  toggleMobileDebug() {
+    const debugPanel = document.getElementById("mobile-debug-panel");
+    if (debugPanel) {
+      const isVisible = debugPanel.style.display !== "none";
+      debugPanel.style.display = isVisible ? "none" : "block";
+      console.log(`🐛 Debug panel ${isVisible ? 'hidden' : 'shown'}`);
+
+      if (!isVisible) {
+        // Show current debug logs when opening
+        this.updateDebugPanel();
+      }
+    }
+  },
+
+  /**
+   * Update debug panel content with current logs
+   */
+  updateDebugPanel() {
+    const debugContent = document.getElementById("mobile-debug-content");
+    if (debugContent && window.debugLogs) {
+      debugContent.innerHTML = window.debugLogs
+        .slice(-20) // Show last 20 logs
+        .map((log, index) => `<div class="debug-log-line">[${index + 1}] ${log}</div>`)
+        .join("");
+    }
+  },
+
+  /**
+   * Test BOC-100 functions
+   */
+  testBOC100Functions() {
+    console.log("🧪 Running BOC-100 function tests");
+
+    const tests = [
+      {
+        name: "Recipe Data Manager",
+        test: () => !!window.recipeDataManager
+      },
+      {
+        name: "App Core Functions",
+        test: () => !!(window.app && window.app.getRecipes)
+      },
+      {
+        name: "UI Render Function",
+        test: () => !!(window.ui && window.ui.render)
+      },
+      {
+        name: "Recipes Array",
+        test: () => window.app && Array.isArray(window.app.getRecipes())
+      }
+    ];
+
+    const results = tests.map(test => ({
+      name: test.name,
+      passed: test.test(),
+      status: test.test() ? "✅" : "❌"
+    }));
+
+    console.log("🧪 Test Results:", results);
+
+    // Update debug panel with test results
+    const debugContent = document.getElementById("mobile-debug-content");
+    if (debugContent) {
+      debugContent.innerHTML = `
+        <h4>🧪 Function Tests</h4>
+        ${results.map(r => `<div>${r.status} ${r.name}: ${r.passed ? 'PASS' : 'FAIL'}</div>`).join('')}
+        <div>📊 Total Recipes: ${window.app ? window.app.getRecipes().length : 'N/A'}</div>
+      `;
+    }
+
+    alert(`テスト完了: ${results.filter(r => r.passed).length}/${results.length} 成功`);
+  },
+
+  /**
+   * Diagnose recipe ID problems
+   */
+  diagnoseRecipeIdProblem() {
+    console.log("🔬 Running recipe ID diagnosis");
+
+    if (!window.app || !window.app.getRecipes) {
+      alert("❌ アプリが初期化されていません");
+      return;
+    }
+
+    const recipes = window.app.getRecipes();
+    const diagnosis = {
+      totalRecipes: recipes.length,
+      withIds: recipes.filter(r => r.id).length,
+      withoutIds: recipes.filter(r => !r.id).length,
+      duplicateIds: [],
+      maxId: recipes.length > 0 ? Math.max(...recipes.map(r => r.id || 0)) : 0
+    };
+
+    // Check for duplicate IDs
+    const idCounts = {};
+    recipes.forEach(recipe => {
+      if (recipe.id) {
+        idCounts[recipe.id] = (idCounts[recipe.id] || 0) + 1;
+      }
+    });
+
+    diagnosis.duplicateIds = Object.keys(idCounts).filter(id => idCounts[id] > 1);
+
+    console.log("🔬 Recipe ID Diagnosis:", diagnosis);
+
+    const debugContent = document.getElementById("mobile-debug-content");
+    if (debugContent) {
+      debugContent.innerHTML = `
+        <h4>🔬 ID診断結果</h4>
+        <div>📊 総レシピ数: ${diagnosis.totalRecipes}</div>
+        <div>✅ ID有り: ${diagnosis.withIds}</div>
+        <div>❌ ID無し: ${diagnosis.withoutIds}</div>
+        <div>🔄 重複ID: ${diagnosis.duplicateIds.length > 0 ? diagnosis.duplicateIds.join(', ') : 'なし'}</div>
+        <div>📈 最大ID: ${diagnosis.maxId}</div>
+      `;
+    }
+
+    alert(`ID診断完了: ${diagnosis.withIds}/${diagnosis.totalRecipes} にIDあり`);
+  },
+
+  /**
+   * Clear BOC-100 logs
+   */
+  clearBOC100Logs() {
+    console.log("🗑️ Clearing debug logs");
+
+    if (window.debugLogs) {
+      window.debugLogs = [];
+    }
+
+    const debugContent = document.getElementById("mobile-debug-content");
+    if (debugContent) {
+      debugContent.innerHTML = "<div>🧹 ログをクリアしました</div>";
+    }
+
+    console.log("✅ Debug logs cleared");
+    alert("ログをクリアしました");
+  }
 };
 
 // Make ui globally available
 window.ui = ui;
+
+// Make debug functions globally available
+window.toggleMobileDebug = () => window.ui.toggleMobileDebug();
+window.testBOC100Functions = () => window.ui.testBOC100Functions();
+window.diagnoseRecipeIdProblem = () => window.ui.diagnoseRecipeIdProblem();
+window.clearBOC100Logs = () => window.ui.clearBOC100Logs();
 
 // NOTE: Event listeners are now set up by core.js after initialization
 // This ensures proper initialization order: core.js → data loading → UI render → event listeners

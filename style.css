@@ -73,6 +73,30 @@ html, body {
     position: sticky;
     top: 0;
     z-index: 100;
+    position: relative; /* For absolute positioning of debug button */
+}
+
+/* Debug Logs Button (🍳) */
+.debug-logs-button {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: var(--transition);
+    z-index: 101;
+}
+
+.debug-logs-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
 }
 
 .app-title {
@@ -315,6 +339,7 @@ html, body {
     position: sticky;
     top: 0;
     z-index: 100;
+    position: relative; /* For absolute positioning of debug button */
 }
 
 .app-title {
@@ -1019,34 +1044,6 @@ html, body {
     font-size: 1.1rem;
 }
 
-/* Floating Action Button */
-.fab {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, var(--success-color) 0%, #219A52 100%);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-    transition: var(--transition);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.fab:hover {
-    transform: translateY(-3px) scale(1.1);
-    box-shadow: 0 8px 25px rgba(39, 174, 96, 0.5);
-}
-
-.fab:active {
-    transform: translateY(-1px) scale(1.05);
 }
 
 /* Screen Title */
@@ -1642,31 +1639,6 @@ html, body {
     color: #feca57;
 }
 
-.debug-toggle-btn {
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: var(--box-shadow);
-    z-index: 9999;
-    transition: var(--transition);
-}
-
-.debug-toggle-btn:hover {
-    background: var(--secondary-color);
-    transform: scale(1.1);
-}
-
-.debug-toggle-btn:active {
-    transform: scale(0.95);
-}
 
 /* BOC-106: AI Recipe Input Styles */
 .ai-add-button {

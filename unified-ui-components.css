@@ -1,0 +1,287 @@
+/* Unified UI Components - Recipe Card Design Consistency */
+
+/* === Design System Variables === */
+:root {
+  --card-bg-gradient: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+  --card-bg-hover: linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%);
+  --card-border-radius: 12px;
+  --card-shadow: 0 2px 8px rgba(52, 152, 219, 0.08);
+  --card-shadow-hover: 0 8px 25px rgba(52, 152, 219, 0.2);
+  --card-border: 1px solid rgba(52, 152, 219, 0.1);
+  --card-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --primary-blue: #3498db;
+  --secondary-blue: #2980b9;
+  --hover-transform: translateY(-4px);
+}
+
+/* === Sort Tabs - Recipe Card Style === */
+.sort-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.sort-tab {
+  background: var(--card-bg-gradient);
+  border: var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: var(--card-transition);
+  position: relative;
+  min-width: 120px;
+  text-align: center;
+}
+
+.sort-tab:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--card-shadow-hover);
+  background: var(--card-bg-hover);
+}
+
+.sort-tab.active {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.sort-tab.active:hover {
+  background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+  transform: var(--hover-transform);
+}
+
+/* === Action Buttons - Recipe Card Style === */
+.action-btn-enhanced {
+  background: var(--card-bg-gradient);
+  border: var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: var(--card-transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 44px;
+  justify-content: center;
+}
+
+.action-btn-enhanced:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--card-shadow-hover);
+  background: var(--card-bg-hover);
+}
+
+.action-btn-enhanced.primary {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.action-btn-enhanced.primary:hover {
+  background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--primary-blue) 100%);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.action-btn-enhanced.success {
+  background: linear-gradient(135deg, #27AE60 0%, #219A52 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+}
+
+.action-btn-enhanced.success:hover {
+  background: linear-gradient(135deg, #219A52 0%, #27AE60 100%);
+  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+.action-btn-enhanced.danger {
+  background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.action-btn-enhanced.danger:hover {
+  background: linear-gradient(135deg, #C0392B 0%, #E74C3C 100%);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.action-btn-enhanced.warning {
+  background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+.action-btn-enhanced.warning:hover {
+  background: linear-gradient(135deg, #E67E22 0%, #F39C12 100%);
+  box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+}
+
+/* === Button Groups === */
+.button-group-enhanced {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.button-group-enhanced.compact {
+  gap: 8px;
+}
+
+.button-group-enhanced.spread {
+  justify-content: space-between;
+}
+
+/* === Search Input - Recipe Card Style === */
+.search-input-enhanced {
+  background: var(--card-bg-gradient);
+  border: var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #555;
+  transition: var(--card-transition);
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-input-enhanced:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  background: var(--card-bg-hover);
+}
+
+.search-input-enhanced::placeholder {
+  color: #999;
+}
+
+/* === Settings Items - Recipe Card Style === */
+.setting-item-enhanced {
+  background: var(--card-bg-gradient);
+  border: var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: var(--card-transition);
+}
+
+.setting-item-enhanced:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--card-shadow-hover);
+  background: var(--card-bg-hover);
+}
+
+.setting-item-enhanced .setting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.setting-item-enhanced .setting-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.setting-item-enhanced .setting-description {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* === Form Elements - Recipe Card Style === */
+.form-input-enhanced {
+  background: var(--card-bg-gradient);
+  border: var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #555;
+  transition: var(--card-transition);
+  width: 100%;
+}
+
+.form-input-enhanced:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  background: var(--card-bg-hover);
+}
+
+.form-textarea-enhanced {
+  background: var(--card-bg-gradient);
+  border: var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 16px;
+  font-size: 14px;
+  color: #555;
+  transition: var(--card-transition);
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.form-textarea-enhanced:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  background: var(--card-bg-hover);
+}
+
+/* === Header Actions - Recipe Card Style === */
+.header-actions-enhanced {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.header-actions-enhanced .action-btn-enhanced {
+  padding: 8px 12px;
+  font-size: 12px;
+  min-width: 36px;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+  .sort-tabs {
+    gap: 8px;
+  }
+
+  .sort-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    min-width: 100px;
+  }
+
+  .button-group-enhanced {
+    gap: 8px;
+  }
+
+  .action-btn-enhanced {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .setting-item-enhanced {
+    padding: 16px;
+  }
+}

@@ -6,6 +6,7 @@
     <title>Petit Recipe</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="enhanced-recipe-card.css">
+    <link rel="stylesheet" href="unified-ui-components.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3498db">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -38,6 +39,7 @@
         <!-- 料理レシピ画面 -->
         <div id="recipes-screen" class="screen active">
             <header class="screen-header">
+                <button class="debug-logs-button" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
                     <button id="refresh-button" class="refresh-button" title="レシピデータをリロード" onclick="if(window.app && window.app.refresh) { window.app.refresh(); } else { alert('❌ リロード機能が利用できません'); }">🔄</button>
@@ -47,14 +49,13 @@
 
             <div class="screen-content">
                 <div class="search-container">
-                    <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
-                    <button class="refresh-data-button" title="レシピデータをリロード" onclick="if(window.app && window.app.refresh) { window.app.refresh(); } else { alert('❌ リロード機能が利用できません'); }">🔄</button>
+                    <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input search-input-enhanced">
+                    <button class="refresh-data-button action-btn-enhanced" title="レシピデータをリロード" onclick="if(window.app && window.app.refresh) { window.app.refresh(); } else { alert('❌ リロード機能が利用できません'); }">🔄</button>
                 </div>
 
                 <div class="sort-tabs">
-                    <button class="sort-tab active" data-sort="time">時系列</button>
-                    <button class="sort-tab" data-sort="name">あいうえお順</button>
-                    <button class="sort-tab" data-sort="popular">🔥人気順</button>
+                    <button class="sort-tab sort-tab-enhanced active" data-sort="time">時系列</button>
+                    <button class="sort-tab sort-tab-enhanced" data-sort="name">あいうえお順</button>
                 </div>
 
                 <div id="recipes-list" class="recipes-list recipe-grid-enhanced">
@@ -73,17 +74,18 @@
         <!-- レシピ詳細画面 -->
         <div id="recipe-detail-screen" class="screen">
             <header class="screen-header">
+                <button class="debug-logs-button" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
                 <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 id="recipe-detail-title">レシピ詳細</h2>
                 <!-- ▼▼▼ BOC-99: Edit/Delete Action Buttons ▼▼▼ -->
-                <div class="header-actions">
-                    <button class="action-btn edit-btn" onclick="window.app.startEditRecipe()" title="レシピを編集">
+                <div class="header-actions header-actions-enhanced">
+                    <button class="action-btn action-btn-enhanced primary edit-btn" onclick="window.app.startEditRecipe()" title="レシピを編集">
                         ✏️
                     </button>
-                    <button class="action-btn duplicate-btn" onclick="window.app.duplicateRecipe()" title="レシピを複製">
+                    <button class="action-btn action-btn-enhanced warning duplicate-btn" onclick="window.app.duplicateRecipe()" title="レシピを複製">
                         📋
                     </button>
-                    <button class="action-btn delete-btn" onclick="window.app.confirmDeleteRecipe()" title="レシピを削除">
+                    <button class="action-btn action-btn-enhanced danger delete-btn" onclick="window.app.confirmDeleteRecipe()" title="レシピを削除">
                         🗑️
                     </button>
                 </div>
@@ -116,6 +118,7 @@
         <!-- ▼▼▼ BOC-98: Recipe Addition Screen ▼▼▼ -->
         <div id="add-recipe-screen" class="screen">
             <header class="screen-header">
+                <button class="debug-logs-button" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
                 <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 class="screen-title">新しいレシピを追加</h2>
             </header>
@@ -135,7 +138,7 @@
                             type="text"
                             id="recipe-title"
                             name="title"
-                            class="form-input"
+                            class="form-input form-input-enhanced"
                             placeholder="例: チキンカレー"
                             required
                         >
@@ -149,7 +152,7 @@
                         <textarea
                             id="recipe-ingredients"
                             name="ingredients"
-                            class="form-textarea"
+                            class="form-textarea form-textarea-enhanced"
                             placeholder="材料を1行ずつ入力してください&#10;例:&#10;鶏もも肉 300g&#10;玉ねぎ 1個&#10;カレールウ 1箱"
                             rows="6"
                             required
@@ -163,7 +166,7 @@
                         <textarea
                             id="recipe-instructions"
                             name="instructions"
-                            class="form-textarea"
+                            class="form-textarea form-textarea-enhanced"
                             placeholder="手順を1行ずつ入力してください&#10;例:&#10;玉ねぎを薄切りにする&#10;鶏肉を一口大に切る&#10;フライパンで炒める"
                             rows="8"
                             required
@@ -172,11 +175,11 @@
                     </div>
 
                     <!-- アクションボタン -->
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="window.app.navigateBack()">
+                    <div class="form-actions button-group-enhanced">
+                        <button type="button" class="btn btn-secondary action-btn-enhanced" onclick="window.app.navigateBack()">
                             キャンセル
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary action-btn-enhanced success">
                             <span class="btn-icon">💾</span>
                             レシピを保存
                         </button>
@@ -253,58 +256,39 @@
         <!-- ▼▼▼ BOC-100: Settings Screen ▼▼▼ -->
         <div id="settings-screen" class="screen">
             <header class="screen-header">
+                <button class="debug-logs-button" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
                 <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 class="screen-title">設定</h2>
             </header>
 
             <div class="screen-content">
-                <div class="settings-section">
-                    <h3>🔧 デバッグ機能</h3>
-                    <div class="settings-group">
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <h4>🐛 デバッグログ表示</h4>
-                                <p>アプリの動作ログとエラー情報を確認できます</p>
-                            </div>
-                            <button id="debug-logs-button" class="setting-button primary" onclick="window.ui.showDebugLogs()">
-                                🐛 ログ表示
-                            </button>
-                        </div>
-
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <h4>🧪 ChatGPT強化テスト実行</h4>
-                                <p>データ読み込み機能の堅牢性と複数フォーマット対応をテスト</p>
-                            </div>
-                            <button id="test-button" class="setting-button primary" onclick="window.runRecipeTests()">
-                                🧪 テスト実行
-                            </button>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="settings-section">
                     <h3>データ管理</h3>
                     <div class="settings-group">
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <h4>データをエクスポート（バックアップ）</h4>
-                                <p>全てのレシピと閲覧データをJSONファイルで保存します</p>
+                        <div class="setting-item setting-item-enhanced">
+                            <div class="setting-header">
+                                <div class="setting-info">
+                                    <h4 class="setting-title">データをエクスポート（バックアップ）</h4>
+                                    <p class="setting-description">全てのレシピと閲覧データをJSONファイルで保存します</p>
+                                </div>
+                                <button class="setting-button action-btn-enhanced primary" onclick="window.ui.exportData()">
+                                    📦 エクスポート
+                                </button>
                             </div>
-                            <button class="setting-button primary" onclick="window.ui.exportData()">
-                                📦 エクスポート
-                            </button>
                         </div>
 
-                        <div class="setting-item">
-                            <div class="setting-info">
-                                <h4>データをインポート（リストア）</h4>
-                                <p>バックアップファイルからデータを復元します</p>
-                                <small class="warning">⚠️ 現在のデータは全て上書きされます</small>
+                        <div class="setting-item setting-item-enhanced">
+                            <div class="setting-header">
+                                <div class="setting-info">
+                                    <h4 class="setting-title">データをインポート（リストア）</h4>
+                                    <p class="setting-description">バックアップファイルからデータを復元します</p>
+                                    <small class="warning">⚠️ 現在のデータは全て上書きされます</small>
+                                </div>
+                                <button class="setting-button action-btn-enhanced danger" onclick="window.ui.importData()">
+                                    📥 インポート
+                                </button>
                             </div>
-                            <button class="setting-button danger" onclick="window.ui.importData()">
-                                📥 インポート
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -362,8 +346,6 @@
             </div>
         </div>
 
-        <!-- Debug toggle button (floating) -->
-        <button id="debug-toggle-btn" class="debug-toggle-btn">🐛</button>
         <!-- ▲▲▲ BOC-100: Mobile Debug Panel ▲▲▲ -->
 
         <!-- Hidden file input for import -->

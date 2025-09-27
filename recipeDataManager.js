@@ -732,6 +732,39 @@ window.initializeAndLoadRecipes = async function () {
 
     return { version: "1.0", recipes: [] };
   }
+
+  /**
+   * Core Function 2: saveRecipes() - Save recipes array to Documents/recipes.json
+   * @param {Array} recipes - Array of recipe objects to save
+   */
+  async saveRecipes(recipes) {
+    console.log("💾 BOC-111: Saving recipes to file", recipes.length);
+
+    try {
+      if (!this.filesystem) {
+        await this.initialize();
+      }
+
+      const data = {
+        version: "1.0",
+        recipes: recipes,
+        lastUpdated: new Date().toISOString()
+      };
+
+      await this.filesystem.writeFile({
+        path: this.filePath,
+        data: JSON.stringify(data, null, 2),
+        directory: this.directory,
+        encoding: this.encoding
+      });
+
+      console.log(`✅ BOC-111: Successfully saved ${recipes.length} recipes to ${this.filePath}`);
+      return true;
+    } catch (error) {
+      console.error("❌ BOC-111: Failed to save recipes:", error);
+      throw error;
+    }
+  }
 };
 
 // Create global instance for app integration

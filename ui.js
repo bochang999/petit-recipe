@@ -6,30 +6,29 @@
  * Responsible for rendering data from app.recipes to the DOM
  */
 const ui = {
-
   /**
    * Render all recipes to the UI
    * This function receives data and displays it - no data management
    */
   render() {
-    console.log('🎨 BOC-109: UI render started');
+    console.log("🎨 BOC-109: UI render started");
 
     if (!window.app || !window.app.isInitialized) {
-      console.log('⏳ App not initialized yet, skipping render');
+      console.log("⏳ App not initialized yet, skipping render");
       return;
     }
 
     const recipes = window.app.getRecipes();
     console.log(`🎨 Rendering ${recipes.length} recipes to UI`);
 
-    const recipesListElement = document.getElementById('recipes-list');
+    const recipesListElement = document.getElementById("recipes-list");
     if (!recipesListElement) {
-      console.error('❌ recipes-list element not found');
+      console.error("❌ recipes-list element not found");
       return;
     }
 
     // Clear existing content
-    recipesListElement.innerHTML = '';
+    recipesListElement.innerHTML = "";
 
     if (recipes.length === 0) {
       recipesListElement.innerHTML = `
@@ -42,25 +41,25 @@ const ui = {
     }
 
     // Render each recipe
-    recipes.forEach(recipe => {
+    recipes.forEach((recipe) => {
       const recipeElement = this.createRecipeElement(recipe);
       recipesListElement.appendChild(recipeElement);
     });
 
-    console.log('✅ BOC-109: UI render completed');
+    console.log("✅ BOC-109: UI render completed");
   },
 
   /**
    * Create a single recipe element
    */
   createRecipeElement(recipe) {
-    const element = document.createElement('div');
-    element.className = 'recipe-item';
+    const element = document.createElement("div");
+    element.className = "recipe-item";
     element.innerHTML = `
       <div class="recipe-card">
-        <h3 class="recipe-title">${recipe.name || 'No title'}</h3>
+        <h3 class="recipe-title">${recipe.name || "No title"}</h3>
         <div class="recipe-info">
-          <span class="cook-time">⏱️ ${recipe.cookTime || '30分'}</span>
+          <span class="cook-time">⏱️ ${recipe.cookTime || "30分"}</span>
           <span class="servings">👥 ${recipe.servings || 4}人前</span>
         </div>
         <div class="recipe-ingredients">
@@ -70,14 +69,14 @@ const ui = {
     `;
 
     // Add click handler for recipe details
-    element.addEventListener('click', () => {
+    element.addEventListener("click", () => {
       console.log(`🍳 Recipe clicked: ${recipe.name} (ID: ${recipe.id})`);
 
-      if (window.app && typeof window.app.showRecipeDetails === 'function') {
+      if (window.app && typeof window.app.showRecipeDetails === "function") {
         window.app.showRecipeDetails(recipe.id);
       } else {
-        console.error('❌ app.showRecipeDetails not available');
-        alert('レシピ詳細機能は準備中です');
+        console.error("❌ app.showRecipeDetails not available");
+        alert("レシピ詳細機能は準備中です");
       }
     });
 
@@ -89,13 +88,15 @@ const ui = {
    */
   formatIngredients(ingredients) {
     if (!Array.isArray(ingredients)) {
-      return 'No ingredients';
+      return "No ingredients";
     }
 
-    return ingredients
-      .slice(0, 3) // Show first 3 ingredients
-      .map(ing => `${ing.name} ${ing.amount}${ing.unit}`)
-      .join(', ') + (ingredients.length > 3 ? '...' : '');
+    return (
+      ingredients
+        .slice(0, 3) // Show first 3 ingredients
+        .map((ing) => `${ing.name} ${ing.amount}${ing.unit}`)
+        .join(", ") + (ingredients.length > 3 ? "..." : "")
+    );
   },
 
   /**
@@ -104,87 +105,87 @@ const ui = {
   setupEventListeners() {
     // Prevent multiple setup
     if (this._listenersSetup) {
-      console.log('🔄 BOC-109: Event listeners already setup, skipping...');
+      console.log("🔄 BOC-109: Event listeners already setup, skipping...");
       return;
     }
 
-    console.log('🔗 BOC-109: Setting up UI event listeners');
+    console.log("🔗 BOC-109: Setting up UI event listeners");
 
     // Refresh button (header) - Simplified
-    const refreshButton = document.getElementById('refresh-button');
+    const refreshButton = document.getElementById("refresh-button");
     if (refreshButton) {
-      refreshButton.addEventListener('click', () => {
-        console.log('🔄 Recipe data reload button clicked');
-        if (window.app && typeof window.app.refresh === 'function') {
+      refreshButton.addEventListener("click", () => {
+        console.log("🔄 Recipe data reload button clicked");
+        if (window.app && typeof window.app.refresh === "function") {
           window.app.refresh();
         } else {
-          console.error('❌ app.refresh not available');
+          console.error("❌ app.refresh not available");
         }
       });
-      console.log('✅ Header refresh button connected');
+      console.log("✅ Header refresh button connected");
     } else {
-      console.error('❌ Header refresh button not found');
+      console.error("❌ Header refresh button not found");
     }
 
     // Settings button
-    const settingsButton = document.querySelector('.settings-button');
+    const settingsButton = document.querySelector(".settings-button");
     if (settingsButton) {
-      settingsButton.addEventListener('click', () => {
-        console.log('⚙️ Settings button clicked');
+      settingsButton.addEventListener("click", () => {
+        console.log("⚙️ Settings button clicked");
         if (window.app && window.app.showSettings) {
           window.app.showSettings();
         } else {
-          console.error('❌ app.showSettings not available');
-          alert('設定機能は準備中です');
+          console.error("❌ app.showSettings not available");
+          alert("設定機能は準備中です");
         }
       });
-      console.log('✅ Settings button connected');
+      console.log("✅ Settings button connected");
     }
 
     // AI Recipe Add button
-    const aiAddButton = document.querySelector('.ai-add-button');
+    const aiAddButton = document.querySelector(".ai-add-button");
     if (aiAddButton) {
-      aiAddButton.addEventListener('click', () => {
-        console.log('🤖 AI Add button clicked');
+      aiAddButton.addEventListener("click", () => {
+        console.log("🤖 AI Add button clicked");
         if (window.showAIRecipeInput) {
           window.showAIRecipeInput();
         } else {
-          console.error('❌ showAIRecipeInput not available');
-          alert('AI追加機能は準備中です');
+          console.error("❌ showAIRecipeInput not available");
+          alert("AI追加機能は準備中です");
         }
       });
-      console.log('✅ AI Add button connected');
+      console.log("✅ AI Add button connected");
     }
 
     // Data refresh button (search area) - Simplified
-    const refreshDataButton = document.querySelector('.refresh-data-button');
+    const refreshDataButton = document.querySelector(".refresh-data-button");
     if (refreshDataButton) {
-      refreshDataButton.addEventListener('click', () => {
-        console.log('🔄 Recipe data reload button clicked');
+      refreshDataButton.addEventListener("click", () => {
+        console.log("🔄 Recipe data reload button clicked");
         if (window.forceReloadRecipes) {
           window.forceReloadRecipes();
-        } else if (window.app && typeof window.app.refresh === 'function') {
+        } else if (window.app && typeof window.app.refresh === "function") {
           window.app.refresh();
         } else {
-          console.error('❌ No recipe reload function available');
+          console.error("❌ No recipe reload function available");
         }
       });
-      console.log('✅ Data refresh button connected');
+      console.log("✅ Data refresh button connected");
     }
 
     // Sort tabs
-    const sortTabs = document.querySelectorAll('.sort-tab');
-    sortTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
+    const sortTabs = document.querySelectorAll(".sort-tab");
+    sortTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
         const sortType = tab.dataset.sort;
         console.log(`📊 Sort tab clicked: ${sortType}`);
 
         // Update active tab
-        sortTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+        sortTabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
 
         // Future: implement sorting
-        console.log('🔮 Sorting feature coming soon');
+        console.log("🔮 Sorting feature coming soon");
       });
     });
     if (sortTabs.length > 0) {
@@ -192,102 +193,102 @@ const ui = {
     }
 
     // Debug toggle button (floating)
-    const debugToggleBtn = document.getElementById('debug-toggle-btn');
+    const debugToggleBtn = document.getElementById("debug-toggle-btn");
     if (debugToggleBtn) {
-      debugToggleBtn.addEventListener('click', () => {
-        console.log('🐛 Debug toggle button clicked');
+      debugToggleBtn.addEventListener("click", () => {
+        console.log("🐛 Debug toggle button clicked");
         if (window.toggleMobileDebug) {
           window.toggleMobileDebug();
         } else {
-          console.error('❌ toggleMobileDebug function not available');
-          alert('デバッグ機能は準備中です');
+          console.error("❌ toggleMobileDebug function not available");
+          alert("デバッグ機能は準備中です");
         }
       });
-      console.log('✅ Debug toggle button connected');
+      console.log("✅ Debug toggle button connected");
     }
 
     // Debug panel buttons
-    const debugTestBtn = document.querySelector('.debug-btn.test');
+    const debugTestBtn = document.querySelector(".debug-btn.test");
     if (debugTestBtn) {
-      debugTestBtn.addEventListener('click', () => {
-        console.log('🧪 Debug test button clicked');
+      debugTestBtn.addEventListener("click", () => {
+        console.log("🧪 Debug test button clicked");
         if (window.testBOC100Functions) {
           window.testBOC100Functions();
         } else {
-          console.error('❌ testBOC100Functions not available');
-          alert('テスト機能は準備中です');
+          console.error("❌ testBOC100Functions not available");
+          alert("テスト機能は準備中です");
         }
       });
-      console.log('✅ Debug test button connected');
+      console.log("✅ Debug test button connected");
     }
 
-    const debugDiagnoseBtn = document.querySelector('.debug-btn.diagnose');
+    const debugDiagnoseBtn = document.querySelector(".debug-btn.diagnose");
     if (debugDiagnoseBtn) {
-      debugDiagnoseBtn.addEventListener('click', () => {
-        console.log('🔬 Debug diagnose button clicked');
+      debugDiagnoseBtn.addEventListener("click", () => {
+        console.log("🔬 Debug diagnose button clicked");
         if (window.diagnoseRecipeIdProblem) {
           window.diagnoseRecipeIdProblem();
         } else {
-          console.error('❌ diagnoseRecipeIdProblem not available');
-          alert('ID診断機能は準備中です');
+          console.error("❌ diagnoseRecipeIdProblem not available");
+          alert("ID診断機能は準備中です");
         }
       });
-      console.log('✅ Debug diagnose button connected');
+      console.log("✅ Debug diagnose button connected");
     }
 
-    const debugClearBtn = document.querySelector('.debug-btn.clear');
+    const debugClearBtn = document.querySelector(".debug-btn.clear");
     if (debugClearBtn) {
-      debugClearBtn.addEventListener('click', () => {
-        console.log('🗑️ Debug clear button clicked');
+      debugClearBtn.addEventListener("click", () => {
+        console.log("🗑️ Debug clear button clicked");
         if (window.clearBOC100Logs) {
           window.clearBOC100Logs();
         } else {
-          console.error('❌ clearBOC100Logs not available');
-          alert('ログクリア機能は準備中です');
+          console.error("❌ clearBOC100Logs not available");
+          alert("ログクリア機能は準備中です");
         }
       });
-      console.log('✅ Debug clear button connected');
+      console.log("✅ Debug clear button connected");
     }
 
-    const debugCloseBtn = document.querySelector('.debug-btn.close');
+    const debugCloseBtn = document.querySelector(".debug-btn.close");
     if (debugCloseBtn) {
-      debugCloseBtn.addEventListener('click', () => {
-        console.log('✕ Debug close button clicked');
+      debugCloseBtn.addEventListener("click", () => {
+        console.log("✕ Debug close button clicked");
         if (window.toggleMobileDebug) {
           window.toggleMobileDebug();
         } else {
-          console.error('❌ toggleMobileDebug not available');
-          alert('デバッグパネル機能は準備中です');
+          console.error("❌ toggleMobileDebug not available");
+          alert("デバッグパネル機能は準備中です");
         }
       });
-      console.log('✅ Debug close button connected');
+      console.log("✅ Debug close button connected");
     }
 
     // FAB (Floating Action Button) for recipe addition
-    const fabButton = document.querySelector('.fab');
+    const fabButton = document.querySelector(".fab");
     if (fabButton) {
-      fabButton.addEventListener('click', () => {
-        console.log('➕ FAB button clicked - Add new recipe');
+      fabButton.addEventListener("click", () => {
+        console.log("➕ FAB button clicked - Add new recipe");
         if (window.app && window.app.showAddRecipeScreen) {
           window.app.showAddRecipeScreen();
         } else {
-          console.error('❌ app.showAddRecipeScreen not available');
-          alert('レシピ追加機能は準備中です');
+          console.error("❌ app.showAddRecipeScreen not available");
+          alert("レシピ追加機能は準備中です");
         }
       });
-      console.log('✅ FAB button connected');
+      console.log("✅ FAB button connected");
     }
 
     // Recipe detail screen buttons
-    const backButtons = document.querySelectorAll('.back-button');
-    backButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        console.log('← Back button clicked');
+    const backButtons = document.querySelectorAll(".back-button");
+    backButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        console.log("← Back button clicked");
         if (window.app && window.app.navigateBack) {
           window.app.navigateBack();
         } else {
-          console.error('❌ app.navigateBack not available');
-          alert('戻る機能は準備中です');
+          console.error("❌ app.navigateBack not available");
+          alert("戻る機能は準備中です");
         }
       });
     });
@@ -296,43 +297,47 @@ const ui = {
     }
 
     // Settings screen buttons
-    const exportButton = document.querySelector('button[onclick*="exportData"]');
+    const exportButton = document.querySelector(
+      'button[onclick*="exportData"]',
+    );
     if (exportButton) {
-      exportButton.addEventListener('click', () => {
-        console.log('📦 Export button clicked');
+      exportButton.addEventListener("click", () => {
+        console.log("📦 Export button clicked");
         if (window.app && window.app.exportData) {
           window.app.exportData();
         } else {
-          console.error('❌ app.exportData not available');
-          alert('エクスポート機能は準備中です');
+          console.error("❌ app.exportData not available");
+          alert("エクスポート機能は準備中です");
         }
       });
-      console.log('✅ Export button connected');
+      console.log("✅ Export button connected");
     }
 
-    const importButton = document.querySelector('button[onclick*="importData"]');
+    const importButton = document.querySelector(
+      'button[onclick*="importData"]',
+    );
     if (importButton) {
-      importButton.addEventListener('click', () => {
-        console.log('📥 Import button clicked');
+      importButton.addEventListener("click", () => {
+        console.log("📥 Import button clicked");
         if (window.app && window.app.importData) {
           window.app.importData();
         } else {
-          console.error('❌ app.importData not available');
-          alert('インポート機能は準備中です');
+          console.error("❌ app.importData not available");
+          alert("インポート機能は準備中です");
         }
       });
-      console.log('✅ Import button connected');
+      console.log("✅ Import button connected");
     }
 
     // Mark as setup to prevent duplicate calls
     this._listenersSetup = true;
-    console.log('🔗 BOC-109: All UI event listeners setup completed');
+    console.log("🔗 BOC-109: All UI event listeners setup completed");
   },
 
   /**
    * Show user feedback message
    */
-  showMessage(message, type = 'info') {
+  showMessage(message, type = "info") {
     console.log(`📢 UI Message (${type}): ${message}`);
     // Future: implement actual message display
     alert(message); // Temporary simple implementation
@@ -345,15 +350,15 @@ const ui = {
     console.log(`🔄 Switching to screen: ${screenId}`);
 
     // Hide all screens
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(screen => {
-      screen.classList.remove('active');
+    const screens = document.querySelectorAll(".screen");
+    screens.forEach((screen) => {
+      screen.classList.remove("active");
     });
 
     // Show target screen
     const targetScreen = document.getElementById(screenId);
     if (targetScreen) {
-      targetScreen.classList.add('active');
+      targetScreen.classList.add("active");
       console.log(`✅ Screen ${screenId} activated`);
     } else {
       console.error(`❌ Screen ${screenId} not found`);
@@ -364,35 +369,35 @@ const ui = {
    * Debug logs functions
    */
   showDebugLogs() {
-    console.log('🐛 Opening debug logs modal');
+    console.log("🐛 Opening debug logs modal");
 
     // Show debug panel instead of modal for mobile compatibility
-    const debugPanel = document.getElementById('mobile-debug-panel');
+    const debugPanel = document.getElementById("mobile-debug-panel");
     if (debugPanel) {
-      debugPanel.style.display = 'block';
+      debugPanel.style.display = "block";
       this.refreshDebugLogs();
-      console.log('✅ Debug panel shown');
+      console.log("✅ Debug panel shown");
     } else {
-      console.error('❌ Debug panel not found');
+      console.error("❌ Debug panel not found");
     }
   },
 
   hideDebugLogs() {
-    console.log('🐛 Closing debug logs');
+    console.log("🐛 Closing debug logs");
 
-    const debugPanel = document.getElementById('mobile-debug-panel');
+    const debugPanel = document.getElementById("mobile-debug-panel");
     if (debugPanel) {
-      debugPanel.style.display = 'none';
-      console.log('✅ Debug panel hidden');
+      debugPanel.style.display = "none";
+      console.log("✅ Debug panel hidden");
     }
   },
 
   refreshDebugLogs() {
-    console.log('🔄 Refreshing debug logs');
+    console.log("🔄 Refreshing debug logs");
 
-    const content = document.getElementById('mobile-debug-content');
+    const content = document.getElementById("mobile-debug-content");
     if (!content) {
-      console.error('❌ Debug content area not found');
+      console.error("❌ Debug content area not found");
       return;
     }
 
@@ -401,9 +406,11 @@ const ui = {
 
     // BOC-100 logs if available
     if (window.boc100Logs && Array.isArray(window.boc100Logs)) {
-      allLogs = allLogs.concat(window.boc100Logs.map(log =>
-        `[${log.time}] [${log.type.toUpperCase()}] ${log.message}`
-      ));
+      allLogs = allLogs.concat(
+        window.boc100Logs.map(
+          (log) => `[${log.time}] [${log.type.toUpperCase()}] ${log.message}`,
+        ),
+      );
     }
 
     // General debug logs if available
@@ -412,9 +419,15 @@ const ui = {
     }
 
     // Recent console logs (simplified)
-    allLogs.push(`[${new Date().toLocaleTimeString()}] [INFO] Debug logs refreshed`);
-    allLogs.push(`[${new Date().toLocaleTimeString()}] [INFO] App initialized: ${!!window.app?.isInitialized}`);
-    allLogs.push(`[${new Date().toLocaleTimeString()}] [INFO] Recipes loaded: ${window.app?.getRecipes()?.length || 0}`);
+    allLogs.push(
+      `[${new Date().toLocaleTimeString()}] [INFO] Debug logs refreshed`,
+    );
+    allLogs.push(
+      `[${new Date().toLocaleTimeString()}] [INFO] App initialized: ${!!window.app?.isInitialized}`,
+    );
+    allLogs.push(
+      `[${new Date().toLocaleTimeString()}] [INFO] Recipes loaded: ${window.app?.getRecipes()?.length || 0}`,
+    );
 
     // Create scrollable log display with copy functionality
     content.innerHTML = `
@@ -425,11 +438,15 @@ const ui = {
           <button onclick="window.ui.scrollToBottom()" class="debug-button">⬇️ 最下部へ</button>
         </div>
         <div id="debug-logs-scroll" class="debug-logs-scroll">
-          ${allLogs.length > 0 ?
-            allLogs.map((log, index) =>
-              `<div class="debug-log-line" onclick="window.ui.copyLogLine(${index})">${log}</div>`
-            ).join('') :
-            '<div class="debug-log-line">ログがありません</div>'
+          ${
+            allLogs.length > 0
+              ? allLogs
+                  .map(
+                    (log, index) =>
+                      `<div class="debug-log-line" onclick="window.ui.copyLogLine(${index})">${log}</div>`,
+                  )
+                  .join("")
+              : '<div class="debug-log-line">ログがありません</div>'
           }
         </div>
       </div>
@@ -442,18 +459,23 @@ const ui = {
   },
 
   copyAllLogs() {
-    console.log('📋 Copying all debug logs');
+    console.log("📋 Copying all debug logs");
 
-    const logLines = document.querySelectorAll('.debug-log-line');
-    const allText = Array.from(logLines).map(line => line.textContent).join('\n');
+    const logLines = document.querySelectorAll(".debug-log-line");
+    const allText = Array.from(logLines)
+      .map((line) => line.textContent)
+      .join("\n");
 
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(allText).then(() => {
-        alert('✅ 全ログをコピーしました');
-      }).catch(err => {
-        console.error('❌ Clipboard copy failed:', err);
-        this.fallbackCopy(allText);
-      });
+      navigator.clipboard
+        .writeText(allText)
+        .then(() => {
+          alert("✅ 全ログをコピーしました");
+        })
+        .catch((err) => {
+          console.error("❌ Clipboard copy failed:", err);
+          this.fallbackCopy(allText);
+        });
     } else {
       this.fallbackCopy(allText);
     }
@@ -462,21 +484,24 @@ const ui = {
   copyLogLine(index) {
     console.log(`📋 Copying log line ${index}`);
 
-    const logLine = document.querySelectorAll('.debug-log-line')[index];
+    const logLine = document.querySelectorAll(".debug-log-line")[index];
     if (!logLine) {
-      console.error('❌ Log line not found');
+      console.error("❌ Log line not found");
       return;
     }
 
     const text = logLine.textContent;
 
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert(`✅ ログをコピーしました: ${text.substring(0, 50)}...`);
-      }).catch(err => {
-        console.error('❌ Clipboard copy failed:', err);
-        this.fallbackCopy(text);
-      });
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          alert(`✅ ログをコピーしました: ${text.substring(0, 50)}...`);
+        })
+        .catch((err) => {
+          console.error("❌ Clipboard copy failed:", err);
+          this.fallbackCopy(text);
+        });
     } else {
       this.fallbackCopy(text);
     }
@@ -484,29 +509,29 @@ const ui = {
 
   fallbackCopy(text) {
     // Fallback for older browsers or restricted environments
-    const textarea = document.createElement('textarea');
+    const textarea = document.createElement("textarea");
     textarea.value = text;
     document.body.appendChild(textarea);
     textarea.select();
     try {
-      document.execCommand('copy');
-      alert('✅ ログをコピーしました (fallback method)');
+      document.execCommand("copy");
+      alert("✅ ログをコピーしました (fallback method)");
     } catch (err) {
-      console.error('❌ Fallback copy failed:', err);
-      alert('❌ コピーに失敗しました。手動でテキストを選択してください。');
+      console.error("❌ Fallback copy failed:", err);
+      alert("❌ コピーに失敗しました。手動でテキストを選択してください。");
     }
     document.body.removeChild(textarea);
   },
 
   scrollToBottom() {
-    const scrollContainer = document.getElementById('debug-logs-scroll');
+    const scrollContainer = document.getElementById("debug-logs-scroll");
     if (scrollContainer) {
       scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
   },
 
   clearDebugLogs() {
-    console.log('🧹 Clearing debug logs');
+    console.log("🧹 Clearing debug logs");
 
     // Clear global log arrays
     if (window.boc100Logs) {
@@ -519,14 +544,14 @@ const ui = {
     // Refresh display
     this.refreshDebugLogs();
 
-    alert('✅ デバッグログをクリアしました');
+    alert("✅ デバッグログをクリアしました");
   },
 
   /**
    * Export data functionality
    */
   async exportData() {
-    console.log('📦 Starting data export');
+    console.log("📦 Starting data export");
 
     try {
       // Get all recipes from app
@@ -540,16 +565,19 @@ const ui = {
         recipes: recipes,
         metadata: {
           appVersion: "Petit Recipe v3.0",
-          exportSource: "Settings Screen"
-        }
+          exportSource: "Settings Screen",
+        },
       };
 
       // Convert to JSON
       const jsonData = JSON.stringify(exportData, null, 2);
-      const blob = new Blob([jsonData], { type: 'application/json' });
+      const blob = new Blob([jsonData], { type: "application/json" });
 
       // Create download
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      const timestamp = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/:/g, "-");
       const filename = `petit-recipe-backup-${timestamp}.json`;
 
       if (window.Capacitor && window.Capacitor.isNativePlatform()) {
@@ -563,11 +591,13 @@ const ui = {
           encoding: Encoding.UTF8,
         });
 
-        alert(`✅ データをエクスポートしました: Documents/${filename}\n\nレシピ数: ${recipes.length}件`);
+        alert(
+          `✅ データをエクスポートしました: Documents/${filename}\n\nレシピ数: ${recipes.length}件`,
+        );
       } else {
         // Web environment - use download
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
@@ -575,13 +605,14 @@ const ui = {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        alert(`✅ データをエクスポートしました: ${filename}\n\nレシピ数: ${recipes.length}件`);
+        alert(
+          `✅ データをエクスポートしました: ${filename}\n\nレシピ数: ${recipes.length}件`,
+        );
       }
 
       console.log(`✅ Export completed: ${recipes.length} recipes`);
-
     } catch (error) {
-      console.error('❌ Export failed:', error);
+      console.error("❌ Export failed:", error);
       alert(`❌ エクスポートに失敗しました: ${error.message}`);
     }
   },
@@ -590,15 +621,17 @@ const ui = {
    * Import data functionality
    */
   async importData() {
-    console.log('📥 Starting data import');
+    console.log("📥 Starting data import");
 
     try {
       if (window.Capacitor && window.Capacitor.isNativePlatform()) {
         // APK environment - show file picker instructions
-        const proceed = confirm('📥 データをインポートしますか？\n\n⚠️ 現在のデータは全て上書きされます。\n\n📁 Documents フォルダにバックアップファイル(*.json)を配置してからOKを押してください。');
+        const proceed = confirm(
+          "📥 データをインポートしますか？\n\n⚠️ 現在のデータは全て上書きされます。\n\n📁 Documents フォルダにバックアップファイル(*.json)を配置してからOKを押してください。",
+        );
 
         if (!proceed) {
-          console.log('Import cancelled by user');
+          console.log("Import cancelled by user");
           return;
         }
 
@@ -607,41 +640,47 @@ const ui = {
 
         try {
           const files = await Filesystem.readdir({
-            path: '',
-            directory: Directory.Documents
+            path: "",
+            directory: Directory.Documents,
           });
 
-          const backupFiles = files.files.filter(file =>
-            file.name.endsWith('.json') &&
-            (file.name.includes('backup') || file.name.includes('petit-recipe'))
+          const backupFiles = files.files.filter(
+            (file) =>
+              file.name.endsWith(".json") &&
+              (file.name.includes("backup") ||
+                file.name.includes("petit-recipe")),
           );
 
           if (backupFiles.length === 0) {
-            alert('❌ バックアップファイルが見つかりません。\n\nDocuments フォルダに *.json ファイルを配置してください。');
+            alert(
+              "❌ バックアップファイルが見つかりません。\n\nDocuments フォルダに *.json ファイルを配置してください。",
+            );
             return;
           }
 
           // Use the most recent backup file
-          const latestFile = backupFiles.sort((a, b) => b.name.localeCompare(a.name))[0];
+          const latestFile = backupFiles.sort((a, b) =>
+            b.name.localeCompare(a.name),
+          )[0];
 
           const fileData = await Filesystem.readFile({
             path: latestFile.name,
             directory: Directory.Documents,
-            encoding: 'utf8'
+            encoding: "utf8",
           });
 
           await this.processImportData(fileData.data, latestFile.name);
-
         } catch (fileError) {
-          console.error('File system error:', fileError);
-          alert('❌ ファイル読み込みエラー: Documents フォルダにアクセスできません。');
+          console.error("File system error:", fileError);
+          alert(
+            "❌ ファイル読み込みエラー: Documents フォルダにアクセスできません。",
+          );
         }
-
       } else {
         // Web environment - use file input
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
 
         input.onchange = async (event) => {
           const file = event.target.files[0];
@@ -652,7 +691,7 @@ const ui = {
             try {
               await this.processImportData(e.target.result, file.name);
             } catch (error) {
-              console.error('❌ Import processing failed:', error);
+              console.error("❌ Import processing failed:", error);
               alert(`❌ インポート処理に失敗しました: ${error.message}`);
             }
           };
@@ -661,9 +700,8 @@ const ui = {
 
         input.click();
       }
-
     } catch (error) {
-      console.error('❌ Import failed:', error);
+      console.error("❌ Import failed:", error);
       alert(`❌ インポートに失敗しました: ${error.message}`);
     }
   },
@@ -679,29 +717,34 @@ const ui = {
 
       // Validate import data
       if (!importData.recipes || !Array.isArray(importData.recipes)) {
-        throw new Error('無効なバックアップファイル形式です');
+        throw new Error("無効なバックアップファイル形式です");
       }
 
       const recipeCount = importData.recipes.length;
 
       const confirm = window.confirm(
         `📥 データをインポートしますか？\n\n` +
-        `ファイル: ${filename}\n` +
-        `レシピ数: ${recipeCount}件\n` +
-        `エクスポート日: ${importData.exportDate || '不明'}\n\n` +
-        `⚠️ 現在のデータは全て上書きされます。`
+          `ファイル: ${filename}\n` +
+          `レシピ数: ${recipeCount}件\n` +
+          `エクスポート日: ${importData.exportDate || "不明"}\n\n` +
+          `⚠️ 現在のデータは全て上書きされます。`,
       );
 
       if (!confirm) {
-        console.log('Import cancelled by user');
+        console.log("Import cancelled by user");
         return;
       }
 
       // Save imported data using recipeDataManager
-      if (window.recipeDataManager && typeof window.recipeDataManager.saveRecipes === 'function') {
-        console.log('📥 Using recipeDataManager to save imported data');
+      if (
+        window.recipeDataManager &&
+        typeof window.recipeDataManager.saveRecipes === "function"
+      ) {
+        console.log("📥 Using recipeDataManager to save imported data");
 
-        const success = await window.recipeDataManager.saveRecipes(importData.recipes);
+        const success = await window.recipeDataManager.saveRecipes(
+          importData.recipes,
+        );
 
         if (success) {
           // Update app state
@@ -715,22 +758,21 @@ const ui = {
             window.ui.render();
           }
 
-          alert(`✅ データをインポートしました！\n\nインポート件数: ${recipeCount}件\nファイル: ${filename}`);
+          alert(
+            `✅ データをインポートしました！\n\nインポート件数: ${recipeCount}件\nファイル: ${filename}`,
+          );
           console.log(`✅ Import completed: ${recipeCount} recipes imported`);
 
           // Navigate back to main screen
-          this.showScreen('recipes-screen');
-
+          this.showScreen("recipes-screen");
         } else {
-          throw new Error('レシピデータの保存に失敗しました');
+          throw new Error("レシピデータの保存に失敗しました");
         }
-
       } else {
-        throw new Error('recipeDataManager が利用できません');
+        throw new Error("recipeDataManager が利用できません");
       }
-
     } catch (error) {
-      console.error('❌ Import processing failed:', error);
+      console.error("❌ Import processing failed:", error);
       alert(`❌ インポート処理に失敗しました: ${error.message}`);
     }
   },
@@ -742,19 +784,19 @@ const ui = {
     console.log(`🍳 Rendering recipe details for: ${recipe.name}`);
 
     // Update the recipe title
-    const titleElement = document.getElementById('recipe-detail-title');
+    const titleElement = document.getElementById("recipe-detail-title");
     if (titleElement) {
       titleElement.textContent = recipe.name;
     }
 
     // Render ingredients
-    const ingredientsContainer = document.getElementById('ingredients-list');
+    const ingredientsContainer = document.getElementById("ingredients-list");
     if (ingredientsContainer && recipe.ingredients) {
-      ingredientsContainer.innerHTML = '';
+      ingredientsContainer.innerHTML = "";
 
-      recipe.ingredients.forEach(ingredient => {
-        const ingredientElement = document.createElement('div');
-        ingredientElement.className = 'ingredient-item';
+      recipe.ingredients.forEach((ingredient) => {
+        const ingredientElement = document.createElement("div");
+        ingredientElement.className = "ingredient-item";
         ingredientElement.innerHTML = `
           <span class="ingredient-name">${ingredient.name}</span>
           <span class="ingredient-amount">${ingredient.amount}${ingredient.unit}</span>
@@ -766,13 +808,13 @@ const ui = {
     }
 
     // Render steps
-    const stepsContainer = document.getElementById('steps-list');
+    const stepsContainer = document.getElementById("steps-list");
     if (stepsContainer && recipe.steps) {
-      stepsContainer.innerHTML = '';
+      stepsContainer.innerHTML = "";
 
       recipe.steps.forEach((step, index) => {
-        const stepElement = document.createElement('div');
-        stepElement.className = 'step-item';
+        const stepElement = document.createElement("div");
+        stepElement.className = "step-item";
         stepElement.innerHTML = `
           <div class="step-number">${index + 1}</div>
           <div class="step-content">${step}</div>
@@ -784,53 +826,31 @@ const ui = {
     }
 
     // Update serving info if available
-    const servingInfo = document.querySelector('.portion-slider-container');
+    const servingInfo = document.querySelector(".portion-slider-container");
     if (servingInfo && recipe.servings) {
-      const portionValue = document.getElementById('portion-value');
-      const portionSlider = document.getElementById('portion-slider');
+      const portionValue = document.getElementById("portion-value");
+      const portionSlider = document.getElementById("portion-slider");
 
       if (portionValue) portionValue.textContent = recipe.servings;
       if (portionSlider) portionSlider.value = recipe.servings;
     }
 
     // Show nutrition info if available
-    const nutritionContainer = document.getElementById('nutrition-info');
+    const nutritionContainer = document.getElementById("nutrition-info");
     if (nutritionContainer && recipe.nutrition) {
       nutritionContainer.innerHTML = `
         <h4>栄養情報 (1人前)</h4>
         <div class="nutrition-grid">
-          ${recipe.nutrition.calories ? `<div class="nutrition-item">カロリー: ${recipe.nutrition.calories}kcal</div>` : ''}
-          ${recipe.nutrition.protein ? `<div class="nutrition-item">タンパク質: ${recipe.nutrition.protein}g</div>` : ''}
-          ${recipe.nutrition.carbs ? `<div class="nutrition-item">炭水化物: ${recipe.nutrition.carbs}g</div>` : ''}
-          ${recipe.nutrition.fat ? `<div class="nutrition-item">脂質: ${recipe.nutrition.fat}g</div>` : ''}
+          ${recipe.nutrition.calories ? `<div class="nutrition-item">カロリー: ${recipe.nutrition.calories}kcal</div>` : ""}
+          ${recipe.nutrition.protein ? `<div class="nutrition-item">タンパク質: ${recipe.nutrition.protein}g</div>` : ""}
+          ${recipe.nutrition.carbs ? `<div class="nutrition-item">炭水化物: ${recipe.nutrition.carbs}g</div>` : ""}
+          ${recipe.nutrition.fat ? `<div class="nutrition-item">脂質: ${recipe.nutrition.fat}g</div>` : ""}
         </div>
       `;
     }
 
-    console.log('✅ Recipe details rendered successfully');
+    console.log("✅ Recipe details rendered successfully");
   },
-
-  /**
-   * Show specific screen and hide others
-   */
-  showScreen(screenId) {
-    console.log(`🖼️ Showing screen: ${screenId}`);
-
-    // Hide all screens
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(screen => {
-      screen.style.display = 'none';
-    });
-
-    // Show target screen
-    const targetScreen = document.getElementById(screenId);
-    if (targetScreen) {
-      targetScreen.style.display = 'block';
-      console.log(`✅ Screen ${screenId} displayed`);
-    } else {
-      console.error(`❌ Screen ${screenId} not found`);
-    }
-  }
 };
 
 // Make ui globally available
@@ -840,11 +860,11 @@ window.ui = ui;
 // This ensures proper initialization order: core.js → data loading → UI render → event listeners
 
 // Re-render when app is initialized or refreshed
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Wait for app initialization
   const checkAppReady = () => {
     if (window.app && window.app.isInitialized) {
-      console.log('🎨 App ready, triggering initial UI render');
+      console.log("🎨 App ready, triggering initial UI render");
       window.ui.render();
     } else {
       setTimeout(checkAppReady, 100);
@@ -853,4 +873,4 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(checkAppReady, 100);
 });
 
-console.log('🎨 BOC-109: UI.js loaded - Clean UI layer established');
+console.log("🎨 BOC-109: UI.js loaded - Clean UI layer established");

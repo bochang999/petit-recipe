@@ -19,7 +19,7 @@ class RecipeTestFramework {
    * Test loadRecipes function with different data formats
    */
   async testLoadRecipes() {
-    this.log('🧪 Starting loadRecipes tests...');
+    this.log("🧪 Starting loadRecipes tests...");
 
     // Test 1: Direct array format
     await this.testArrayFormat();
@@ -33,48 +33,48 @@ class RecipeTestFramework {
     // Test 4: Error handling
     await this.testErrorHandling();
 
-    this.log('✅ All loadRecipes tests completed');
+    this.log("✅ All loadRecipes tests completed");
   }
 
   async testArrayFormat() {
-    this.log('📊 Test 1: Direct array format');
+    this.log("📊 Test 1: Direct array format");
 
     // Mock array format data
     const testData = [
       { id: "1", name: "Test Recipe 1", servings: 2 },
-      { id: "2", name: "Test Recipe 2", servings: 4 }
+      { id: "2", name: "Test Recipe 2", servings: 4 },
     ];
 
     const result = this.validateTestData(testData);
     if (result.valid) {
-      this.log('✅ Array format validation passed');
+      this.log("✅ Array format validation passed");
     } else {
       this.log(`❌ Array format validation failed: ${result.error}`);
     }
   }
 
   async testNestedFormat() {
-    this.log('📊 Test 2: Nested object format {recipes: [...]}');
+    this.log("📊 Test 2: Nested object format {recipes: [...]}");
 
     // Mock nested format data
     const testData = {
       version: "1.0",
       recipes: [
         { id: "1", name: "Test Recipe 1", servings: 2 },
-        { id: "2", name: "Test Recipe 2", servings: 4 }
-      ]
+        { id: "2", name: "Test Recipe 2", servings: 4 },
+      ],
     };
 
     const result = this.validateTestData(testData);
     if (result.valid) {
-      this.log('✅ Nested format validation passed');
+      this.log("✅ Nested format validation passed");
     } else {
       this.log(`❌ Nested format validation failed: ${result.error}`);
     }
   }
 
   async testDeepNestedFormat() {
-    this.log('📊 Test 3: Deep nested format {data: {recipes: [...]}}');
+    this.log("📊 Test 3: Deep nested format {data: {recipes: [...]}}");
 
     // Mock deep nested format data
     const testData = {
@@ -82,30 +82,30 @@ class RecipeTestFramework {
       data: {
         recipes: [
           { id: "1", name: "Test Recipe 1", servings: 2 },
-          { id: "2", name: "Test Recipe 2", servings: 4 }
-        ]
-      }
+          { id: "2", name: "Test Recipe 2", servings: 4 },
+        ],
+      },
     };
 
     const result = this.validateTestData(testData);
     if (result.valid) {
-      this.log('✅ Deep nested format validation passed');
+      this.log("✅ Deep nested format validation passed");
     } else {
       this.log(`❌ Deep nested format validation failed: ${result.error}`);
     }
   }
 
   async testErrorHandling() {
-    this.log('📊 Test 4: Error handling');
+    this.log("📊 Test 4: Error handling");
 
     // Test invalid data
     const invalidData = { invalid: true };
     const result = this.validateTestData(invalidData);
 
     if (!result.valid) {
-      this.log('✅ Error handling works correctly (invalid data rejected)');
+      this.log("✅ Error handling works correctly (invalid data rejected)");
     } else {
-      this.log('❌ Error handling failed (invalid data accepted)');
+      this.log("❌ Error handling failed (invalid data accepted)");
     }
   }
 
@@ -125,15 +125,18 @@ class RecipeTestFramework {
       }
 
       if (!Array.isArray(arr)) {
-        return { valid: false, error: 'Not a valid recipe array' };
+        return { valid: false, error: "Not a valid recipe array" };
       }
 
       // Basic validation: first item should have id/title/name
-      if (arr.length === 0 || (typeof arr[0] === 'object' &&
-        (arr[0].id || arr[0].title || arr[0].name))) {
+      if (
+        arr.length === 0 ||
+        (typeof arr[0] === "object" &&
+          (arr[0].id || arr[0].title || arr[0].name))
+      ) {
         return { valid: true, count: arr.length };
       } else {
-        return { valid: false, error: 'Invalid recipe format' };
+        return { valid: false, error: "Invalid recipe format" };
       }
     } catch (error) {
       return { valid: false, error: error.message };
@@ -144,10 +147,10 @@ class RecipeTestFramework {
    * Test actual recipes.json file format
    */
   async testRecipesJsonFile() {
-    this.log('🧪 Testing actual recipes.json file...');
+    this.log("🧪 Testing actual recipes.json file...");
 
     try {
-      const response = await fetch('./recipes.json');
+      const response = await fetch("./recipes.json");
       if (!response.ok) {
         this.log(`❌ Failed to fetch recipes.json: ${response.status}`);
         return;
@@ -157,7 +160,9 @@ class RecipeTestFramework {
       const result = this.validateTestData(data);
 
       if (result.valid) {
-        this.log(`✅ recipes.json validation passed: ${result.count} recipes found`);
+        this.log(
+          `✅ recipes.json validation passed: ${result.count} recipes found`,
+        );
       } else {
         this.log(`❌ recipes.json validation failed: ${result.error}`);
       }
@@ -170,18 +175,18 @@ class RecipeTestFramework {
    * Run all tests
    */
   async runAllTests() {
-    this.log('🚀 Starting ChatGPT-enhanced Recipe Test Suite...');
+    this.log("🚀 Starting ChatGPT-enhanced Recipe Test Suite...");
 
     await this.testLoadRecipes();
     await this.testRecipesJsonFile();
 
-    this.log('🎉 Test suite completed');
+    this.log("🎉 Test suite completed");
 
     // Return logs for debugging
     return {
       success: true,
       logs: this.logs,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -197,7 +202,7 @@ class RecipeTestFramework {
 window.RecipeTestFramework = RecipeTestFramework;
 
 // Add convenience function for debug panel
-window.runRecipeTests = async function() {
+window.runRecipeTests = async function () {
   const testFramework = new RecipeTestFramework();
   const result = await testFramework.runAllTests();
 
@@ -210,4 +215,6 @@ window.runRecipeTests = async function() {
   return result;
 };
 
-console.log('🧪 Recipe Test Framework loaded - use window.runRecipeTests() to run tests');
+console.log(
+  "🧪 Recipe Test Framework loaded - use window.runRecipeTests() to run tests",
+);

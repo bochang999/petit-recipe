@@ -186,6 +186,133 @@ const app = {
       console.error("❌ UI layer not available");
     }
   },
+
+  /**
+   * Start editing the current recipe
+   */
+  startEditRecipe() {
+    console.log("✏️ Starting recipe edit");
+
+    if (!this.selectedRecipe) {
+      console.error("❌ No recipe selected for editing");
+      alert("編集するレシピが選択されていません");
+      return;
+    }
+
+    console.log(`✏️ Editing recipe: ${this.selectedRecipe.name}`);
+
+    // TODO: Navigate to edit screen and populate with current recipe data
+    alert(`✏️ レシピ編集機能は準備中です\nレシピ: ${this.selectedRecipe.name}`);
+  },
+
+  /**
+   * Duplicate the current recipe
+   */
+  duplicateRecipe() {
+    console.log("📋 Duplicating current recipe");
+
+    if (!this.selectedRecipe) {
+      console.error("❌ No recipe selected for duplication");
+      alert("複製するレシピが選択されていません");
+      return;
+    }
+
+    const originalRecipe = this.selectedRecipe;
+    const duplicatedRecipe = {
+      ...originalRecipe,
+      id: `${originalRecipe.id}_copy_${Date.now()}`,
+      name: `${originalRecipe.name} (コピー)`,
+    };
+
+    console.log(`📋 Duplicating recipe: ${originalRecipe.name}`);
+
+    // Add to recipes list
+    this.recipes.push(duplicatedRecipe);
+
+    // Save to storage if available
+    if (
+      window.recipeDataManager &&
+      typeof window.recipeDataManager.saveRecipes === "function"
+    ) {
+      window.recipeDataManager.saveRecipes(this.recipes);
+    }
+
+    // Refresh UI
+    if (window.ui) {
+      window.ui.render();
+    }
+
+    alert(`✅ レシピを複製しました！\n新しいレシピ: ${duplicatedRecipe.name}`);
+    console.log(`✅ Recipe duplicated: ${duplicatedRecipe.name}`);
+  },
+
+  /**
+   * Confirm and delete the current recipe
+   */
+  confirmDeleteRecipe() {
+    console.log("🗑️ Confirm delete recipe");
+
+    if (!this.selectedRecipe) {
+      console.error("❌ No recipe selected for deletion");
+      alert("削除するレシピが選択されていません");
+      return;
+    }
+
+    const recipeName = this.selectedRecipe.name;
+    const confirm = window.confirm(
+      `🗑️ レシピを削除しますか？\n\n` +
+        `レシピ名: ${recipeName}\n\n` +
+        `⚠️ この操作は取り消すことができません。`,
+    );
+
+    if (!confirm) {
+      console.log("Recipe deletion cancelled by user");
+      return;
+    }
+
+    this.deleteRecipe(this.selectedRecipe.id);
+  },
+
+  /**
+   * Delete recipe by ID
+   */
+  deleteRecipe(recipeId) {
+    console.log(`🗑️ Deleting recipe with ID: ${recipeId}`);
+
+    const recipeIndex = this.recipes.findIndex(
+      (recipe) => recipe.id === recipeId,
+    );
+
+    if (recipeIndex === -1) {
+      console.error(`❌ Recipe not found with ID: ${recipeId}`);
+      alert("削除するレシピが見つかりません");
+      return;
+    }
+
+    const deletedRecipe = this.recipes[recipeIndex];
+
+    // Remove from recipes array
+    this.recipes.splice(recipeIndex, 1);
+
+    // Save to storage if available
+    if (
+      window.recipeDataManager &&
+      typeof window.recipeDataManager.saveRecipes === "function"
+    ) {
+      window.recipeDataManager.saveRecipes(this.recipes);
+    }
+
+    // Navigate back to main screen
+    this.navigateBack();
+
+    // Refresh UI
+    if (window.ui) {
+      window.ui.render();
+    }
+
+    alert(`✅ レシピを削除しました\nレシピ名: ${deletedRecipe.name}`);
+    console.log(`✅ Recipe deleted: ${deletedRecipe.name}`);
+  },
 };
 
 // Make app globally available

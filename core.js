@@ -127,6 +127,51 @@ const app = {
    */
   getRecipeById(id) {
     return this.recipes.find(recipe => recipe.id === id);
+  },
+
+  /**
+   * Show recipe details page
+   */
+  showRecipeDetails(recipeId) {
+    console.log(`🍳 Showing recipe details for ID: ${recipeId}`);
+
+    const recipe = this.getRecipeById(recipeId);
+    if (!recipe) {
+      console.error(`❌ Recipe not found with ID: ${recipeId}`);
+      alert(`レシピが見つかりません (ID: ${recipeId})`);
+      return;
+    }
+
+    // Store current recipe for detail page
+    this.selectedRecipe = recipe;
+    console.log(`✅ Selected recipe: ${recipe.name}`);
+
+    // Navigate to detail screen
+    this.currentScreen = 'recipe-detail-screen';
+
+    // Use UI layer to show screen and render recipe details
+    if (window.ui) {
+      window.ui.showScreen('recipe-detail-screen');
+      window.ui.renderRecipeDetails(recipe);
+    } else {
+      console.error('❌ UI layer not available');
+    }
+  },
+
+  /**
+   * Navigate back to main screen
+   */
+  navigateBack() {
+    console.log('← Navigating back to main screen');
+
+    this.currentScreen = 'recipes-screen';
+    this.selectedRecipe = null;
+
+    if (window.ui) {
+      window.ui.showScreen('recipes-screen');
+    } else {
+      console.error('❌ UI layer not available');
+    }
   }
 };
 

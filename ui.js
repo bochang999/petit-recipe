@@ -69,10 +69,16 @@ const ui = {
       </div>
     `;
 
-    // Add click handler if needed
+    // Add click handler for recipe details
     element.addEventListener('click', () => {
-      console.log(`Recipe clicked: ${recipe.name}`);
-      // Future: show recipe details
+      console.log(`🍳 Recipe clicked: ${recipe.name} (ID: ${recipe.id})`);
+
+      if (window.app && typeof window.app.showRecipeDetails === 'function') {
+        window.app.showRecipeDetails(recipe.id);
+      } else {
+        console.error('❌ app.showRecipeDetails not available');
+        alert('レシピ詳細機能は準備中です');
+      }
     });
 
     return element;
@@ -726,6 +732,103 @@ const ui = {
     } catch (error) {
       console.error('❌ Import processing failed:', error);
       alert(`❌ インポート処理に失敗しました: ${error.message}`);
+    }
+  },
+
+  /**
+   * Render recipe details page
+   */
+  renderRecipeDetails(recipe) {
+    console.log(`🍳 Rendering recipe details for: ${recipe.name}`);
+
+    // Update the recipe title
+    const titleElement = document.getElementById('recipe-detail-title');
+    if (titleElement) {
+      titleElement.textContent = recipe.name;
+    }
+
+    // Render ingredients
+    const ingredientsContainer = document.getElementById('ingredients-list');
+    if (ingredientsContainer && recipe.ingredients) {
+      ingredientsContainer.innerHTML = '';
+
+      recipe.ingredients.forEach(ingredient => {
+        const ingredientElement = document.createElement('div');
+        ingredientElement.className = 'ingredient-item';
+        ingredientElement.innerHTML = `
+          <span class="ingredient-name">${ingredient.name}</span>
+          <span class="ingredient-amount">${ingredient.amount}${ingredient.unit}</span>
+        `;
+        ingredientsContainer.appendChild(ingredientElement);
+      });
+
+      console.log(`✅ Rendered ${recipe.ingredients.length} ingredients`);
+    }
+
+    // Render steps
+    const stepsContainer = document.getElementById('steps-list');
+    if (stepsContainer && recipe.steps) {
+      stepsContainer.innerHTML = '';
+
+      recipe.steps.forEach((step, index) => {
+        const stepElement = document.createElement('div');
+        stepElement.className = 'step-item';
+        stepElement.innerHTML = `
+          <div class="step-number">${index + 1}</div>
+          <div class="step-content">${step}</div>
+        `;
+        stepsContainer.appendChild(stepElement);
+      });
+
+      console.log(`✅ Rendered ${recipe.steps.length} steps`);
+    }
+
+    // Update serving info if available
+    const servingInfo = document.querySelector('.portion-slider-container');
+    if (servingInfo && recipe.servings) {
+      const portionValue = document.getElementById('portion-value');
+      const portionSlider = document.getElementById('portion-slider');
+
+      if (portionValue) portionValue.textContent = recipe.servings;
+      if (portionSlider) portionSlider.value = recipe.servings;
+    }
+
+    // Show nutrition info if available
+    const nutritionContainer = document.getElementById('nutrition-info');
+    if (nutritionContainer && recipe.nutrition) {
+      nutritionContainer.innerHTML = `
+        <h4>栄養情報 (1人前)</h4>
+        <div class="nutrition-grid">
+          ${recipe.nutrition.calories ? `<div class="nutrition-item">カロリー: ${recipe.nutrition.calories}kcal</div>` : ''}
+          ${recipe.nutrition.protein ? `<div class="nutrition-item">タンパク質: ${recipe.nutrition.protein}g</div>` : ''}
+          ${recipe.nutrition.carbs ? `<div class="nutrition-item">炭水化物: ${recipe.nutrition.carbs}g</div>` : ''}
+          ${recipe.nutrition.fat ? `<div class="nutrition-item">脂質: ${recipe.nutrition.fat}g</div>` : ''}
+        </div>
+      `;
+    }
+
+    console.log('✅ Recipe details rendered successfully');
+  },
+
+  /**
+   * Show specific screen and hide others
+   */
+  showScreen(screenId) {
+    console.log(`🖼️ Showing screen: ${screenId}`);
+
+    // Hide all screens
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => {
+      screen.style.display = 'none';
+    });
+
+    // Show target screen
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+      targetScreen.style.display = 'block';
+      console.log(`✅ Screen ${screenId} displayed`);
+    } else {
+      console.error(`❌ Screen ${screenId} not found`);
     }
   }
 };

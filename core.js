@@ -21,6 +21,7 @@ const app = {
    */
   async initialize() {
     console.log('🚀 BOC-109: Core app initialization started');
+    alert('🚀 Core app initialization started');
 
     try {
       // Load recipes using recipeDataManager if available
@@ -106,6 +107,7 @@ window.app = app;
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🔧 BOC-109: DOM loaded, starting core app initialization');
+  alert('🚀 APP STARTING! DOM loaded');
   window.app.initialize();
 });
 

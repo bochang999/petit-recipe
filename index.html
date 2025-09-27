@@ -35,16 +35,15 @@
             <header class="screen-header">
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions">
-                    <button id="refresh-button" class="refresh-button" title="レシピデータをリロード" onclick="alert('🔄 RELOAD BUTTON CLICKED!'); console.log('🔄 RELOAD BUTTON CLICKED!'); console.log('app exists:', !!window.app); console.log('recipeDataManager exists:', !!window.recipeDataManager); if(window.app && window.app.refresh) { alert('📞 Calling app.refresh()'); window.app.refresh(); } else { alert('❌ app.refresh not found'); }">🔄</button>
+                    <button id="refresh-button" class="refresh-button" title="レシピデータをリロード" onclick="if(window.app && window.app.refresh) { window.app.refresh(); } else { alert('❌ リロード機能が利用できません'); }">🔄</button>
                     <button class="settings-button" onclick="window.ui.showScreen('settings-screen')">⚙️</button>
-                    <button class="ai-add-button">🤖 AI追加</button>
                 </div>
             </header>
 
             <div class="screen-content">
                 <div class="search-container">
                     <input type="text" id="recipe-search" placeholder="レシピを検索..." class="search-input">
-                    <button class="refresh-data-button" title="レシピデータをリロード" onclick="alert('🔄 DATA RELOAD BUTTON CLICKED!'); console.log('🔄 DATA RELOAD BUTTON CLICKED!'); if(window.app && window.app.refresh) { alert('📞 Calling app.refresh()'); window.app.refresh(); } else { alert('❌ No reload function found'); }">🔄</button>
+                    <button class="refresh-data-button" title="レシピデータをリロード" onclick="if(window.app && window.app.refresh) { window.app.refresh(); } else { alert('❌ リロード機能が利用できません'); }">🔄</button>
                 </div>
 
                 <div class="sort-tabs">

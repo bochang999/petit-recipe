@@ -33,43 +33,64 @@ class RecipeDataManager {
    * Load recipes from Documents/recipes.json (APK-exclusive)
    */
   async loadRecipes() {
+    console.log('--- Starting loadRecipes ---');
+
+    const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
+    const FILENAME = 'recipes.json';
+
     try {
-      await this.initialize();
-
-      // APK-exclusive: Always use Capacitor FileSystem
-      try {
-        alert("📁 READING: Attempting to read Documents/recipes.json");
-        const result = await this.filesystem.readFile({
-          path: this.filePath,
-          directory: this.directory,
-          encoding: this.encoding,
+        // まず、ユーザーのファイル読み込みを試みる
+        const result = await Filesystem.readFile({
+            path: FILENAME,
+            directory: Directory.Documents,
+            encoding: Encoding.UTF8,
         });
-        alert(`📁 READ RESULT: ${JSON.stringify(result).substring(0, 100)}`);
 
-        if (!result || !result.data) {
-          alert("❌ READ FAILED: result or result.data is null/undefined");
-          throw new Error("No data returned from readFile");
+        // ファイルが存在し、中身が空でないことを確認
+        if (result.data && result.data.trim() !== '') {
+            console.log(`✅ READ SUCCESS: ${result.data.length} bytes read from Documents.`);
+            const parsedData = JSON.parse(result.data);
+            return parsedData.recipes || []; // recipesプロパティがなくてもエラーにしない
+        } else {
+            // ファイルは存在するが空の場合
+            console.warn('⚠️ File exists in Documents but is empty. Treating as first launch.');
+            throw new Error('Empty file found'); // catchブロックに移行させる
         }
-
-        alert(`📁 READ SUCCESS: File size ${result.data.length} characters`);
-        const data = JSON.parse(result.data);
-        alert(`📁 PARSE SUCCESS: Found ${data.recipes ? data.recipes.length : 'NO RECIPES PROPERTY'} recipes`);
-        console.log(
-          `✅ Loaded ${data.recipes.length} recipes from Documents/${this.filePath}`,
-        );
-        return data.recipes || [];
-      } catch (fileError) {
-        console.log(
-          "📝 No recipes.json found in Documents, initializing from APK assets",
-        );
-        alert("📝 CREATING INITIAL FILE: recipes.json not found in Documents");
-        const result = await this.createInitialRecipesFile();
-        alert(`📝 INITIAL FILE RESULT: Created ${result.length} recipes`);
-        return result;
-      }
     } catch (error) {
-      console.error("❌ loadRecipes failed:", error);
-      return [];
+        // readFileが失敗した（ファイルが存在しない）か、ファイルが空だった場合
+        console.log(`ℹ️ CATCH: Cannot read file. Assuming first launch. Error: ${error.message}`);
+        console.log('➡️ CREATING INITIAL FILE from APK assets...');
+
+        try {
+            // APKに同梱された初期データを取得
+            const response = await fetch('./recipes.json');
+            if (!response.ok) {
+                // fetchが失敗した場合（404 Not Foundなど）
+                throw new Error(`Fetch failed with status: ${response.status}`);
+            }
+
+            const bundledDataText = await response.text();
+            // 初期データが空でないことを確認
+            if (!bundledDataText || bundledDataText.trim() === '') {
+                throw new Error('Fetched initial data is empty!');
+            }
+
+            // ユーザーの保存領域に書き込む
+            await Filesystem.writeFile({
+                path: FILENAME,
+                data: bundledDataText,
+                directory: Directory.Documents,
+                encoding: Encoding.UTF8,
+            });
+
+            console.log(`✅ CREATE SUCCESS: Initial file created in Documents.`);
+            const parsedData = JSON.parse(bundledDataText);
+            return parsedData.recipes || [];
+        } catch (creationError) {
+            console.error('❌ FATAL: Failed to create initial recipe file!', creationError);
+            alert('致命的なエラー: 初期レシピファイルの作成に失敗しました。アプリを再インストールしてみてください。');
+            return []; // 最悪のケースでは空の配列を返す
+        }
     }
   }
 

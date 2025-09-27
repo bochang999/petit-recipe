@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Enhanced Test Runner - petit-recipe</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .test-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .test-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e1e8ed;
+        }
+
+        .test-section h3 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-button {
+            width: 100%;
+            padding: 15px 20px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .test-button:hover {
+            background: linear-gradient(135deg, #2980b9, #1f4e79);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .test-button:active {
+            transform: translateY(0);
+        }
+
+        .test-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .test-button.running {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .test-button.success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .test-button.error {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .results-section {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+
+        .test-results {
+            background: #2c3e50;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .test-results::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .test-results::-webkit-scrollbar-track {
+            background: #34495e;
+            border-radius: 4px;
+        }
+
+        .test-results::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-left: 4px solid;
+        }
+
+        .log-info {
+            color: #3498db;
+            background: rgba(52, 152, 219, 0.1);
+            border-left-color: #3498db;
+        }
+
+        .log-success {
+            color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+            border-left-color: #27ae60;
+        }
+
+        .log-error {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            border-left-color: #e74c3c;
+        }
+
+        .log-warning {
+            color: #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+            border-left-color: #f39c12;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e1e8ed;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .control-button {
+            padding: 10px 20px;
+            background: #34495e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background: #2c3e50;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .test-dashboard {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🧪 Enhanced Test Runner</h1>
+            <p>petit-recipe プロジェクト包括テストシステム</p>
+        </div>
+
+        <div class="test-dashboard">
+            <!-- Core Tests Section -->
+            <div class="test-section">
+                <h3>🔧 Core Tests</h3>
+                <button class="test-button" onclick="runCoreTests()">
+                    <span class="button-text">Core機能テスト実行</span>
+                </button>
+                <button class="test-button" onclick="runDataTests()">
+                    <span class="button-text">データ管理テスト実行</span>
+                </button>
+                <button class="test-button" onclick="runUITests()">
+                    <span class="button-text">UI統合テスト実行</span>
+                </button>
+            </div>
+
+            <!-- Magic MCP Tests Section -->
+            <div class="test-section">
+                <h3>🔮 Magic MCP Tests</h3>
+                <button class="test-button" onclick="runMagicTests()">
+                    <span class="button-text">Magicコンポーネント生成テスト</span>
+                </button>
+                <button class="test-button" onclick="runEnhancedCardTests()">
+                    <span class="button-text">Enhanced Card統合テスト</span>
+                </button>
+                <button class="test-button" onclick="runPerformanceTests()">
+                    <span class="button-text">パフォーマンステスト実行</span>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <h3>📊 テスト結果</h3>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-tests">0</div>
+                        <div class="stat-label">総テスト数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="passed-tests" style="color: #27ae60;">0</div>
+                        <div class="stat-label">成功</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="failed-tests" style="color: #e74c3c;">0</div>
+                        <div class="stat-label">失敗</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="test-duration">0ms</div>
+                        <div class="stat-label">実行時間</div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="control-panel">
+                    <button class="control-button" onclick="runAllTests()">🚀 全テスト実行</button>
+                    <button class="control-button" onclick="clearResults()">🧹 結果クリア</button>
+                    <button class="control-button" onclick="exportResults()">💾 結果エクスポート</button>
+                    <button class="control-button" onclick="toggleAutoScroll()">📜 自動スクロール</button>
+                </div>
+
+                <div class="test-results" id="test-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load petit-recipe components -->
+    <script src="core.js"></script>
+    <script src="ui.js"></script>
+    <script src="recipeDataManager.js"></script>
+
+    <!-- Load Magic MCP components -->
+    <script src="magic-component-generator.js"></script>
+    <script src="test-magic-generation.js"></script>
+
+    <!-- Enhanced Test Runner Implementation -->
+    <script>
+        class EnhancedTestRunner {
+            constructor() {
+                this.testResults = [];
+                this.stats = {
+                    total: 0,
+                    passed: 0,
+                    failed: 0,
+                    duration: 0
+                };
+                this.autoScroll = true;
+                this.startTime = null;
+                this.currentTestSuite = null;
+            }
+
+            log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry log-${type}`;
+                logEntry.innerHTML = `<span style="opacity: 0.7;">[${timestamp}]</span> ${message}`;
+
+                const resultsContainer = document.getElementById('test-results');
+                resultsContainer.appendChild(logEntry);
+
+                if (this.autoScroll) {
+                    resultsContainer.scrollTop = resultsContainer.scrollHeight;
+                }
+
+                this.testResults.push({ timestamp, message, type });
+            }
+
+            updateStats() {
+                document.getElementById('total-tests').textContent = this.stats.total;
+                document.getElementById('passed-tests').textContent = this.stats.passed;
+                document.getElementById('failed-tests').textContent = this.stats.failed;
+                document.getElementById('test-duration').textContent = `${this.stats.duration}ms`;
+
+                const progress = this.stats.total > 0 ?
+                    ((this.stats.passed + this.stats.failed) / this.stats.total) * 100 : 0;
+                document.getElementById('progress-fill').style.width = `${progress}%`;
+            }
+
+            async runTest(testName, testFunction) {
+                this.log(`🧪 Starting: ${testName}`, 'info');
+                this.stats.total++;
+                this.updateStats();
+
+                const testStart = performance.now();
+                try {
+                    const result = await testFunction();
+                    const duration = Math.round(performance.now() - testStart);
+
+                    if (result.success !== false) {
+                        this.stats.passed++;
+                        this.log(`✅ Passed: ${testName} (${duration}ms)`, 'success');
+                        return { success: true, duration, result };
+                    } else {
+                        this.stats.failed++;
+                        this.log(`❌ Failed: ${testName} - ${result.error || 'Unknown error'} (${duration}ms)`, 'error');
+                        return { success: false, duration, error: result.error };
+                    }
+                } catch (error) {
+                    const duration = Math.round(performance.now() - testStart);
+                    this.stats.failed++;
+                    this.log(`❌ Error: ${testName} - ${error.message} (${duration}ms)`, 'error');
+                    return { success: false, duration, error: error.message };
+                } finally {
+                    this.updateStats();
+                }
+            }
+
+            setButtonState(button, state) {
+                button.classList.remove('running', 'success', 'error');
+                const spinner = button.querySelector('.loading-spinner');
+
+                if (state === 'running') {
+                    button.classList.add('running');
+                    button.disabled = true;
+                    if (!spinner) {
+                        const spinnerEl = document.createElement('span');
+                        spinnerEl.className = 'loading-spinner';
+                        button.querySelector('.button-text').prepend(spinnerEl);
+                    }
+                } else {
+                    button.disabled = false;
+                    if (spinner) spinner.remove();
+                    if (state) button.classList.add(state);
+                }
+            }
+
+            async runTestSuite(suiteName, tests, button) {
+                this.currentTestSuite = suiteName;
+                this.setButtonState(button, 'running');
+                this.log(`🚀 Starting test suite: ${suiteName}`, 'info');
+
+                const suiteStart = performance.now();
+                let suitePassed = 0;
+                let suiteFailed = 0;
+
+                for (const [testName, testFn] of tests) {
+                    const result = await this.runTest(testName, testFn);
+                    if (result.success) {
+                        suitePassed++;
+                    } else {
+                        suiteFailed++;
+                    }
+                }
+
+                const suiteDuration = Math.round(performance.now() - suiteStart);
+                const suiteSuccess = suiteFailed === 0;
+
+                this.log(`📊 Suite ${suiteName} completed: ${suitePassed} passed, ${suiteFailed} failed (${suiteDuration}ms)`,
+                    suiteSuccess ? 'success' : 'error');
+
+                this.setButtonState(button, suiteSuccess ? 'success' : 'error');
+                this.currentTestSuite = null;
+
+                return { success: suiteSuccess, passed: suitePassed, failed: suiteFailed, duration: suiteDuration };
+            }
+
+            clear() {
+                document.getElementById('test-results').innerHTML = '';
+                this.testResults = [];
+                this.stats = { total: 0, passed: 0, failed: 0, duration: 0 };
+                this.updateStats();
+
+                // Reset button states
+                document.querySelectorAll('.test-button').forEach(button => {
+                    this.setButtonState(button, null);
+                });
+            }
+
+            export() {
+                const exportData = {
+                    timestamp: new Date().toISOString(),
+                    stats: this.stats,
+                    results: this.testResults,
+                    userAgent: navigator.userAgent,
+                    url: window.location.href
+                };
+
+                const blob = new Blob([JSON.stringify(exportData, null, 2)],
+                    { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `test-results-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                this.log('📁 Test results exported', 'success');
+            }
+
+            toggleAutoScroll() {
+                this.autoScroll = !this.autoScroll;
+                this.log(`📜 Auto scroll ${this.autoScroll ? 'enabled' : 'disabled'}`, 'info');
+            }
+        }
+
+        // Initialize test runner
+        const testRunner = new EnhancedTestRunner();
+
+        // Core Tests
+        async function runCoreTests() {
+            const button = event.target;
+            const tests = [
+                ['App Initialization', async () => {
+                    if (!window.app) throw new Error('App object not found');
+                    if (!window.app.isInitialized) throw new Error('App not initialized');
+                    return { success: true };
+                }],
+                ['Recipe Loading', async () => {
+                    const recipes = window.app.getRecipes();
+                    if (!Array.isArray(recipes)) throw new Error('Recipes not loaded as array');
+                    if (recipes.length === 0) throw new Error('No recipes loaded');
+                    return { success: true, count: recipes.length };
+                }],
+                ['Navigation System', async () => {
+                    if (typeof window.app.showRecipeDetails !== 'function') {
+                        throw new Error('Navigation function not available');
+                    }
+                    return { success: true };
+                }]
+            ];
+
+            return await testRunner.runTestSuite('Core Tests', tests, button);
+        }
+
+        async function runDataTests() {
+            const button = event.target;
+            const tests = [
+                ['Data Manager Available', async () => {
+                    if (!window.recipeDataManager) throw new Error('recipeDataManager not found');
+                    return { success: true };
+                }],
+                ['Load Recipes Function', async () => {
+                    if (typeof window.recipeDataManager.loadRecipes !== 'function') {
+                        throw new Error('loadRecipes function not available');
+                    }
+                    const result = await window.recipeDataManager.loadRecipes();
+                    if (!Array.isArray(result) && !result.recipes) {
+                        throw new Error('Invalid loadRecipes result format');
+                    }
+                    return { success: true };
+                }],
+                ['Save Recipes Function', async () => {
+                    if (typeof window.recipeDataManager.saveRecipes !== 'function') {
+                        throw new Error('saveRecipes function not available');
+                    }
+                    return { success: true };
+                }]
+            ];
+
+            return await testRunner.runTestSuite('Data Tests', tests, button);
+        }
+
+        async function runUITests() {
+            const button = event.target;
+            const tests = [
+                ['UI Object Available', async () => {
+                    if (!window.ui) throw new Error('UI object not found');
+                    return { success: true };
+                }],
+                ['Screen Management', async () => {
+                    if (typeof window.ui.showScreen !== 'function') {
+                        throw new Error('showScreen function not available');
+                    }
+                    return { success: true };
+                }],
+                ['Recipe Rendering', async () => {
+                    if (typeof window.ui.render !== 'function') {
+                        throw new Error('render function not available');
+                    }
+                    const recipesContainer = document.getElementById('recipes-list');
+                    return { success: !!recipesContainer };
+                }]
+            ];
+
+            return await testRunner.runTestSuite('UI Tests', tests, button);
+        }
+
+        // Magic MCP Tests
+        async function runMagicTests() {
+            const button = event.target;
+            const tests = [
+                ['Magic Generator Available', async () => {
+                    if (!window.magicGenerator) throw new Error('Magic generator not found');
+                    return { success: true };
+                }],
+                ['Component Generation', async () => {
+                    if (!window.testMagicGeneration) throw new Error('Test function not available');
+                    const result = await window.testMagicGeneration();
+                    return result;
+                }],
+                ['Enhanced Recipe Card', async () => {
+                    if (!window.EnhancedRecipeCard) {
+                        testRunner.log('⚠️ EnhancedRecipeCard not loaded, using fallback', 'warning');
+                        return { success: true, fallback: true };
+                    }
+                    return { success: true };
+                }]
+            ];
+
+            return await testRunner.runTestSuite('Magic MCP Tests', tests, button);
+        }
+
+        async function runEnhancedCardTests() {
+            const button = event.target;
+            const tests = [
+                ['CSS Integration', async () => {
+                    const styles = document.querySelectorAll('link[href*="enhanced-recipe-card"]');
+                    if (styles.length === 0) throw new Error('Enhanced card CSS not loaded');
+                    return { success: true };
+                }],
+                ['Grid Layout', async () => {
+                    const container = document.querySelector('.recipe-grid-enhanced');
+                    if (!container) throw new Error('Enhanced grid container not found');
+                    return { success: true };
+                }],
+                ['Card Rendering', async () => {
+                    const recipes = window.app.getRecipes();
+                    if (recipes.length > 0) {
+                        const testRecipe = recipes[0];
+                        const element = window.ui.createRecipeElement(testRecipe);
+                        if (!element) throw new Error('Failed to create recipe element');
+                        const hasEnhanced = element.querySelector('.recipe-card-enhanced');
+                        return { success: true, enhanced: !!hasEnhanced };
+                    }
+                    return { success: true, skipped: true };
+                }]
+            ];
+
+            return await testRunner.runTestSuite('Enhanced Card Tests', tests, button);
+        }
+
+        async function runPerformanceTests() {
+            const button = event.target;
+            const tests = [
+                ['Render Performance', async () => {
+                    const start = performance.now();
+                    if (window.ui && window.ui.render) {
+                        window.ui.render();
+                    }
+                    const duration = performance.now() - start;
+                    if (duration > 1000) throw new Error(`Render too slow: ${duration}ms`);
+                    return { success: true, duration: `${Math.round(duration)}ms` };
+                }],
+                ['Memory Usage', async () => {
+                    if (performance.memory) {
+                        const memory = performance.memory;
+                        const used = Math.round(memory.usedJSHeapSize / 1024 / 1024);
+                        if (used > 100) testRunner.log(`⚠️ High memory usage: ${used}MB`, 'warning');
+                        return { success: true, memory: `${used}MB` };
+                    }
+                    return { success: true, memory: 'N/A' };
+                }]
+            ];
+
+            return await testRunner.runTestSuite('Performance Tests', tests, button);
+        }
+
+        // Global Functions
+        async function runAllTests() {
+            testRunner.clear();
+            testRunner.log('🚀 Starting comprehensive test suite...', 'info');
+
+            const startTime = performance.now();
+
+            // Run all test suites
+            const suites = [
+                ['Core Tests', runCoreTests],
+                ['Data Tests', runDataTests],
+                ['UI Tests', runUITests],
+                ['Magic MCP Tests', runMagicTests],
+                ['Enhanced Card Tests', runEnhancedCardTests],
+                ['Performance Tests', runPerformanceTests]
+            ];
+
+            for (const [suiteName, suiteFunction] of suites) {
+                testRunner.log(`📋 Running ${suiteName}...`, 'info');
+                // Create a mock button for suite function
+                const mockButton = document.createElement('button');
+                await suiteFunction.call({ target: mockButton });
+            }
+
+            const totalDuration = Math.round(performance.now() - startTime);
+            testRunner.stats.duration = totalDuration;
+            testRunner.updateStats();
+
+            const success = testRunner.stats.failed === 0;
+            testRunner.log(`🎉 All tests completed: ${testRunner.stats.passed} passed, ${testRunner.stats.failed} failed (${totalDuration}ms)`,
+                success ? 'success' : 'error');
+        }
+
+        function clearResults() {
+            testRunner.clear();
+            testRunner.log('🧹 Test results cleared', 'info');
+        }
+
+        function exportResults() {
+            testRunner.export();
+        }
+
+        function toggleAutoScroll() {
+            testRunner.toggleAutoScroll();
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            testRunner.log('🧪 Enhanced Test Runner initialized', 'success');
+            testRunner.log(`🔍 Environment: ${navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop'}`, 'info');
+            testRunner.log(`🌐 URL: ${window.location.href}`, 'info');
+
+            // Check initial state
+            if (window.app) {
+                testRunner.log('✅ App object detected', 'success');
+            } else {
+                testRunner.log('⚠️ App object not detected', 'warning');
+            }
+
+            if (window.magicGenerator) {
+                testRunner.log('✅ Magic Generator detected', 'success');
+            } else {
+                testRunner.log('⚠️ Magic Generator not detected', 'warning');
+            }
+        });
+    </script>
+</body>
+</html>

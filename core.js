@@ -32,7 +32,24 @@ const app = {
         console.log('🔍 RecipeDataManager type:', typeof window.recipeDataManager);
 
         alert('📁 INIT STEP 4: Calling loadRecipes()');
-        this.recipes = await window.recipeDataManager.loadRecipes();
+        const loadResult = await window.recipeDataManager.loadRecipes();
+
+        // Handle new enhanced loadRecipes return format
+        if (loadResult && typeof loadResult === 'object' && loadResult.recipes) {
+          // New format: {recipes: [...], source: 'filesystem', logs: [...]}
+          this.recipes = loadResult.recipes;
+          console.log(`📊 Data source: ${loadResult.source}`);
+          console.log(`📋 Debug logs available: ${loadResult.logs ? loadResult.logs.length : 0} entries`);
+          if (loadResult.logs && loadResult.logs.length > 0) {
+            // Store logs for debug panel
+            if (!window.debugLogs) window.debugLogs = [];
+            window.debugLogs = window.debugLogs.concat(loadResult.logs);
+          }
+        } else {
+          // Legacy format: simple array or null
+          this.recipes = Array.isArray(loadResult) ? loadResult : [];
+        }
+
         alert(`✅ INIT STEP 5: Loaded ${this.recipes.length} recipes`);
         console.log(`✅ Loaded ${this.recipes.length} recipes from Capacitor FileSystem`);
       } else {

@@ -287,6 +287,16 @@
                                 🐛 ログ表示
                             </button>
                         </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>🧪 ChatGPT強化テスト実行</h4>
+                                <p>データ読み込み機能の堅牢性と複数フォーマット対応をテスト</p>
+                            </div>
+                            <button id="test-button" class="setting-button primary" onclick="window.runRecipeTests()">
+                                🧪 テスト実行
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -387,6 +397,9 @@
 
     <!-- 3. UI rendering layer -->
     <script src="ui.js"></script>
+
+    <!-- 4. ChatGPT-enhanced Testing framework -->
+    <script src="test.js"></script>
 
     <!-- OLD ARCHITECTURE DISABLED FOR DEBUGGING -->
     <!-- <script src="app.js"></script> -->

@@ -136,7 +136,7 @@ jobs:
 
         # distディレクトリ作成とファイルコピー
         mkdir -p dist
-        cp index.html style.css core.js ui.js local-recipe-ui-integration.js app.js recipeDataManager.js manifest.json sw.js recipes.json dist/
+        cp index.html style.css core.js ui.js local-recipe-ui-integration.js app.js recipeDataManager.js test.js manifest.json sw.js recipes.json dist/
 
         # iconsディレクトリも含める
         if [ -d "icons" ]; then
@@ -144,6 +144,39 @@ jobs:
         fi
 
         echo "✅ ウェブアセット準備完了（BOC-109新アーキテクチャ: core.js, ui.js, local-recipe-ui-integration.js含む）"
+
+    # ========== ChatGPT提案: recipes.json検証フェーズ ==========
+    - name: Validate recipes.json exists in dist
+      run: |
+        echo "🔍 ChatGPT提案: recipes.json検証開始"
+
+        # recipes.jsonの存在確認
+        if [ ! -f "./dist/recipes.json" ]; then
+          echo "❌ dist/recipes.json not found"
+          ls -la dist || true
+          exit 1
+        fi
+
+        # JSON形式検証（ChatGPT提案の堅牢検証）
+        node -e "
+          const fs=require('fs');
+          const s=fs.readFileSync('dist/recipes.json','utf8');
+          const j=JSON.parse(s);
+          if(!Array.isArray(j) && !Array.isArray(j.recipes) && !(j.data && Array.isArray(j.data.recipes))){
+            console.error('❌ Invalid recipes.json format');
+            process.exit(2);
+          }
+          console.log('✅ recipes.json format validation passed');
+          if(Array.isArray(j)) {
+            console.log('📊 Format: Direct array,', j.length, 'recipes');
+          } else if(Array.isArray(j.recipes)) {
+            console.log('📊 Format: {recipes: [...]},', j.recipes.length, 'recipes');
+          } else if(j.data && Array.isArray(j.data.recipes)) {
+            console.log('📊 Format: {data: {recipes: [...]}},', j.data.recipes.length, 'recipes');
+          }
+        "
+
+        echo "✅ recipes.json検証完了"
 
     - name: Initialize and Sync Capacitor Project
       run: |
@@ -247,6 +280,47 @@ jobs:
           echo "❌ APK生成失敗"
           exit 1
         fi
+
+    # ========== ChatGPT提案: APK内recipes.json確認フェーズ ==========
+    - name: Check APK contents for recipes.json
+      env:
+        VERSION_TAG: ${{ env.VERSION_TAG }}
+      run: |
+        echo "🔍 ChatGPT提案: APK内recipes.json確認開始"
+
+        APK_PATH="android/app/build/outputs/apk/release/petit-recipe_$VERSION_TAG.apk"
+
+        # APK内のファイルリストを確認
+        echo "📋 APK内容確認:"
+        unzip -l "$APK_PATH" | grep -E "\.(html|css|js|json)$" || echo "ウェブアセットファイルなし"
+
+        # recipes.jsonの存在確認
+        unzip -l "$APK_PATH" | grep recipes.json || (
+          echo "❌ recipes.json not found in APK"
+          echo "📋 APK内容詳細:"
+          unzip -l "$APK_PATH"
+          exit 1
+        )
+
+        echo "✅ recipes.json found in APK"
+
+        # APK内のrecipes.jsonを抽出して内容確認
+        unzip -p "$APK_PATH" assets/public/recipes.json > /tmp/extracted-recipes.json 2>/dev/null || \
+        unzip -p "$APK_PATH" assets/recipes.json > /tmp/extracted-recipes.json 2>/dev/null || \
+        unzip -p "$APK_PATH" recipes.json > /tmp/extracted-recipes.json 2>/dev/null || (
+          echo "⚠️ recipes.jsonの抽出に失敗（パスが想定と異なる可能性）"
+          echo "📋 assetsディレクトリ内容:"
+          unzip -l "$APK_PATH" | grep assets || echo "assetsディレクトリなし"
+        )
+
+        if [ -f "/tmp/extracted-recipes.json" ]; then
+          echo "📊 抽出されたrecipes.json内容確認:"
+          head -10 /tmp/extracted-recipes.json
+          echo "..."
+          echo "📏 ファイルサイズ: $(wc -c < /tmp/extracted-recipes.json) bytes"
+        fi
+
+        echo "✅ APK内recipes.json確認完了"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4

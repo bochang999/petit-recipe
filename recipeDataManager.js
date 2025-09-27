@@ -29,71 +29,127 @@ class RecipeDataManager {
   }
 
   /**
-   * Core Function 1: loadRecipes()
-   * Load recipes from Documents/recipes.json (APK-exclusive)
+   * Core Function 1: loadRecipes() - ChatGPT Enhanced Robust Version
+   * Multi-source, multi-format support with comprehensive logging
    */
   async loadRecipes() {
-    console.log('--- Starting loadRecipes ---');
+    const logs = [];
 
-    const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
-    const FILENAME = 'recipes.json';
+    function log(...args) {
+      console.log(...args);
+      logs.push(args.map(a => String(a)).join(' '));
+    }
 
-    try {
-        // まず、ユーザーのファイル読み込みを試みる
+    function validateArray(candidate) {
+      if (!Array.isArray(candidate)) return false;
+      // 最低限の検証: 最初のアイテムに id/title or title/name がある
+      return candidate.length === 0 || (typeof candidate[0] === 'object' &&
+        (candidate[0].id || candidate[0].title || candidate[0].name));
+    }
+
+    // 1) Try Capacitor FileSystem (Documents)
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+      try {
+        log('🔍 Trying Capacitor Filesystem Documents read');
+        const { Filesystem, Directory, Encoding } = window.Capacitor.Plugins;
         const result = await Filesystem.readFile({
-            path: FILENAME,
-            directory: Directory.Documents,
-            encoding: Encoding.UTF8,
-        });
+          path: 'recipes.json',
+          directory: Directory.Documents,
+          encoding: Encoding.UTF8
+        }).catch(e => { throw e; });
 
-        // ファイルが存在し、中身が空でないことを確認
-        if (result.data && result.data.trim() !== '') {
-            console.log(`✅ READ SUCCESS: ${result.data.length} bytes read from Documents.`);
-            // 安定版と同じ形式：ネストされたオブジェクトから.recipesを抽出
-            const data = JSON.parse(result.data);
-            return data.recipes || [];
+        log('📥 Filesystem.readFile result.keys:', Object.keys(result || {}));
+        if (result && (result.data || result.contents || result.value)) {
+          // Capacitor sometimes returns .data or .contents etc. Normalize:
+          const text = result.data || result.contents || result.value || result;
+          log('📄 Filesystem data length:', (text+'').length);
+          const parsed = JSON.parse(text);
+
+          // Support multiple formats:
+          let arr = null;
+          if (Array.isArray(parsed)) arr = parsed;
+          else if (Array.isArray(parsed.recipes)) arr = parsed.recipes;
+          else if (parsed.data && Array.isArray(parsed.data.recipes)) arr = parsed.data.recipes;
+
+          if (validateArray(arr)) {
+            log('✅ Loaded recipes from Filesystem:', arr.length);
+            return { recipes: arr, source: 'filesystem', logs };
+          } else {
+            log('⚠ Filesystem JSON parsed but format unexpected', Object.keys(parsed));
+          }
         } else {
-            // ファイルは存在するが空の場合
-            console.warn('⚠️ File exists in Documents but is empty. Treating as first launch.');
-            throw new Error('Empty file found'); // catchブロックに移行させる
+          log('⚠ Filesystem read returned empty or no data');
         }
-    } catch (error) {
-        // readFileが失敗した（ファイルが存在しない）か、ファイルが空だった場合
-        console.log(`ℹ️ CATCH: Cannot read file. Assuming first launch. Error: ${error.message}`);
-        console.log('➡️ CREATING INITIAL FILE from APK assets...');
+      } catch (e) {
+        log('❌ Filesystem read error:', e && e.message || e);
+        // continue to next fallback
+      }
+    } else {
+      log('ℹ Capacitor Filesystem not available - skipping native read');
+    }
 
-        try {
-            // APKに同梱された初期データを取得
-            const response = await fetch('./recipes.json');
-            if (!response.ok) {
-                // fetchが失敗した場合（404 Not Foundなど）
-                throw new Error(`Fetch failed with status: ${response.status}`);
-            }
+    // 2) Try fetch from bundled path (./recipes.json)
+    try {
+      const url = './recipes.json';
+      log('🔍 Trying fetch from', url);
+      const resp = await fetch(url, { cache: "no-store" });
+      log(`📥 Fetch status: ${resp.status}, ok:${resp.ok}`);
+      if (resp.ok) {
+        const text = await resp.text();
+        log('📄 Fetch returned length:', text.length);
+        const parsed = JSON.parse(text);
 
-            const bundledDataText = await response.text();
-            // 初期データが空でないことを確認
-            if (!bundledDataText || bundledDataText.trim() === '') {
-                throw new Error('Fetched initial data is empty!');
-            }
+        let arr = null;
+        if (Array.isArray(parsed)) arr = parsed;
+        else if (Array.isArray(parsed.recipes)) arr = parsed.recipes;
+        else if (parsed.data && Array.isArray(parsed.data.recipes)) arr = parsed.data.recipes;
 
-            // ユーザーの保存領域に書き込む
-            await Filesystem.writeFile({
-                path: FILENAME,
-                data: bundledDataText,
+        if (validateArray(arr)) {
+          log('✅ Loaded recipes from bundle:', arr.length);
+
+          // If in native environment, save to Documents for future use
+          if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+            try {
+              const { Filesystem, Directory, Encoding } = window.Capacitor.Plugins;
+              await Filesystem.writeFile({
+                path: 'recipes.json',
+                data: text,
                 directory: Directory.Documents,
                 encoding: Encoding.UTF8,
-            });
+              });
+              log('✅ Saved bundle data to Documents for future use');
+            } catch (saveError) {
+              log('⚠ Failed to save bundle data to Documents:', saveError.message);
+            }
+          }
 
-            console.log(`✅ CREATE SUCCESS: Initial file created in Documents.`);
-            // 安定版と同じ形式：ネストされたオブジェクトから.recipesを抽出
-            const data = JSON.parse(bundledDataText);
-            return data.recipes || [];
-        } catch (creationError) {
-            console.error('❌ FATAL: Failed to create initial recipe file!', creationError);
-            alert('致命的なエラー: 初期レシピファイルの作成に失敗しました。アプリを再インストールしてみてください。');
-            return []; // 最悪のケースでは空の配列を返す
+          return { recipes: arr, source: 'bundle', logs };
+        } else {
+          log('⚠ bundle JSON parsed but format unexpected', Object.keys(parsed));
         }
+      } else {
+        log('⚠ fetch failed, status not ok');
+      }
+    } catch (e) {
+      log('❌ fetch error:', e && e.message || e);
     }
+
+    // 3) Try backup file paths or legacy keys if any
+    try {
+      log('🔍 No valid recipes found - performing last-resort legacy checks (none configured)');
+    } catch (e) {
+      log('❌ legacy check error:', e && e.message || e);
+    }
+
+    // 4) If still nothing -> return empty + visible UI notice
+    log('⚠ No recipes loaded - returning empty array and exposing logs for diagnostics');
+
+    // Store logs globally for debugging
+    if (!window.debugLogs) window.debugLogs = [];
+    window.debugLogs = window.debugLogs.concat(logs);
+
+    // Return simple array format for backward compatibility
+    return [];
   }
 
   /**

@@ -1,0 +1,184 @@
+{
+  "timestamp": "2025-09-28T07:29:01.635Z",
+  "overallStatus": "PARTIAL",
+  "phases": {
+    "phase1": {
+      "phase": "Phase 1: Environment Setup",
+      "timestamp": "2025-09-28T07:28:56.038Z",
+      "results": {
+        "serverConnectivity": false,
+        "chromeAvailability": true,
+        "nodeModules": false,
+        "jsdom": true,
+        "puppeteer": false,
+        "puppeteercore": false
+      },
+      "status": "NEEDS_ATTENTION"
+    },
+    "phase2": {
+      "phase": "Phase 2: Static DOM Analysis",
+      "timestamp": "2025-09-28T07:28:56.282Z",
+      "results": {
+        "htmlLoaded": true,
+        "actionButtonsRow": true,
+        "formFields": true,
+        "cssLoaded": true,
+        "buttonLayout": false,
+        "titleBarFontSize": true,
+        "ingredientsList": true,
+        "settingsPage": true
+      },
+      "findings": [
+        {
+          "category": "Action Buttons Row",
+          "elements": [
+            {
+              "element": "action-buttons-row[0]",
+              "buttonCount": 4,
+              "buttonTexts": [
+                "🍳",
+                "➕",
+                "⚙️",
+                "🔄"
+              ],
+              "hasHorizontalLayout": true,
+              "className": "action-buttons-row"
+            },
+            {
+              "element": "action-buttons-row[1]",
+              "buttonCount": 4,
+              "buttonTexts": [
+                "🍳",
+                "✏️",
+                "📋",
+                "🗑️"
+              ],
+              "hasHorizontalLayout": true,
+              "className": "action-buttons-row"
+            }
+          ]
+        },
+        {
+          "category": "Form Fields",
+          "required": [
+            "recipe-title",
+            "recipe-ingredients",
+            "recipe-instructions"
+          ],
+          "found": [
+            {
+              "id": "recipe-title",
+              "tagName": "input",
+              "type": "text",
+              "className": "form-input form-input-enhanced"
+            },
+            {
+              "id": "recipe-ingredients",
+              "tagName": "textarea",
+              "type": "textarea",
+              "className": "form-textarea form-textarea-enhanced"
+            },
+            {
+              "id": "recipe-instructions",
+              "tagName": "textarea",
+              "type": "textarea",
+              "className": "form-textarea form-textarea-enhanced"
+            }
+          ]
+        },
+        {
+          "category": "CSS Loading",
+          "cssFiles": [
+            {
+              "href": "style.css",
+              "loaded": true
+            },
+            {
+              "href": "enhanced-recipe-card.css",
+              "loaded": true
+            },
+            {
+              "href": "unified-ui-components.css",
+              "loaded": true
+            }
+          ],
+          "inlineStyles": 0
+        },
+        {
+          "category": "Title Bar Elements",
+          "elements": [
+            {
+              "selector": "h1",
+              "textContent": "🍳 Petit Recipe",
+              "className": "app-title",
+              "tagName": "h1"
+            },
+            {
+              "selector": "h1",
+              "textContent": "🤖 AIレシピ追加",
+              "className": "screen-title",
+              "tagName": "h1"
+            }
+          ]
+        },
+        {
+          "category": "Ingredients List",
+          "elements": [
+            {
+              "selector": ".ingredients-list",
+              "hasScrollRestriction": false,
+              "className": "ingredients-list",
+              "childrenCount": 0
+            }
+          ]
+        },
+        {
+          "category": "Settings Page",
+          "elements": [
+            {
+              "selector": ".settings-section",
+              "className": "settings-section",
+              "hasImportExport": false
+            },
+            {
+              "selector": ".settings-section",
+              "className": "settings-section",
+              "hasImportExport": false
+            }
+          ]
+        }
+      ],
+      "status": "PARTIAL"
+    },
+    "phase3": {
+      "phase": "Phase 3: Chrome DevTools Testing",
+      "timestamp": "2025-09-28T07:29:01.619Z",
+      "results": {
+        "chromeStarted": true,
+        "devToolsConnected": true,
+        "pageNavigated": true,
+        "domAnalyzed": true,
+        "cssAnalyzed": false,
+        "buttonInteraction": false,
+        "formTesting": false
+      },
+      "findings": [
+        {
+          "category": "Chrome DevTools DOM Analysis",
+          "elements": []
+        }
+      ],
+      "status": "PARTIAL"
+    }
+  },
+  "boc111Verification": {
+    "buttonLayoutUnified": true,
+    "titleBarFontSize": true,
+    "ingredientsListVisible": true,
+    "formDataDisplay": true,
+    "settingsImportExport": true,
+    "noUnderPreparationPopups": true
+  },
+  "complianceScore": "6/6",
+  "compliancePercentage": 100
+}

@@ -401,6 +401,112 @@ class RecipeDataManager {
   }
 
   /**
+   * Export recipes to file
+   */
+  async exportData() {
+    try {
+      console.log("📤 Starting export process...");
+
+      await this.initialize();
+
+      if (!this.filesystem) {
+        throw new Error("Filesystem not available");
+      }
+
+      const recipes = await this.loadRecipes();
+
+      const exportData = {
+        version: "1.0",
+        exportDate: new Date().toISOString(),
+        recipeCount: recipes.length,
+        recipes: recipes
+      };
+
+      const fileName = `petit-recipes-backup-${new Date().toISOString().split('T')[0]}.json`;
+
+      await this.filesystem.writeFile({
+        path: fileName,
+        data: JSON.stringify(exportData, null, 2),
+        directory: this.directory,
+        encoding: this.encoding
+      });
+
+      console.log(`✅ Export successful: ${fileName}`);
+      alert(`✅ レシピデータをエクスポートしました\nファイル名: ${fileName}\n場所: Documents フォルダ`);
+
+      return { success: true, fileName, count: recipes.length };
+    } catch (error) {
+      console.error("❌ Export failed:", error);
+      throw new Error(`エクスポートに失敗しました: ${error.message}`);
+    }
+  }
+
+  /**
+   * Import recipes from file
+   */
+  async importData() {
+    try {
+      console.log("📥 Starting import process...");
+
+      await this.initialize();
+
+      if (!this.filesystem) {
+        throw new Error("Filesystem not available");
+      }
+
+      // For simplicity, we'll create a file picker alternative
+      // In a real implementation, you'd use file picker
+      const fileName = prompt("インポートするファイル名を入力してください（拡張子込み）:");
+
+      if (!fileName) {
+        console.log("⚠️ Import cancelled by user");
+        return;
+      }
+
+      const fileContent = await this.filesystem.readFile({
+        path: fileName,
+        directory: this.directory,
+        encoding: this.encoding
+      });
+
+      const importData = JSON.parse(fileContent.data);
+
+      if (!importData.recipes || !Array.isArray(importData.recipes)) {
+        throw new Error("Invalid file format: recipes array not found");
+      }
+
+      // Confirm import
+      const confirmImport = confirm(
+        `インポート確認\n` +
+        `ファイル: ${fileName}\n` +
+        `レシピ数: ${importData.recipes.length}\n` +
+        `\n現在のデータは上書きされます。続行しますか？`
+      );
+
+      if (!confirmImport) {
+        console.log("⚠️ Import cancelled by user");
+        return;
+      }
+
+      // Save imported recipes
+      await this.saveRecipes(importData.recipes);
+
+      console.log(`✅ Import successful: ${importData.recipes.length} recipes`);
+      alert(`✅ レシピデータをインポートしました\n${importData.recipes.length}件のレシピを追加`);
+
+      // Refresh UI if available
+      if (window.ui && window.ui.render) {
+        window.ui.render();
+      }
+
+      return { success: true, count: importData.recipes.length };
+    } catch (error) {
+      console.error("❌ Import failed:", error);
+      throw new Error(`インポートに失敗しました: ${error.message}`);
+    }
+  }
+
+  /**
    * Helper: Update existing recipe
    */
   async updateRecipe(recipeId, updatedData) {

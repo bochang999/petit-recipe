@@ -300,12 +300,13 @@
 
 /* === Action Buttons Row - Second Line Layout === */
 .action-buttons-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 16px;
-  margin-bottom: 16px;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 12px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px 16px !important;
+  margin-bottom: 16px !important;
   background: var(--card-bg-gradient);
   border-radius: var(--card-border-radius);
   box-shadow: var(--card-shadow);
@@ -319,6 +320,23 @@
   font-size: 14px;
   min-width: 44px;
   height: 44px;
+}
+
+/* === 詳細ページタイトルバー調整 === */
+.recipe-detail .screen-header h1 {
+  font-size: 1.3rem !important; /* 2rem → 1.3rem */
+  line-height: 1.2 !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  max-width: calc(100% - 120px) !important; /* 戻るボタン分考慮 */
+}
+
+/* レシピ詳細タイトル特別対応 */
+.recipe-title-detail {
+  font-size: 1.3rem !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  padding: 8px 16px !important;
 }
 
 /* === Recipe Detail Page - Ingredients & Steps === */

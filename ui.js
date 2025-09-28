@@ -503,13 +503,18 @@ const ui = {
       'button[onclick*="exportData"]',
     );
     if (exportButton) {
-      exportButton.addEventListener("click", () => {
+      exportButton.addEventListener("click", async () => {
         console.log("📦 Export button clicked");
-        if (window.app && window.app.exportData) {
-          window.app.exportData();
-        } else {
-          console.error("❌ app.exportData not available");
-          alert("エクスポート機能は準備中です");
+        try {
+          if (window.recipeDataManager && window.recipeDataManager.exportData) {
+            await window.recipeDataManager.exportData();
+          } else {
+            console.error("❌ recipeDataManager.exportData not available");
+            alert("エクスポート機能が利用できません");
+          }
+        } catch (error) {
+          console.error("❌ Export failed:", error);
+          alert(`エクスポートに失敗しました: ${error.message}`);
         }
       });
       console.log("✅ Export button connected");
@@ -519,13 +524,18 @@ const ui = {
       'button[onclick*="importData"]',
     );
     if (importButton) {
-      importButton.addEventListener("click", () => {
+      importButton.addEventListener("click", async () => {
         console.log("📥 Import button clicked");
-        if (window.app && window.app.importData) {
-          window.app.importData();
-        } else {
-          console.error("❌ app.importData not available");
-          alert("インポート機能は準備中です");
+        try {
+          if (window.recipeDataManager && window.recipeDataManager.importData) {
+            await window.recipeDataManager.importData();
+          } else {
+            console.error("❌ recipeDataManager.importData not available");
+            alert("インポート機能が利用できません");
+          }
+        } catch (error) {
+          console.error("❌ Import failed:", error);
+          alert(`インポートに失敗しました: ${error.message}`);
         }
       });
       console.log("✅ Import button connected");

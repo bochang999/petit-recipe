@@ -447,7 +447,21 @@ const app = {
 
       let ingredientsText = '';
       if (Array.isArray(ingredients)) {
-        ingredientsText = ingredients.join('\n');
+        ingredientsText = ingredients.map(ingredient => {
+          if (typeof ingredient === 'string') {
+            return ingredient;
+          } else if (ingredient && typeof ingredient === 'object') {
+            // オブジェクトの場合、name: amount 形式で変換
+            if (ingredient.name && ingredient.amount) {
+              return `${ingredient.name}: ${ingredient.amount}`;
+            } else if (ingredient.name) {
+              return ingredient.name;
+            } else {
+              return JSON.stringify(ingredient);
+            }
+          }
+          return String(ingredient);
+        }).join('\n');
       } else if (typeof ingredients === 'string') {
         ingredientsText = ingredients;
       } else {

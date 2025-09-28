@@ -429,46 +429,6 @@ const app = {
     this.deleteRecipe(this.selectedRecipe.id);
   },
 
-  /**
-   * Delete recipe by ID
-   */
-  deleteRecipe(recipeId) {
-    console.log(`🗑️ Deleting recipe with ID: ${recipeId}`);
-
-    const recipeIndex = this.recipes.findIndex(
-      (recipe) => recipe.id === recipeId,
-    );
-
-    if (recipeIndex === -1) {
-      console.error(`❌ Recipe not found with ID: ${recipeId}`);
-      alert("削除するレシピが見つかりません");
-      return;
-    }
-
-    const deletedRecipe = this.recipes[recipeIndex];
-
-    // Remove from recipes array
-    this.recipes.splice(recipeIndex, 1);
-
-    // Save to storage if available
-    if (
-      window.recipeDataManager &&
-      typeof window.recipeDataManager.saveRecipes === "function"
-    ) {
-      window.recipeDataManager.saveRecipes(this.recipes);
-    }
-
-    // Navigate back to main screen
-    this.navigateBack();
-
-    // Refresh UI
-    if (window.ui) {
-      window.ui.render();
-    }
-
-    alert(`✅ レシピを削除しました\nレシピ名: ${deletedRecipe.name}`);
-    console.log(`✅ Recipe deleted: ${deletedRecipe.name}`);
-  },
 };
 
 // Make app globally available

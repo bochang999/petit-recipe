@@ -732,12 +732,10 @@ window.initializeAndLoadRecipes = async function () {
 
     return { version: "1.0", recipes: [] };
   }
+};
 
-  /**
-   * Core Function 2: saveRecipes() - Save recipes array to Documents/recipes.json
-   * @param {Array} recipes - Array of recipe objects to save
-   */
-  async saveRecipes(recipes) {
+// Extending existing RecipeDataManager class with saveRecipes method
+RecipeDataManager.prototype.saveRecipes = async function(recipes) {
     console.log("💾 BOC-111: Saving recipes to file", recipes.length);
 
     try {
@@ -764,7 +762,6 @@ window.initializeAndLoadRecipes = async function () {
       console.error("❌ BOC-111: Failed to save recipes:", error);
       throw error;
     }
-  }
 };
 
 // Create global instance for app integration

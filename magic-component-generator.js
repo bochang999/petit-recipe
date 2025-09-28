@@ -73,7 +73,7 @@ class MagicComponentGenerator {
     console.log('🔮 Using Magic MCP for generation...');
 
     try {
-      const prompt = this.createMagicPrompt(specs);
+      const _prompt = this.createMagicPrompt(specs);
 
       // This would be the actual Magic MCP call
       // const generated = await window.Magic.generate(prompt);

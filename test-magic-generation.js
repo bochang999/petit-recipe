@@ -178,7 +178,7 @@ async function testPetitRecipeIntegration() {
     console.log(`📊 Found ${recipes.length} recipes for integration test`);
 
     // Generate component for first recipe
-    const firstRecipe = recipes[0];
+    const _firstRecipe = recipes[0];
     const testResult = await testMagicGeneration();
 
     if (testResult.success) {

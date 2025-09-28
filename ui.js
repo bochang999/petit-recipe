@@ -1228,8 +1228,23 @@ window.testBOC100Functions = () => window.ui.testBOC100Functions();
 window.diagnoseRecipeIdProblem = () => window.ui.diagnoseRecipeIdProblem();
 window.clearBOC100Logs = () => window.ui.clearBOC100Logs();
 
-// NOTE: Event listeners are now set up by core.js after initialization
-// This ensures proper initialization order: core.js → data loading → UI render → event listeners
+// Setup event listeners when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log("🔗 DOM loaded, setting up UI event listeners");
+    if (window.ui && window.ui.setupEventListeners) {
+      window.ui.setupEventListeners();
+    }
+  });
+} else {
+  // DOM is already loaded
+  setTimeout(() => {
+    console.log("🔗 DOM already loaded, setting up UI event listeners");
+    if (window.ui && window.ui.setupEventListeners) {
+      window.ui.setupEventListeners();
+    }
+  }, 100);
+}
 
 // Re-render when app is initialized or refreshed
 document.addEventListener("DOMContentLoaded", () => {

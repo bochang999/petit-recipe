@@ -20,12 +20,34 @@ class RecipeDataManager {
    * Initialize Capacitor FileSystem (APK-exclusive)
    */
   async initialize() {
-    // APK-exclusive: Direct Capacitor plugin access
-    const { Filesystem, Directory, Encoding } = Capacitor.Plugins;
-    this.filesystem = Filesystem;
-    this.directory = Directory.Documents;
-    this.encoding = Encoding.UTF8;
-    console.log("✅ APK-exclusive Capacitor FileSystem initialized");
+    try {
+      // Modern Capacitor: Try direct plugin access first
+      if (window.Capacitor && window.Capacitor.Plugins) {
+        const { Filesystem, Directory, Encoding } = window.Capacitor.Plugins;
+        this.filesystem = Filesystem;
+        this.directory = Directory.Documents;
+        this.encoding = Encoding.UTF8;
+        console.log("✅ Capacitor FileSystem initialized (Plugins)");
+      } else if (window.Capacitor) {
+        // Fallback: Import plugins directly
+        const { Filesystem } = await import('@capacitor/filesystem');
+        this.filesystem = Filesystem;
+        this.directory = 'DOCUMENTS';
+        this.encoding = 'utf8';
+        console.log("✅ Capacitor FileSystem initialized (Direct Import)");
+      } else {
+        // Web fallback
+        console.log("⚠️ Running in web environment, using localStorage fallback");
+        this.filesystem = null;
+        this.directory = null;
+        this.encoding = null;
+      }
+    } catch (error) {
+      console.error("❌ Failed to initialize Capacitor FileSystem:", error);
+      this.filesystem = null;
+      this.directory = null;
+      this.encoding = null;
+    }
   }
 
   /**

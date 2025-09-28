@@ -298,6 +298,136 @@
   margin-right: auto;
 }
 
+/* === Action Buttons Row - Second Line Layout === */
+.action-buttons-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  background: var(--card-bg-gradient);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  border: var(--card-border);
+}
+
+.action-buttons-row .action-btn-enhanced {
+  flex: 1;
+  max-width: 120px;
+  padding: 10px 12px;
+  font-size: 14px;
+  min-width: 44px;
+  height: 44px;
+}
+
+/* === Recipe Detail Page - Ingredients & Steps === */
+.ingredients-section,
+.steps-section {
+  background: var(--card-bg-gradient);
+  border: var(--card-border);
+  border-radius: var(--card-border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: var(--card-transition);
+}
+
+.ingredients-section:hover,
+.steps-section:hover {
+  transform: var(--hover-transform);
+  box-shadow: var(--card-shadow-hover);
+  background: var(--card-bg-hover);
+}
+
+.ingredients-section h3,
+.steps-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(52, 152, 219, 0.1);
+}
+
+.ingredients-list {
+  /* Remove any scroll restrictions and ensure natural height */
+  max-height: none !important;
+  overflow: visible !important;
+  height: auto !important;
+
+  /* Add nice spacing between ingredients */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ingredients-list .ingredient-item {
+  background: rgba(52, 152, 219, 0.05);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 3px solid var(--primary-blue);
+  font-size: 14px;
+  line-height: 1.4;
+  transition: var(--card-transition);
+}
+
+.ingredients-list .ingredient-item:hover {
+  background: rgba(52, 152, 219, 0.1);
+  transform: translateX(4px);
+}
+
+.steps-list {
+  /* Ensure steps also display naturally without scroll */
+  max-height: none !important;
+  overflow: visible !important;
+  height: auto !important;
+
+  /* Add nice spacing between steps */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.steps-list .step-item {
+  background: rgba(39, 174, 96, 0.05);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 3px solid var(--success-color);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: var(--card-transition);
+  position: relative;
+}
+
+.steps-list .step-item:hover {
+  background: rgba(39, 174, 96, 0.1);
+  transform: translateX(4px);
+}
+
+.steps-list .step-item::before {
+  content: counter(step-counter);
+  counter-increment: step-counter;
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--success-color);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.steps-list {
+  counter-reset: step-counter;
+}
+
 /* === Responsive Design === */
 @media (max-width: 768px) {
   .sort-tabs {
@@ -321,5 +451,17 @@
 
   .setting-item-enhanced {
     padding: 16px;
+  }
+
+  .ingredients-section,
+  .steps-section {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .ingredients-list .ingredient-item,
+  .steps-list .step-item {
+    padding: 8px 12px;
+    font-size: 13px;
   }
 }

@@ -349,15 +349,36 @@ const app = {
   showAddRecipeForm() {
     console.log("➕ Showing add recipe form");
 
-    // Clear the form
-    const form = document.getElementById('add-recipe-form');
-    if (form) {
-      form.reset();
-    }
+    // Reset edit mode
+    this.editMode = false;
+    this.editingRecipeId = null;
 
-    // Navigate to add recipe screen
+    // Navigate to add recipe screen first
     if (window.ui && window.ui.showScreen) {
       window.ui.showScreen('add-recipe-screen');
+
+      // Use setTimeout to ensure screen is visible before clearing form
+      setTimeout(() => {
+        // Clear the form
+        const form = document.getElementById('add-recipe-form');
+        if (form) {
+          form.reset();
+        }
+
+        // Reset form title to add mode
+        const formTitle = document.querySelector('#add-recipe-screen .screen-header h2');
+        if (formTitle) {
+          formTitle.textContent = '新しいレシピを追加';
+        }
+
+        // Hide edit mode indicator
+        const editIndicator = document.getElementById('edit-mode-indicator');
+        if (editIndicator) {
+          editIndicator.style.display = 'none';
+        }
+
+        console.log("✅ Add recipe form reset to add mode");
+      }, 100);
     } else {
       console.error("❌ UI navigation not available");
       alert("❌ レシピ追加画面を開けません");
@@ -380,8 +401,11 @@ const app = {
 
     // Navigate to add recipe screen with edit mode
     if (window.ui && window.ui.showScreen) {
-      this.populateEditForm();
       window.ui.showScreen('add-recipe-screen');
+      // Use setTimeout to ensure screen is visible before populating form
+      setTimeout(() => {
+        this.populateEditForm();
+      }, 100);
     } else {
       console.error("❌ UI navigation not available");
       alert("❌ レシピ編集画面を開けません");
@@ -392,39 +416,85 @@ const app = {
    * Populate edit form with current recipe data
    */
   populateEditForm() {
-    if (!this.selectedRecipe) return;
+    console.log("🔄 Populating edit form with recipe data");
+
+    if (!this.selectedRecipe) {
+      console.error("❌ No selected recipe to populate form");
+      return;
+    }
+
+    console.log("📝 Selected recipe data:", this.selectedRecipe);
 
     const titleInput = document.getElementById('recipe-title');
     const ingredientsInput = document.getElementById('recipe-ingredients');
     const instructionsInput = document.getElementById('recipe-instructions');
 
+    console.log("🔍 Form elements found:", {
+      titleInput: !!titleInput,
+      ingredientsInput: !!ingredientsInput,
+      instructionsInput: !!instructionsInput
+    });
+
     if (titleInput) {
-      titleInput.value = this.selectedRecipe.title || this.selectedRecipe.name || '';
+      const title = this.selectedRecipe.title || this.selectedRecipe.name || '';
+      titleInput.value = title;
+      console.log("✅ Title populated:", title);
     }
 
     if (ingredientsInput) {
       const ingredients = this.selectedRecipe.ingredients || [];
-      ingredientsInput.value = Array.isArray(ingredients)
-        ? ingredients.join('\n')
-        : ingredients;
+      console.log("📋 Raw ingredients data:", ingredients, "Type:", typeof ingredients);
+
+      let ingredientsText = '';
+      if (Array.isArray(ingredients)) {
+        ingredientsText = ingredients.join('\n');
+      } else if (typeof ingredients === 'string') {
+        ingredientsText = ingredients;
+      } else {
+        ingredientsText = String(ingredients);
+      }
+
+      ingredientsInput.value = ingredientsText;
+      console.log("✅ Ingredients populated:", ingredientsText);
     }
 
     if (instructionsInput) {
       const instructions = this.selectedRecipe.instructions || [];
-      instructionsInput.value = Array.isArray(instructions)
-        ? instructions.join('\n')
-        : instructions;
+      console.log("📋 Raw instructions data:", instructions, "Type:", typeof instructions);
+
+      let instructionsText = '';
+      if (Array.isArray(instructions)) {
+        instructionsText = instructions.join('\n');
+      } else if (typeof instructions === 'string') {
+        instructionsText = instructions;
+      } else {
+        instructionsText = String(instructions);
+      }
+
+      instructionsInput.value = instructionsText;
+      console.log("✅ Instructions populated:", instructionsText);
     }
 
     // Mark as edit mode
     this.editMode = true;
     this.editingRecipeId = this.selectedRecipe.id;
+    console.log("✏️ Edit mode activated for recipe ID:", this.editingRecipeId);
 
     // Update form title
     const formTitle = document.querySelector('#add-recipe-screen .screen-header h2');
     if (formTitle) {
       formTitle.textContent = 'レシピ編集';
+      console.log("✅ Form title updated to edit mode");
     }
+
+    // Show edit mode indicator
+    const editIndicator = document.getElementById('edit-mode-indicator');
+    if (editIndicator) {
+      editIndicator.style.display = 'block';
+      console.log("✅ Edit mode indicator shown");
+    }
+
+    console.log("🎯 Edit form population completed successfully");
   },
 
   /**

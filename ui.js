@@ -801,7 +801,7 @@ const ui = {
 
       // Convert to JSON
       const jsonData = JSON.stringify(exportData, null, 2);
-      const blob = new Blob([jsonData], { type: "application/json" });
+      const _blob = new Blob([jsonData], { type: "application/json" });
 
       // Create download
       const timestamp = new Date()
@@ -855,7 +855,7 @@ const ui = {
         }
 
         // Try to find backup files in Documents
-        const { Filesystem, Directory, Encoding } = window.Capacitor.Plugins;
+        const { Filesystem, Directory, Encoding: _Encoding } = window.Capacitor.Plugins;
 
         try {
           const files = await Filesystem.readdir({

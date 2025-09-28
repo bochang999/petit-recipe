@@ -810,8 +810,8 @@ const ui = {
         .replace(/:/g, "-");
       const filename = `petit-recipe-backup-${timestamp}.json`;
 
-      if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-        // APK environment - use Capacitor FileSystem
+      // Use Capacitor FileSystem (same as recipeDataManager.js)
+      if (window.Capacitor && window.Capacitor.Plugins) {
         const { Filesystem, Directory, Encoding } = window.Capacitor.Plugins;
 
         await Filesystem.writeFile({
@@ -825,19 +825,7 @@ const ui = {
           `✅ データをエクスポートしました: Documents/${filename}\n\nレシピ数: ${recipes.length}件`,
         );
       } else {
-        // Web environment - use download
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        alert(
-          `✅ データをエクスポートしました: ${filename}\n\nレシピ数: ${recipes.length}件`,
-        );
+        throw new Error("Capacitor FileSystem not available");
       }
 
       console.log(`✅ Export completed: ${recipes.length} recipes`);
@@ -854,7 +842,8 @@ const ui = {
     console.log("📥 Starting data import");
 
     try {
-      if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+      // Use Capacitor FileSystem (same as recipeDataManager.js)
+      if (window.Capacitor && window.Capacitor.Plugins) {
         // APK environment - show file picker instructions
         const proceed = confirm(
           "📥 データをインポートしますか？\n\n⚠️ 現在のデータは全て上書きされます。\n\n📁 Documents フォルダにバックアップファイル(*.json)を配置してからOKを押してください。",
@@ -866,7 +855,7 @@ const ui = {
         }
 
         // Try to find backup files in Documents
-        const { Filesystem, Directory } = window.Capacitor.Plugins;
+        const { Filesystem, Directory, Encoding } = window.Capacitor.Plugins;
 
         try {
           const files = await Filesystem.readdir({
@@ -907,28 +896,7 @@ const ui = {
           );
         }
       } else {
-        // Web environment - use file input
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = ".json";
-
-        input.onchange = async (event) => {
-          const file = event.target.files[0];
-          if (!file) return;
-
-          const reader = new FileReader();
-          reader.onload = async (e) => {
-            try {
-              await this.processImportData(e.target.result, file.name);
-            } catch (error) {
-              console.error("❌ Import processing failed:", error);
-              alert(`❌ インポート処理に失敗しました: ${error.message}`);
-            }
-          };
-          reader.readAsText(file);
-        };
-
-        input.click();
+        throw new Error("Capacitor FileSystem not available");
       }
     } catch (error) {
       console.error("❌ Import failed:", error);

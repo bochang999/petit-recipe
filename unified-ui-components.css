@@ -247,6 +247,16 @@
   background: var(--card-bg-hover);
 }
 
+/* === Ingredients Display Fix === */
+.ingredients-list,
+.recipe-ingredients,
+.recipe-detail .ingredients-list,
+.detail-page .ingredients-list {
+  max-height: none !important;
+  overflow: visible !important;
+  height: auto !important;
+}
+
 /* === Header Actions - Recipe Card Style === */
 .header-actions-enhanced {
   display: flex;

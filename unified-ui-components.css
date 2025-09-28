@@ -260,6 +260,44 @@
   min-width: 36px;
 }
 
+/* === Unified Header Actions - Single Line Layout === */
+.header-actions-unified {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.header-actions-unified .action-btn-enhanced {
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 40px;
+  height: 40px;
+}
+
+/* === Screen Header Improvements === */
+.screen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--card-bg-gradient);
+  border-bottom: var(--card-border);
+  gap: 12px;
+}
+
+.screen-header .app-title {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.screen-header .back-button {
+  margin-right: auto;
+}
+
 /* === Responsive Design === */
 @media (max-width: 768px) {
   .sort-tabs {

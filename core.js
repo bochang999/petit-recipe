@@ -344,6 +344,27 @@ const app = {
   },
 
   /**
+   * Show add recipe form
+   */
+  showAddRecipeForm() {
+    console.log("➕ Showing add recipe form");
+
+    // Clear the form
+    const form = document.getElementById('add-recipe-form');
+    if (form) {
+      form.reset();
+    }
+
+    // Navigate to add recipe screen
+    if (window.ui && window.ui.showScreen) {
+      window.ui.showScreen('add-recipe-screen');
+    } else {
+      console.error("❌ UI navigation not available");
+      alert("❌ レシピ追加画面を開けません");
+    }
+  },
+
+  /**
    * Start editing the current recipe
    */
   startEditRecipe() {
@@ -357,8 +378,118 @@ const app = {
 
     console.log(`✏️ Editing recipe: ${this.selectedRecipe.name}`);
 
-    // TODO: Navigate to edit screen and populate with current recipe data
-    alert(`✏️ レシピ編集機能は準備中です\nレシピ: ${this.selectedRecipe.name}`);
+    // Navigate to add recipe screen with edit mode
+    if (window.ui && window.ui.showScreen) {
+      this.populateEditForm();
+      window.ui.showScreen('add-recipe-screen');
+    } else {
+      console.error("❌ UI navigation not available");
+      alert("❌ レシピ編集画面を開けません");
+    }
+  },
+
+  /**
+   * Populate edit form with current recipe data
+   */
+  populateEditForm() {
+    if (!this.selectedRecipe) return;
+
+    const titleInput = document.getElementById('recipe-title');
+    const ingredientsInput = document.getElementById('recipe-ingredients');
+    const instructionsInput = document.getElementById('recipe-instructions');
+
+    if (titleInput) {
+      titleInput.value = this.selectedRecipe.title || this.selectedRecipe.name || '';
+    }
+
+    if (ingredientsInput) {
+      const ingredients = this.selectedRecipe.ingredients || [];
+      ingredientsInput.value = Array.isArray(ingredients)
+        ? ingredients.join('\n')
+        : ingredients;
+    }
+
+    if (instructionsInput) {
+      const instructions = this.selectedRecipe.instructions || [];
+      instructionsInput.value = Array.isArray(instructions)
+        ? instructions.join('\n')
+        : instructions;
+    }
+
+    // Mark as edit mode
+    this.editMode = true;
+    this.editingRecipeId = this.selectedRecipe.id;
+
+    // Update form title
+    const formTitle = document.querySelector('#add-recipe-screen .screen-header h2');
+    if (formTitle) {
+      formTitle.textContent = 'レシピ編集';
+    }
+  },
+
+  /**
+   * Handle recipe form submission (both add and edit)
+   */
+  async handleRecipeFormSubmit(event) {
+    event.preventDefault();
+    console.log("📝 Handling recipe form submission");
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    const recipeData = {
+      title: formData.get('title')?.trim() || '',
+      ingredients: this.parseIngredients(formData.get('ingredients') || ''),
+      instructions: this.parseInstructions(formData.get('instructions') || ''),
+      lastModified: new Date().toISOString()
+    };
+
+    // Validate required fields
+    if (!recipeData.title) {
+      alert('❌ レシピ名を入力してください');
+      return;
+    }
+
+    if (!recipeData.ingredients.length) {
+      alert('❌ 材料を入力してください');
+      return;
+    }
+
+    if (!recipeData.instructions.length) {
+      alert('❌ 作り方を入力してください');
+      return;
+    }
+
+    try {
+      if (this.editMode && this.editingRecipeId) {
+        // Edit mode: update existing recipe
+        console.log(`✏️ Updating recipe ID: ${this.editingRecipeId}`);
+        await this.updateRecipe(this.editingRecipeId, recipeData);
+        alert(`✅ レシピを更新しました！\n「${recipeData.title}」`);
+      } else {
+        // Add mode: create new recipe
+        console.log("➕ Adding new recipe");
+        await this.addRecipe(recipeData);
+        alert(`✅ 新しいレシピを追加しました！\n「${recipeData.title}」`);
+      }
+
+      // Reset form and edit mode
+      form.reset();
+      this.editMode = false;
+      this.editingRecipeId = null;
+
+      // Navigate back to main screen
+      this.navigateBack();
+
+      // Refresh UI
+      if (window.ui) {
+        window.ui.render();
+      }
+
+    } catch (error) {
+      console.error("❌ Failed to save recipe:", error);
+      alert("❌ レシピの保存に失敗しました");
+    }
   },
 
   /**

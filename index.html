@@ -41,7 +41,7 @@
             <header class="screen-header">
                 <h1 class="app-title">🍳 Petit Recipe</h1>
                 <div class="header-actions-unified">
-                    <button class="debug-logs-button action-btn-enhanced" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
+                    <button class="debug-logs-button action-btn-enhanced" title="デバッグログを表示" onclick="if(window.ui && window.ui.showDebugLogs) { window.ui.showDebugLogs(); } else { console.error('❌ Debug function not available'); alert('❌ デバッグ機能が利用できません'); }">🍳</button>
                     <button class="add-recipe-button action-btn-enhanced primary" title="新しいレシピを追加" onclick="window.app.showAddRecipeForm()">➕</button>
                     <button class="settings-button action-btn-enhanced" onclick="window.ui.showScreen('settings-screen')" title="設定">⚙️</button>
                     <button class="refresh-button action-btn-enhanced" title="レシピデータをリロード" onclick="if(window.app && window.app.refresh) { window.app.refresh(); } else { alert('❌ リロード機能が利用できません'); }">🔄</button>
@@ -72,7 +72,7 @@
                 <button class="back-button action-btn-enhanced" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 id="recipe-detail-title">レシピ詳細</h2>
                 <div class="header-actions-unified">
-                    <button class="debug-logs-button action-btn-enhanced" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
+                    <button class="debug-logs-button action-btn-enhanced" title="デバッグログを表示" onclick="if(window.ui && window.ui.showDebugLogs) { window.ui.showDebugLogs(); } else { console.error('❌ Debug function not available'); alert('❌ デバッグ機能が利用できません'); }">🍳</button>
                     <button class="action-btn action-btn-enhanced primary edit-btn" onclick="window.app.startEditRecipe()" title="レシピを編集">
                         ✏️
                     </button>
@@ -112,7 +112,7 @@
         <!-- ▼▼▼ BOC-98: Recipe Addition Screen ▼▼▼ -->
         <div id="add-recipe-screen" class="screen">
             <header class="screen-header">
-                <button class="debug-logs-button" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
+                <button class="debug-logs-button" title="デバッグログを表示" onclick="if(window.ui && window.ui.showDebugLogs) { window.ui.showDebugLogs(); } else { console.error('❌ Debug function not available'); alert('❌ デバッグ機能が利用できません'); }">🍳</button>
                 <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 class="screen-title">新しいレシピを追加</h2>
             </header>
@@ -250,7 +250,7 @@
         <!-- ▼▼▼ BOC-100: Settings Screen ▼▼▼ -->
         <div id="settings-screen" class="screen">
             <header class="screen-header">
-                <button class="debug-logs-button" title="デバッグログを表示" onclick="window.ui.showDebugLogs()">🍳</button>
+                <button class="debug-logs-button" title="デバッグログを表示" onclick="if(window.ui && window.ui.showDebugLogs) { window.ui.showDebugLogs(); } else { console.error('❌ Debug function not available'); alert('❌ デバッグ機能が利用できません'); }">🍳</button>
                 <button class="back-button" onclick="window.app.navigateBack()">← 戻る</button>
                 <h2 class="screen-title">設定</h2>
             </header>

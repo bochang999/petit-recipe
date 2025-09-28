@@ -573,14 +573,32 @@ const ui = {
   showDebugLogs() {
     console.log("🐛 Opening debug logs modal");
 
-    // Show debug panel instead of modal for mobile compatibility
-    const debugPanel = document.getElementById("mobile-debug-panel");
-    if (debugPanel) {
-      debugPanel.style.display = "block";
-      this.refreshDebugLogs();
-      console.log("✅ Debug panel shown");
-    } else {
-      console.error("❌ Debug panel not found");
+    try {
+      // Show debug panel instead of modal for mobile compatibility
+      const debugPanel = document.getElementById("mobile-debug-panel");
+      console.log("🔍 Debug panel element:", debugPanel);
+
+      if (debugPanel) {
+        debugPanel.style.display = "block";
+        debugPanel.style.visibility = "visible";
+        console.log("🔍 Debug panel display set to:", debugPanel.style.display);
+
+        // Refresh debug logs
+        if (typeof this.refreshDebugLogs === 'function') {
+          this.refreshDebugLogs();
+          console.log("✅ Debug panel shown and logs refreshed");
+        } else {
+          console.log("✅ Debug panel shown (refresh function not available)");
+        }
+      } else {
+        console.error("❌ Debug panel not found");
+        // Fallback: create a simple debug alert
+        const logs = this.debugLogs || ['No debug logs available'];
+        alert(`🐛 Debug Logs:\n\n${logs.slice(-10).join('\n')}`);
+      }
+    } catch (error) {
+      console.error("❌ Error in showDebugLogs:", error);
+      alert("❌ デバッグログ機能でエラーが発生しました");
     }
   },
 
